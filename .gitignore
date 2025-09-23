@@ -1,0 +1,10 @@
+# Node (if you later add tooling)
+node_modules/
+.DS_Store
+.env
+
+# OS files
+Thumbs.db
+
+# IDE
+.vscode/

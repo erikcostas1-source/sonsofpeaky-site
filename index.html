@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="pt-br" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sons of Peaky — Manifesto, agenda e planejamento da irmandade de motociclistas.">
+    <meta name="theme-color" content="#0d0d0d">
+    <title>Sons of Peaky - Manifesto</title>
+    <link rel="icon" href="https://i.imgur.com/uG46v5P.jpg" />
+    <!-- Open Graph / Twitter -->
+    <meta property="og:title" content="Sons of Peaky - Manifesto" />
+    <meta property="og:description" content="Manifesto, agenda e planejamento da irmandade Sons of Peaky." />
+    <meta property="og:image" content="https://i.imgur.com/uG46v5P.jpg" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Sons of Peaky - Manifesto" />
+    <meta name="twitter:description" content="Manifesto, agenda e planejamento da irmandade Sons of Peaky." />
+    <meta name="twitter:image" content="https://i.imgur.com/uG46v5P.jpg" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <!-- Modal para confirmação de assinatura -->
+    <div id="modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3 class="text-xl font-bold text-white mb-4">Acordo de Membros</h3>
+            <p id="modal-message" class="text-gray-300 mb-6"></p>
+            <button id="modal-close-btn" class="px-6 py-2 bg-amber-600 text-gray-900 font-bold rounded-full transition-colors duration-200">
+                OK
+            </button>
+        </div>
+    </div>
+
+    <header id="top" class="site-nav text-center py-6 bg-black">
+        <div class="container flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <img src="https://i.imgur.com/uG46v5P.jpg" alt="Logo Sons of Peaky" class="w-16 h-16 rounded-lg shadow-md">
+                <h1 class="text-2xl font-extrabold text-white">Sons of Peaky</h1>
+            </div>
+            <button id="nav-toggle" aria-expanded="false" class="md:hidden px-3 py-2 text-white">☰</button>
+            <nav id="main-nav-menu" class="hidden md:flex items-center space-x-6 text-gray-300">
+                <a href="#historia" class="hover:text-white">Nossa História</a>
+                <a href="#membros" class="hover:text-white">Membros</a>
+                <a href="#agenda" class="hover:text-white">Agenda</a>
+                <a href="#estatuto" class="hover:text-white">Estatuto</a>
+                <a href="#documentos" class="hover:text-white">Documentos</a>
+                <a href="#gemini" class="hover:text-white">Planejamento</a>
+            </nav>
+        </div>
+        <div class="container text-center py-6">
+            <div class="hero">
+                <h2 class="text-3xl md:text-4xl font-extrabold text-white mb-2">Onde a estrada encontra a família.</h2>
+                <p class="text-lg text-gray-400 mb-2">Galpão na Penha · Encontros, passeios e irmandade desde 2021.</p>
+                <div class="mt-4">
+                    <a href="#agenda" class="px-6 py-2 bg-amber-600 text-gray-900 font-bold rounded-full mr-3">Próximos eventos</a>
+                    <a href="#documentos" class="px-6 py-2 border border-gray-600 text-gray-300 rounded-full">Ver documentos</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Seção da História -->
+        <section id="historia" class="py-16 md:py-24">
+            <div class="container">
+                <h2 class="section-title">Nossa História</h2>
+                <div class="card space-y-6 text-gray-300">
+                    <p>O Sons of Peaky é mais do que um grupo de motos; é uma irmandade nascida do asfalto, forjada na lealdade e no compromisso mútuo. Tudo começou com a visão de dois irmãos de sangue, Erik e Ricardo (Brutos), que transformaram uma ideia simples em um refúgio para todos que valorizam a amizade sobre qualquer coisa.</p>
+                    <p>Com a chegada de Lambão e Kazulo, o sonho tomou forma. As viagens em grupo se tornaram o ritual que cimentou nossa união. A inspiração veio das noites de GTA 5 e da lendária série Peaky Blinders, misturando a paixão pela estrada com o espírito inabalável de uma família. Em **25 de maio de 2021**, o Sons of Peaky nasceu, não como um clube, mas como um movimento.</p>
+                    <p>Encontramos nosso lar em **16 de julho de 2021**: um galpão empoeirado de 100 metros quadrados na Penha, SP. Com as próprias mãos e a ajuda de amigos fiéis, transformamos o espaço em nosso santuário: um refúgio com bar, sinuca, fliperama e um acervo de memórias inesquecíveis.</p>
+                    <p>Hoje, nossa família cresceu e se fortaleceu. A Alta Cúpula, liderada por Erik, Brutos, Kazulo, Diogo, Gabriel, Rodrigo, Marquinhos, Zé e Danilo, zela para que o legado do Sons of Peaky seja um farol de união para as gerações que virão. A moto nos trouxe até aqui, mas é a irmandade que nos manterá na estrada, juntos, para sempre.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção de Membros da Alta Cúpula -->
+        <section id="membros" class="py-16 md:py-24">
+            <div class="container">
+                <h2 class="section-title">Membros da Alta Cúpula</h2>
+                <div class="card space-y-6 text-gray-300">
+                    <p class="mb-6 text-center">Os nove irmãos que lideram e mantêm a irmandade.</p>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-8 text-center">
+                        <div class="flex flex-col items-center">
+                            <img src="https://placehold.co/150x150/111827/9ca3af?text=Erik" alt="Erik" class="w-24 h-24 sm:w-32 sm:h-32 rounded-full mb-2 object-cover">
+                            <span class="font-bold">Erik</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <img src="https://placehold.co/150x150/111827/9ca3af?text=Brutos" alt="Ricardo (Brutos)" class="w-24 h-24 sm:w-32 sm:h-32 rounded-full mb-2 object-cover">
+                            <span class="font-bold">Ricardo (Brutos)</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <img src="https://placehold.co/150x150/111827/9ca3af?text=Kazulo" alt="Kazulo" class="w-24 h-24 sm:w-32 sm:h-32 rounded-full mb-2 object-cover">
+                            <span class="font-bold">Kazulo</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <img src="https://placehold.co/150x150/111827/9ca3af?text=Diogo" alt="Diogo" class="w-24 h-24 sm:w-32 sm:h-32 rounded-full mb-2 object-cover">
+                            <span class="font-bold">Diogo</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <img src="https://placehold.co/150x150/111827/9ca3af?text=Gabriel" alt="Gabriel" class="w-24 h-24 sm:w-32 sm:h-32 rounded-full mb-2 object-cover">
+                            <span class="font-bold">Gabriel</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <img src="https://placehold.co/150x150/111827/9ca3af?text=Rodrigo" alt="Rodrigo" class="w-24 h-24 sm:w-32 sm:h-32 rounded-full mb-2 object-cover">
+                            <span class="font-bold">Rodrigo</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <img src="https://placehold.co/150x150/111827/9ca3af?text=Marquinhos" alt="Marquinhos" class="w-24 h-24 sm:w-32 sm:h-32 rounded-full mb-2 object-cover">
+                            <span class="font-bold">Marquinhos</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <img src="https://placehold.co/150x150/111827/9ca3af?text=Zé" alt="Zé" class="w-24 h-24 sm:w-32 sm:h-32 rounded-full mb-2 object-cover">
+                            <span class="font-bold">Zé</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <img src="https://placehold.co/150x150/111827/9ca3af?text=Danilo" alt="Danilo" class="w-24 h-24 sm:w-32 sm:h-32 rounded-full mb-2 object-cover">
+                            <span class="font-bold">Danilo</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção da Agenda de Eventos -->
+        <section id="agenda" class="py-16 md:py-24">
+            <div class="container">
+                <h2 class="section-title">Agenda de Eventos</h2>
+                <div id="agenda-container" class="card space-y-6 text-gray-300">
+                    <p class="mb-6">Fique por dentro dos próximos encontros e celebrações da irmandade.</p>
+                    <div class="space-y-4">
+                        <div class="p-4 rounded-md bg-gray-900 border border-gray-700">
+                            <h3 class="text-lg font-bold text-amber-500">22 de Setembro - Churrasco de Aniversário SOP</h3>
+                            <p class="text-gray-400">Celebração de mais um ano de estrada, com churrasco especial e música ao vivo no galpão.</p>
+                            <button class="mt-2 px-4 py-2 bg-amber-600 text-gray-900 font-bold rounded-full transition-transform duration-300 hover:scale-105 confirmar-btn">Confirmar Presença</button>
+                        </div>
+                        <div class="p-4 rounded-md bg-gray-900 border border-gray-700">
+                            <h3 class="text-lg font-bold text-amber-500">5 de Outubro - Rota dos Lobos Solitários</h3>
+                            <p class="text-gray-400">Viagem de um dia para o interior de São Paulo. Ponto de encontro: Galpão, 8h da manhã.</p>
+                            <button class="mt-2 px-4 py-2 bg-amber-600 text-gray-900 font-bold rounded-full transition-transform duration-300 hover:scale-105 confirmar-btn">Confirmar Presença</button>
+                        </div>
+                        <div class="p-4 rounded-md bg-gray-900 border border-gray-700">
+                            <h3 class="text-lg font-bold text-amber-500">18 de Outubro - Noite do Poker</h3>
+                            <p class="text-gray-400">Torneio anual de poker com grandes prêmios para os membros da Alta Cúpula. Inscrições abertas!</p>
+                            <button class="mt-2 px-4 py-2 bg-amber-600 text-gray-900 font-bold rounded-full transition-transform duration-300 hover:scale-105 confirmar-btn">Confirmar Presença</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção do Estatuto -->
+        <section id="estatuto" class="py-16 md:py-24">
+            <div class="container">
+                <h2 class="section-title">Estatuto da Alta Cúpula</h2>
+                <div class="card space-y-6 text-gray-300">
+                    <p class="mb-6 font-semibold">Este estatuto é um guia para garantir que o espírito que construiu este lugar continue vivo, e que a responsabilidade de mantê-lo seja compartilhada por todos.</p>
+                    <h3 class="text-xl font-bold text-amber-500">Artigo 1: Os Pilares da Irmandade</h3>
+                    <ul class="list-disc pl-6 space-y-2">
+                        <li>**Zelo pelo Patrimônio:** Trate cada item com o cuidado de dono. Se sujou, limpe. Se bagunçou, organize. Comunique problemas imediatamente.</li>
+                        <li>**Gestão de Estoque:** É responsabilidade de todos garantir que o bar esteja sempre abastecido. O valor da reposição deve ser adicionado à sua conta.</li>
+                        <li>**O Galpão como Extensão do Lar:** Convidados são bem-vindos, mas a responsabilidade sobre eles é **sua**. A chave é exclusiva para a Alta Cúpula.</li>
+                    </ul>
+                    <h3 class="text-xl font-bold text-amber-500 mt-6">Artigo 2: Nossas Finanças, Nosso Futuro</h3>
+                    <ul class="list-disc pl-6 space-y-2">
+                        <li>**Taxa Mensal:** R$ 250,00, paga até o dia **10 de cada mês**.</li>
+                        <li>**Conta do Bar:** Quitada quinzenalmente, nos dias **15 e 30**.</li>
+                        <li>**Valores:** Heineken: R$ 5,00 | Duplo Malte: R$ 4,50 | Coca: R$ 4,00 | H2O: R$ 4,50 | Água: R$ 2,00 | Energético: R$ 10,00.</li>
+                        <li>**Pagamento:** Via Pix, para a chave **sonsofpeaky@gmail.com**.</li>
+                    </ul>
+                    <script src="app.js" defer></script>
+                if (!generatedText) {
+                    generatedText = localGenerateRide({ input, km: Number(km), date });
+                }
+
+                // Image generation only if API_KEY provided
+                if (API_KEY && API_URL_GENERATE_IMAGE) {
+                    const promptImage = `Cartaz de convite para rolê de moto Sons of Peaky`;
+                    const payloadImage = { instances: { prompt: promptImage }, parameters: { sampleCount: 1 } };
+                    try {
+                        const responseImage = await fetchWithExponentialBackoff(API_URL_GENERATE_IMAGE, {
+                            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payloadImage)
+                        });
+                        const base64Data = responseImage?.predictions?.[0]?.bytesBase64Encoded;
+                        if (base64Data) imageUrl = `data:image/png;base64,${base64Data}`;
+                    } catch (e) {
+                        console.warn('Imagem remota não gerada, usando fallback.');
+                    }
+                }
+
+                // Fallback image (placeholder) if none
+                if (!imageUrl) imageUrl = 'https://placehold.co/600x300/111827/fb923c?text=Convite+Rol%C3%AA';
+
+                if (outputDiv) outputDiv.innerHTML = `\n                    <div class="space-y-4">\n                        <h4 class="text-lg font-bold text-white">Detalhes do Rolê:</h4>\n                        <div class="p-4 rounded-md bg-gray-900 border border-gray-700 whitespace-pre-wrap">${generatedText}</div>\n                        <h4 class="text-lg font-bold text-white">Convite Gerado:</h4>\n                        <div class="flex justify-center">\n                            <img src="${imageUrl}" alt="Convite para o Rolê" class="rounded-lg shadow-md max-w-full h-auto">\n                        </div>\n                    </div>\n                `;
+
+                // Adicionar o rolê à agenda
+                const agendaContainer = document.querySelector('#agenda-container .space-y-4');
+                if (agendaContainer) {
+                    const newEventHTML = `\n                        <div class="p-4 rounded-md bg-gray-900 border border-gray-700">\n                            <h3 class="text-lg font-bold text-amber-500">${new Date(date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' })} - ${input}</h3>\n                            <p class="text-gray-400">Ponto de encontro: Galpão. Distância: ${km}km.</p>\n                            <button class="mt-2 px-4 py-2 bg-amber-600 text-gray-900 font-bold rounded-full transition-transform duration-300 hover:scale-105 confirmar-btn">Confirmar Presença</button>\n                        </div>\n                    `;
+                    agendaContainer.insertAdjacentHTML('afterbegin', newEventHTML);
+                    addConfirmButtonListeners();
+                }
+
+            } catch (error) {
+                console.error('Erro ao gerar rolê:', error);
+                if ($('role-output')) $('role-output').textContent = 'Ocorreu um erro ao conectar com o serviço. Tente novamente mais tarde.';
+            } finally {
+                if ($('loading-indicator-role')) $('loading-indicator-role').style.display = 'none';
+            }
+        });
+
+        // Gerador de Ideias de Eventos
+        const gerarEventoBtn = $('gerar-evento-btn');
+        if (gerarEventoBtn) gerarEventoBtn.addEventListener('click', async function () {
+            const input = $('evento-input')?.value.trim();
+            const outputDiv = $('evento-output');
+            const loadingIndicator = $('loading-indicator-evento');
+            if (!input) { if (outputDiv) outputDiv.textContent = 'Por favor, descreva o tipo de evento que você quer planejar.'; return; }
+            if (outputDiv) outputDiv.textContent = '';
+            if (loadingIndicator) loadingIndicator.style.display = 'flex';
+            try {
+                let text = null;
+                if (API_KEY && API_URL_GENERATE_TEXT) {
+                    const prompt = `Atue como um planejador de eventos...`;
+                    const payload = { contents: [{ parts: [{ text: prompt }] }] };
+                    const response = await fetchWithExponentialBackoff(API_URL_GENERATE_TEXT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                    text = response?.candidates?.[0]?.content?.parts?.[0]?.text;
+                }
+                if (!text) text = localGenerateEvent({ input });
+                if (outputDiv) outputDiv.textContent = text;
+            } catch (error) {
+                console.error('Erro ao gerar ideias de evento:', error);
+                if ($('evento-output')) $('evento-output').textContent = 'Ocorreu um erro ao conectar com o serviço. Tente novamente mais tarde.';
+            } finally { if (loadingIndicator) loadingIndicator.style.display = 'none'; }
+        });
+
+        // Gerador de Posts do Instagram
+        const gerarInstagramBtn = $('gerar-instagram-btn');
+        if (gerarInstagramBtn) gerarInstagramBtn.addEventListener('click', async function () {
+            const input = $('instagram-input')?.value.trim();
+            const outputDiv = $('instagram-output');
+            const loadingIndicator = $('loading-indicator-instagram');
+            if (!input) { if (outputDiv) outputDiv.textContent = 'Por favor, descreva o conteúdo do post para gerar a legenda e hashtags.'; return; }
+            if (outputDiv) outputDiv.textContent = '';
+            if (loadingIndicator) loadingIndicator.style.display = 'flex';
+            try {
+                let text = null;
+                if (API_KEY && API_URL_GENERATE_TEXT) {
+                    const prompt = `Atue como um especialista em marketing digital...`;
+                    const payload = { contents: [{ parts: [{ text: prompt }] }] };
+                    const response = await fetchWithExponentialBackoff(API_URL_GENERATE_TEXT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                    text = response?.candidates?.[0]?.content?.parts?.[0]?.text;
+                }
+                if (!text) text = localGenerateInstagram({ input });
+                if (outputDiv) outputDiv.textContent = text;
+            } catch (error) {
+                console.error('Erro ao gerar post do Instagram:', error);
+                if ($('instagram-output')) $('instagram-output').textContent = 'Ocorreu um erro ao conectar com o serviço. Tente novamente mais tarde.';
+            } finally { if (loadingIndicator) loadingIndicator.style.display = 'none'; }
+        });
+
+        // Mensagem do Dia
+        const gerarMensagemBtn = $('gerar-mensagem-btn');
+        if (gerarMensagemBtn) gerarMensagemBtn.addEventListener('click', async function () {
+            const outputDiv = $('mensagem-output');
+            const loadingIndicator = $('loading-indicator-mensagem');
+            if (outputDiv) outputDiv.textContent = '';
+            if (loadingIndicator) loadingIndicator.style.display = 'flex';
+            try {
+                let text = null;
+                if (API_KEY && API_URL_GENERATE_TEXT) {
+                    const prompt = `Gere uma mensagem curta e inspiradora...`;
+                    const payload = { contents: [{ parts: [{ text: prompt }] }] };
+                    const response = await fetchWithExponentialBackoff(API_URL_GENERATE_TEXT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                    text = response?.candidates?.[0]?.content?.parts?.[0]?.text;
+                }
+                if (!text) text = localGenerateMessage();
+                if (outputDiv) outputDiv.textContent = text;
+            } catch (error) {
+                console.error('Erro ao gerar mensagem do dia:', error);
+                if ($('mensagem-output')) $('mensagem-output').textContent = 'Ocorreu um erro ao conectar com o serviço. Tente novamente mais tarde.';
+            } finally { if (loadingIndicator) loadingIndicator.style.display = 'none'; }
+        });
+
+        // Lógica para a Assinatura (substituído 'alert' por 'showModal')
+        const assinarBtn = $('assinar-btn');
+        if (assinarBtn) assinarBtn.addEventListener('click', function () {
+            const assinaturaInput = $('assinatura');
+            const nome = assinaturaInput?.value.trim();
+            if (nome) {
+                showModal(`Obrigado, ${nome}! Seu acordo foi registrado. Bem-vindo à família Sons of Peaky.`);
+                if (assinaturaInput) assinaturaInput.value = '';
+            } else {
+                showModal('Por favor, digite seu nome completo para assinar.');
+            }
+        });
+
+    });
+    </script>
+</body>
+
+</html>
