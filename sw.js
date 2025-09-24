@@ -1,5 +1,5 @@
 // Service Worker para PWA do Gerador de Rolês
-const CACHE_NAME = 'gerador-roles-v1.0.0';
+const CACHE_NAME = 'gerador-roles-v1.0.1';
 const urlsToCache = [
   './',
   './index.html',
@@ -10,8 +10,9 @@ const urlsToCache = [
   './destinos.js',
   './assets/img/moto-icon-192.png',
   './assets/img/moto-icon-512.png',
-  'https://cdn.tailwindcss.com',
-  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
+  // CDNs externos removidos do cache (CORS issues)
+  // 'https://cdn.tailwindcss.com',
+  // 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
 ];
 
 // Install
@@ -47,6 +48,13 @@ self.addEventListener('activate', event => {
 // Fetch
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
+  
+  // Skip caching for external CDNs (CORS issues)
+  if (url.hostname === 'cdn.tailwindcss.com' || 
+      url.hostname === 'cdnjs.cloudflare.com') {
+    event.respondWith(fetch(event.request));
+    return;
+  }
   
   // Cache strategy for API calls
   if (url.hostname === 'generativelanguage.googleapis.com') {

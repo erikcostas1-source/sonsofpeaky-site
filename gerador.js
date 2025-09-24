@@ -8,11 +8,13 @@ function getAPIConfig() {
     // Força modo desenvolvimento se configurado
     const forceDevelopment = window.FORCE_DEVELOPMENT_MODE === true;
     
-    // Detecta se está em produção (GitHub Pages/Netlify) ou desenvolvimento local
-    const isDevelopment = forceDevelopment || 
-                         window.location.hostname === 'localhost' || 
-                         window.location.hostname === '127.0.0.1' ||
-                         window.location.port !== '';
+    // Detecta plataforma de hospedagem
+    const isGitHubPages = window.location.hostname.includes('github.io');
+    const isNetlify = window.location.hostname.includes('netlify.app') || window.location.hostname.includes('netlify.com');
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    
+    // Determina se é desenvolvimento
+    const isDevelopment = forceDevelopment || isLocalhost;
     
     if (isDevelopment) {
         // Para desenvolvimento local, usa API direta com chave de desenvolvimento
@@ -23,12 +25,26 @@ function getAPIConfig() {
             apiUrl: `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${devKey}`,
             useServerless: false
         };
-    } else {
-        // Em produção, usa função serverless do Netlify
-        console.log('🌐 Modo produção detectado - usando função serverless');
+    } else if (isNetlify) {
+        // Em Netlify, usa função serverless
+        console.log('🌐 Netlify detectado - usando função serverless');
         return {
             apiUrl: '/.netlify/functions/generate-role',
             useServerless: true
+        };
+    } else if (isGitHubPages) {
+        // Em GitHub Pages, usa API direta (temporário)
+        console.log('📖 GitHub Pages detectado - usando API direta');
+        return {
+            apiUrl: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyCiHRVozYYmHB-5W64QdJzn9dQYAyRl9Tk',
+            useServerless: false
+        };
+    } else {
+        // Fallback padrão
+        console.log('🔧 Ambiente desconhecido - usando API direta');
+        return {
+            apiUrl: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyCiHRVozYYmHB-5W64QdJzn9dQYAyRl9Tk',
+            useServerless: false
         };
     }
 }
