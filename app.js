@@ -1,8 +1,13 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // Configuração para chamadas Gemini API (opcional). Se deixar vazio, usaremos fallbacks locais.
-    const API_KEY = ""; // <-- Coloque sua chave aqui se quiser usar a API remota
-    const API_URL_GENERATE_TEXT = API_KEY ? `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${API_KEY}` : null;
-    const API_URL_GENERATE_IMAGE = API_KEY ? `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${API_KEY}` : null;
+    // Configuração para chamadas Gemini API.
+    // Preferir URLs vindas de window.SOP_CONFIG (config.js). Caso não existam, usar API_KEY local (opcional) ou fallback local.
+    const API_KEY = ""; // opcional; deixe vazio para usar as URLs definidas em config.js
+    const API_URL_GENERATE_TEXT = (window.SOP_CONFIG && window.SOP_CONFIG.textUrl)
+        ? window.SOP_CONFIG.textUrl
+        : (API_KEY ? `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${API_KEY}` : null);
+    const API_URL_GENERATE_IMAGE = (window.SOP_CONFIG && window.SOP_CONFIG.imageUrl)
+        ? window.SOP_CONFIG.imageUrl
+        : (API_KEY ? `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${API_KEY}` : null);
 
     // Safe DOM helpers
     const $ = id => document.getElementById(id);
@@ -57,12 +62,148 @@ document.addEventListener('DOMContentLoaded', function () {
     function addConfirmButtonListeners() {
         document.querySelectorAll('.confirmar-btn').forEach(button => {
             if (!button.dataset.bound) {
-                button.addEventListener('click', () => showModal('Sua presença foi confirmada! Te vejo na estrada.'));
+                button.addEventListener('click', function (e) {
+                    const eventCard = e.target.closest('[id^="reuniao-"]') || e.target.closest('.p-4');
+                    if (!eventCard) return showModal('Erro ao localizar evento.');
+                    const eventId = eventCard.id || eventCard.dataset.eventId || 'evento';
+                    const eventTitle = eventCard.querySelector('h3')?.textContent || 'Evento';
+                    openRSVPModal(eventId, eventTitle);
+                });
                 button.dataset.bound = '1';
             }
         });
     }
     addConfirmButtonListeners();
+
+    // RSVP Modal logic
+    function openRSVPModal(eventId, eventTitle) {
+        const modal = document.getElementById('rsvp-modal');
+        const titleEl = document.getElementById('rsvp-event-title');
+        const nameInput = document.getElementById('rsvp-name');
+        const statusEl = document.getElementById('rsvp-status');
+        modal.classList.remove('hidden');
+        titleEl.textContent = eventTitle;
+        nameInput.value = '';
+        statusEl.classList.add('hidden');
+        modal.dataset.eventId = eventId;
+    }
+    function closeRSVPModal() {
+        const modal = document.getElementById('rsvp-modal');
+        modal.classList.add('hidden');
+    }
+    document.getElementById('rsvp-cancel-btn')?.addEventListener('click', closeRSVPModal);
+    document.getElementById('rsvp-confirm-btn')?.addEventListener('click', function () {
+        const modal = document.getElementById('rsvp-modal');
+        const nameInput = document.getElementById('rsvp-name');
+        const statusEl = document.getElementById('rsvp-status');
+        const eventId = modal.dataset.eventId;
+        const name = nameInput.value.trim();
+        if (!name) {
+            statusEl.textContent = 'Digite seu nome para confirmar.';
+            statusEl.classList.remove('hidden');
+            return;
+        }
+        // Persist attendee in localStorage
+        const key = `sop_rsvp_${eventId}`;
+        let attendees = [];
+        try {
+            attendees = JSON.parse(localStorage.getItem(key) || '[]');
+        } catch {}
+        if (!attendees.includes(name)) attendees.push(name);
+        localStorage.setItem(key, JSON.stringify(attendees));
+        closeRSVPModal();
+        renderAttendees(eventId);
+    });
+
+    // Render attendee list in event card
+    function renderAttendees(eventId) {
+        const key = `sop_rsvp_${eventId}`;
+        let attendees = [];
+        try {
+            attendees = JSON.parse(localStorage.getItem(key) || '[]');
+        } catch {}
+        const eventCard = document.getElementById(eventId);
+        if (!eventCard) return;
+        let list = eventCard.querySelector('.rsvp-list');
+        if (!list) {
+            list = document.createElement('div');
+            list.className = 'rsvp-list mt-2';
+            eventCard.appendChild(list);
+        }
+        if (attendees.length === 0) {
+            list.innerHTML = '<span class="text-gray-400 text-sm">Nenhum confirmado ainda.</span>';
+        } else {
+            list.innerHTML = `<span class="text-amber-400 font-bold">${attendees.length} confirmado(s):</span> <span class="text-gray-300">${attendees.map(n => `<span>${n}</span>`).join(', ')}</span>`;
+        }
+    }
+
+    // Render attendees for all events on load
+    function renderAllAttendees() {
+        document.querySelectorAll('[id^="reuniao-"]').forEach(card => {
+            renderAttendees(card.id);
+        });
+    }
+    renderAllAttendees();
+
+    // Estatutos: toggle panels and unlock Alta Cúpula
+    document.querySelectorAll('[data-toggle]')?.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const sel = btn.getAttribute('data-toggle');
+            const panel = document.querySelector(sel);
+            if (panel) panel.classList.toggle('hidden');
+        });
+    });
+
+    const AC_UNLOCK_KEY = 'sop_ac_unlocked';
+    function showAcUnlocked() {
+        const locked = document.getElementById('ac-locked');
+        const content = document.getElementById('ac-content');
+        if (locked && content) {
+            locked.classList.add('hidden');
+            content.classList.remove('hidden');
+        }
+    }
+    // Persist unlock state per browser
+    if (localStorage.getItem(AC_UNLOCK_KEY) === '1') showAcUnlocked();
+    const acUnlockBtn = document.getElementById('ac-unlock-btn');
+    if (acUnlockBtn) acUnlockBtn.addEventListener('click', () => {
+        const pwd = (document.getElementById('ac-password')?.value || '').trim();
+        const status = document.getElementById('ac-status');
+        if (pwd.toLowerCase() === 'cangaiba') {
+            localStorage.setItem(AC_UNLOCK_KEY, '1');
+            if (status) status.classList.add('hidden');
+            showAcUnlocked();
+        } else {
+            if (status) status.classList.remove('hidden');
+        }
+    });
+
+    // Adiciona evento recorrente: toda quinta às 19:30
+    (function ensureWeeklyMeeting() {
+        const agendaList = document.querySelector('#agenda-container .space-y-4');
+        if (!agendaList) return;
+        // Próxima quinta-feira
+        const now = new Date();
+        const day = now.getDay(); // 0=Dom, 4=Qui
+        const diffToThursday = (4 - day + 7) % 7 || 7; // se hoje for quinta, pegar a próxima
+        const nextThu = new Date(now);
+        nextThu.setDate(now.getDate() + diffToThursday);
+        nextThu.setHours(19, 30, 0, 0);
+
+        const dateStr = nextThu.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' });
+        const eventId = `reuniao-${nextThu.getFullYear()}-${nextThu.getMonth()+1}-${nextThu.getDate()}`;
+        if (document.getElementById(eventId)) return; // já inserido
+
+        const html = `
+            <div id="${eventId}" class="p-4 rounded-md bg-gray-900 border border-gray-700">
+                <h3 class="text-lg font-bold text-amber-500">${dateStr} - Reunião Semanal (19:30)</h3>
+                <p class="text-gray-400">Local: Galpão - Rua José Flavio, 420, Travessa 1A.</p>
+                <button class="mt-2 px-4 py-2 bg-amber-600 text-gray-900 font-bold rounded-full transition-transform duration-300 hover:scale-105 confirmar-btn">Confirmar Presença</button>
+                <button class="mt-2 px-4 py-2 bg-green-600 text-white font-bold rounded-full whatsapp-share-btn flex items-center gap-2"><img src="assets/img/whatsapp.png" alt="WhatsApp" style="width:20px;height:20px;"> Compartilhar no WhatsApp</button>
+            </div>`;
+        agendaList.insertAdjacentHTML('beforeend', html);
+        addConfirmButtonListeners();
+    })();
 
     // Gerador de Rolê (usa API se disponível, caso contrário fallback local)
     const gerarRoleBtn = $('gerar-role-btn');
@@ -84,7 +225,7 @@ document.addEventListener('DOMContentLoaded', function () {
             let generatedText = null;
             let imageUrl = '';
 
-            if (API_KEY && API_URL_GENERATE_TEXT) {
+            if (API_URL_GENERATE_TEXT) {
                 const promptText = `Atue como um especialista em roteiros de viagem de moto para o grupo Sons of Peaky...`;
                 const payloadText = { contents: [{ parts: [{ text: promptText }] }] };
                 const responseText = await fetchWithExponentialBackoff(API_URL_GENERATE_TEXT, {
@@ -98,7 +239,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             // Image generation only if API_KEY provided
-            if (API_KEY && API_URL_GENERATE_IMAGE) {
+            if (API_URL_GENERATE_IMAGE) {
                 const promptImage = `Cartaz de convite para rolê de moto Sons of Peaky`;
                 const payloadImage = { instances: { prompt: promptImage }, parameters: { sampleCount: 1 } };
                 try {
@@ -144,7 +285,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (loadingIndicator) loadingIndicator.style.display = 'flex';
         try {
             let text = null;
-            if (API_KEY && API_URL_GENERATE_TEXT) {
+            if (API_URL_GENERATE_TEXT) {
                 const prompt = `Atue como um planejador de eventos...`;
                 const payload = { contents: [{ parts: [{ text: prompt }] }] };
                 const response = await fetchWithExponentialBackoff(API_URL_GENERATE_TEXT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
@@ -169,7 +310,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (loadingIndicator) loadingIndicator.style.display = 'flex';
         try {
             let text = null;
-            if (API_KEY && API_URL_GENERATE_TEXT) {
+            if (API_URL_GENERATE_TEXT) {
                 const prompt = `Atue como um especialista em marketing digital...`;
                 const payload = { contents: [{ parts: [{ text: prompt }] }] };
                 const response = await fetchWithExponentialBackoff(API_URL_GENERATE_TEXT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
@@ -192,7 +333,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (loadingIndicator) loadingIndicator.style.display = 'flex';
         try {
             let text = null;
-            if (API_KEY && API_URL_GENERATE_TEXT) {
+            if (API_URL_GENERATE_TEXT) {
                 const prompt = `Gere uma mensagem curta e inspiradora...`;
                 const payload = { contents: [{ parts: [{ text: prompt }] }] };
                 const response = await fetchWithExponentialBackoff(API_URL_GENERATE_TEXT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });

@@ -1,14 +1,12 @@
 <!DOCTYPE html>
 <html lang="pt-br" class="scroll-smooth">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Sons of Peaky — Manifesto, agenda e planejamento da irmandade de motociclistas.">
-    <meta name="theme-color" content="#0d0d0d">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Sons of Peaky — Manifesto, agenda e planejamento da irmandade de motociclistas." />
+    <meta name="theme-color" content="#0d0d0d" />
     <title>Sons of Peaky - Manifesto</title>
     <link rel="icon" href="https://i.imgur.com/uG46v5P.jpg" />
-    <!-- Open Graph / Twitter -->
     <meta property="og:title" content="Sons of Peaky - Manifesto" />
     <meta property="og:description" content="Manifesto, agenda e planejamento da irmandade Sons of Peaky." />
     <meta property="og:image" content="https://i.imgur.com/uG46v5P.jpg" />
@@ -18,287 +16,322 @@
     <meta name="twitter:description" content="Manifesto, agenda e planejamento da irmandade Sons of Peaky." />
     <meta name="twitter:image" content="https://i.imgur.com/uG46v5P.jpg" />
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Pirata+One&display=swap" rel="stylesheet" />
 </head>
-
 <body>
+    <header id="top" class="site-nav text-center py-6 bg-black">
+        <div class="container flex flex-col items-center justify-center">
+            <img src="assets/img/logo-sonsofpeaky.png" alt="Sons of Peaky Logo" class="mx-auto mb-4" style="max-width:320px;" />
+            <h1 class="text-4xl font-bold drop-shadow-lg" style="font-family:'Pirata One','Carnevalee Freakshow',serif;color:#fb923c;">Sons of Peaky</h1>
+            <p class="mt-2 text-lg text-gray-300">Rua José Flavio, 420, Travessa 1A</p>
+        </div>
+        <nav class="main-nav flex justify-center gap-8 py-4 text-lg font-semibold">
+            <a href="#irmandade" class="hover:text-amber-500 transition">Irmandade</a>
+            <a href="#missao" class="hover:text-amber-500 transition">Missão & Visão</a>
+            <a href="#estatutos" class="hover:text-amber-500 transition">Estatutos</a>
+            <a href="#agenda" class="hover:text-amber-500 transition">Agenda</a>
+            <a href="#bar" class="hover:text-amber-500 transition">Preços do Bar</a>
+            <a href="#redes" class="hover:text-amber-500 transition">Redes Sociais</a>
+        </nav>
+    </header>
 
-    <!-- Modal para confirmação de assinatura -->
     <div id="modal" class="modal-overlay hidden">
         <div class="modal-content">
             <h3 class="text-xl font-bold text-white mb-4">Acordo de Membros</h3>
             <p id="modal-message" class="text-gray-300 mb-6"></p>
-            <button id="modal-close-btn" class="px-6 py-2 bg-amber-600 text-gray-900 font-bold rounded-full transition-colors duration-200">
-                OK
-            </button>
+            <button id="modal-close-btn" class="px-6 py-2 bg-amber-600 text-gray-900 font-bold rounded-full transition-colors duration-200">OK</button>
         </div>
     </div>
 
-    <header id="top" class="site-nav text-center py-6 bg-black">
-        <div class="container flex items-center justify-between">
-            <div class="flex items-center space-x-4">
-                <img src="https://i.imgur.com/uG46v5P.jpg" alt="Logo Sons of Peaky" class="w-16 h-16 rounded-lg shadow-md">
-                <h1 class="text-2xl font-extrabold text-white">Sons of Peaky</h1>
-            </div>
-            <button id="nav-toggle" aria-expanded="false" class="md:hidden px-3 py-2 text-white">☰</button>
-            <nav id="main-nav-menu" class="hidden md:flex items-center space-x-6 text-gray-300">
-                <a href="#historia" class="hover:text-white">Nossa História</a>
-                <a href="#membros" class="hover:text-white">Membros</a>
-                <a href="#agenda" class="hover:text-white">Agenda</a>
-                <a href="#estatuto" class="hover:text-white">Estatuto</a>
-                <a href="#documentos" class="hover:text-white">Documentos</a>
-                <a href="#gemini" class="hover:text-white">Planejamento</a>
-            </nav>
-        </div>
-        <div class="container text-center py-6">
-            <div class="hero">
-                <h2 class="text-3xl md:text-4xl font-extrabold text-white mb-2">Onde a estrada encontra a família.</h2>
-                <p class="text-lg text-gray-400 mb-2">Galpão na Penha · Encontros, passeios e irmandade desde 2021.</p>
-                <div class="mt-4">
-                    <a href="#agenda" class="px-6 py-2 bg-amber-600 text-gray-900 font-bold rounded-full mr-3">Próximos eventos</a>
-                    <a href="#documentos" class="px-6 py-2 border border-gray-600 text-gray-300 rounded-full">Ver documentos</a>
-                </div>
-            </div>
-        </div>
-    </header>
-
     <main>
-        <!-- Seção da História -->
-        <section id="historia" class="py-16 md:py-24">
-            <div class="container">
-                <h2 class="section-title">Nossa História</h2>
-                <div class="card space-y-6 text-gray-300">
-                    <p>O Sons of Peaky é mais do que um grupo de motos; é uma irmandade nascida do asfalto, forjada na lealdade e no compromisso mútuo. Tudo começou com a visão de dois irmãos de sangue, Erik e Ricardo (Brutos), que transformaram uma ideia simples em um refúgio para todos que valorizam a amizade sobre qualquer coisa.</p>
-                    <p>Com a chegada de Lambão e Kazulo, o sonho tomou forma. As viagens em grupo se tornaram o ritual que cimentou nossa união. A inspiração veio das noites de GTA 5 e da lendária série Peaky Blinders, misturando a paixão pela estrada com o espírito inabalável de uma família. Em **25 de maio de 2021**, o Sons of Peaky nasceu, não como um clube, mas como um movimento.</p>
-                    <p>Encontramos nosso lar em **16 de julho de 2021**: um galpão empoeirado de 100 metros quadrados na Penha, SP. Com as próprias mãos e a ajuda de amigos fiéis, transformamos o espaço em nosso santuário: um refúgio com bar, sinuca, fliperama e um acervo de memórias inesquecíveis.</p>
-                    <p>Hoje, nossa família cresceu e se fortaleceu. A Alta Cúpula, liderada por Erik, Brutos, Kazulo, Diogo, Gabriel, Rodrigo, Marquinhos, Zé e Danilo, zela para que o legado do Sons of Peaky seja um farol de união para as gerações que virão. A moto nos trouxe até aqui, mas é a irmandade que nos manterá na estrada, juntos, para sempre.</p>
+        <!-- Irmandade -->
+            <section id="irmandade" class="py-16 md:py-24">
+                <div class="container space-y-8">
+                    <h2 class="section-title">O Caminho para a Irmandade</h2>
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div class="space-y-4">
+                                    <h3 class="text-white font-bold text-lg mb-2">O Caminho para a Irmandade</h3>
+                                    <p class="text-gray-300">A irmandade Sons of Peaky se sustenta na confiança, na franqueza e na intimidade. Não há hierarquia ou regras rígidas, mas um desejo genuíno de pertencer e de contribuir para a força do grupo. O caminho para ser um membro é uma jornada de aproximação, onde a dedicação e o respeito são os únicos pré-requisitos.</p>
+                                    <p class="text-gray-300">Para se tornar um Membro, é necessário um convite formal feito por um Membro da Alta Cúpula. Esse convite surge naturalmente, após a pessoa frequentar o galpão por um tempo e demonstrar, por suas atitudes, que compartilha dos nossos valores. A partir desse convite, os outros membros podem expressar suas opiniões, garantindo que a decisão seja de toda a irmandade.</p>
+                                    <h4 class="text-white font-semibold mt-4">Vantagens e Contribuições</h4>
+                                    <ul class="list-disc list-inside space-y-2 text-gray-300">
+                                        <li><span class="text-white font-semibold">Frequentadores:</span> O frequentador é sempre bem-vindo para compartilhar a energia do galpão, respeitando o estatuto e a boa vizinhança.<br><span class="text-amber-400">Vantagem:</span> Acesso ao galpão para a convivência com a irmandade.<br><span class="text-amber-400">Contribuição:</span> Respeito ao espaço, à vizinhança e às regras. O consumo de comidas e bebidas é pago na hora, via Pix.</li>
+                                        <li><span class="text-white font-semibold">Membros:</span> O Membro é parte do nosso círculo interno, uma família estendida. Sua contribuição mantém a casa e, em troca, ele obtém vantagens exclusivas.<br><span class="text-amber-400">Vantagens:</span> Acesso prioritário a eventos e reuniões exclusivas. Voz ativa: O direito de participar das reuniões e de opinar sobre os rumos do galpão. A possibilidade de propor um novo frequentador para se tornar membro, após demonstrar seu valor à irmandade.<br><span class="text-amber-400">Contribuição:</span> O compromisso de manter a casa. Para cobrir os custos de manutenção, limpeza e contas do galpão, a contribuição mensal é de R$ 100,00. Esse valor é simbólico e garante o acesso ilimitado para as quintas-feiras e a certeza de que a nossa casa estará sempre em ordem.<br><span class="text-amber-400">Responsabilidades:</span> Ajudar ativamente na organização e na limpeza do galpão após as reuniões. Estar presente para colaborar quando necessário.</li>
+                                        <li><span class="text-white font-semibold">Membros da Alta Cúpula:</span> A Alta Cúpula é o pilar da irmandade. Sua posição não é de poder, mas de referência e responsabilidade.<br><span class="text-amber-400">Vantagens:</span> A honra de guiar a irmandade e manter a sua essência. A decisão final sobre o rumo do grupo e a aceitação de novos membros. Chave do galpão: Acesso total ao espaço para uso pessoal e organização de eventos.<br><span class="text-amber-400">Contribuição:</span> O compromisso de zelar pelo galpão e pelos membros. A contribuição mensal é de R$ 250,00, que cobre os custos fixos da liderança e eventuais imprevistos.</li>
+                                    </ul>
+                                </div>
+                                <div class="space-y-4 p-4 rounded-md bg-gray-900 border border-gray-700">
+                                    <h3 class="text-lg font-bold text-white">Assinatura do Acordo</h3>
+                                    <label for="assinatura" class="block text-sm text-gray-400">Assine com seu nome completo para registrar seu compromisso.</label>
+                                    <div class="flex gap-3 items-center">
+                                        <input id="assinatura" type="text" placeholder="Seu nome completo" class="flex-1 px-3 py-2 rounded bg-gray-800 border border-gray-700 text-gray-100" />
+                                        <button id="assinar-btn" class="px-4 py-2 bg-amber-600 text-gray-900 font-bold rounded-full">Assinar</button>
+                                    </div>
+                                </div>
+                            </div>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <!-- Seção de Membros da Alta Cúpula -->
-        <section id="membros" class="py-16 md:py-24">
-            <div class="container">
-                <h2 class="section-title">Membros da Alta Cúpula</h2>
-                <div class="card space-y-6 text-gray-300">
-                    <p class="mb-6 text-center">Os nove irmãos que lideram e mantêm a irmandade.</p>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-8 text-center">
-                        <div class="flex flex-col items-center">
-                            <img src="https://placehold.co/150x150/111827/9ca3af?text=Erik" alt="Erik" class="w-24 h-24 sm:w-32 sm:h-32 rounded-full mb-2 object-cover">
-                            <span class="font-bold">Erik</span>
+        <!-- Missão & Visão -->
+            <section id="missao" class="py-16 md:py-24">
+                <div class="container space-y-8">
+                    <h2 class="section-title">Missão, Visão, Valores e Cultura</h2>
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div class="p-4 rounded-md bg-gray-900 border border-gray-700">
+                                    <h3 class="text-white font-bold text-lg mb-2">Missão</h3>
+                                    <p class="text-gray-300">Ser um porto seguro onde a franqueza e a intimidade criam laços verdadeiros. Nossa missão é cultivar um ambiente de respeito e confiança, onde cada pessoa se sinta à vontade para ser ela mesma, e onde a amizade é o maior dos nossos bens.</p>
+                                </div>
+                                <div class="p-4 rounded-md bg-gray-900 border border-gray-700">
+                                    <h3 class="text-white font-bold text-lg mb-2">Visão</h3>
+                                    <p class="text-gray-300">Tornar-nos uma irmandade sólida, reconhecida não por poder ou status, mas pelo exemplo de união e camaradagem que manifestamos. Nossa visão é inspirar outros a buscarem relações autênticas e a construírem algo que perdure.</p>
+                                </div>
+                                <div class="p-4 rounded-md bg-gray-900 border border-gray-700">
+                                    <h3 class="text-white font-bold text-lg mb-2">Valores</h3>
+                                    <ul class="list-disc list-inside text-gray-300 space-y-1">
+                                        <li>Honestidade Acima de Tudo: A verdade é a base de todas as nossas interações. A franqueza, mesmo quando difícil, é a chave para a confiança mútua.</li>
+                                        <li>Respeito pela Jornada: Cada pessoa tem a sua própria história. Valorizamos a individualidade e respeitamos o tempo de cada um, sem julgamentos.</li>
+                                        <li>Comunidade e Colaboração: Nossa força reside na nossa capacidade de cuidar uns dos outros e do nosso espaço. A colaboração é o que mantém a irmandade viva.</li>
+                                        <li>Dedicacão Silenciosa: A contribuição para o grupo não precisa de alarde. Valorizamos a atitude de quem cuida da casa e dos irmãos, mesmo sem que ninguém esteja olhando.</li>
+                                    </ul>
+                                </div>
+                                <div class="p-4 rounded-md bg-gray-900 border border-gray-700">
+                                    <h3 class="text-white font-bold text-lg mb-2">Cultura</h3>
+                                    <p class="text-gray-300">A cultura do Sons of Peaky se manifesta nas nossas atitudes diárias. Somos uma irmandade que valoriza a simplicidade, a autenticidade e a convivência. Não há espaço para excessos, ego ou superficialidade. O que nos define é a nossa capacidade de sentar juntos, compartilhar uma conversa sincera e construir memórias que reforçam nossa amizade. Somos o que fazemos, e nosso galpão é o nosso reflexo.</p>
+                                </div>
+                            </div>
+                </div>
+            </section>
+
+        <!-- Estatutos -->
+            <section id="estatutos" class="py-16 md:py-24">
+                <div class="container space-y-6">
+                    <h2 class="section-title">Estatutos</h2>
+
+                    <!-- Alta Cúpula (protegido) -->
+                    <div class="p-4 rounded-md bg-gray-900 border border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-white font-bold text-lg">Estatuto — Alta Cúpula</h3>
+                            <button class="text-sm text-amber-500 hover:text-amber-400" data-toggle="#ac-panel">Mostrar/Ocultar</button>
                         </div>
-                        <div class="flex flex-col items-center">
-                            <img src="https://placehold.co/150x150/111827/9ca3af?text=Brutos" alt="Ricardo (Brutos)" class="w-24 h-24 sm:w-32 sm:h-32 rounded-full mb-2 object-cover">
-                            <span class="font-bold">Ricardo (Brutos)</span>
-                        </div>
-                        <div class="flex flex-col items-center">
-                            <img src="https://placehold.co/150x150/111827/9ca3af?text=Kazulo" alt="Kazulo" class="w-24 h-24 sm:w-32 sm:h-32 rounded-full mb-2 object-cover">
-                            <span class="font-bold">Kazulo</span>
-                        </div>
-                        <div class="flex flex-col items-center">
-                            <img src="https://placehold.co/150x150/111827/9ca3af?text=Diogo" alt="Diogo" class="w-24 h-24 sm:w-32 sm:h-32 rounded-full mb-2 object-cover">
-                            <span class="font-bold">Diogo</span>
-                        </div>
-                        <div class="flex flex-col items-center">
-                            <img src="https://placehold.co/150x150/111827/9ca3af?text=Gabriel" alt="Gabriel" class="w-24 h-24 sm:w-32 sm:h-32 rounded-full mb-2 object-cover">
-                            <span class="font-bold">Gabriel</span>
-                        </div>
-                        <div class="flex flex-col items-center">
-                            <img src="https://placehold.co/150x150/111827/9ca3af?text=Rodrigo" alt="Rodrigo" class="w-24 h-24 sm:w-32 sm:h-32 rounded-full mb-2 object-cover">
-                            <span class="font-bold">Rodrigo</span>
-                        </div>
-                        <div class="flex flex-col items-center">
-                            <img src="https://placehold.co/150x150/111827/9ca3af?text=Marquinhos" alt="Marquinhos" class="w-24 h-24 sm:w-32 sm:h-32 rounded-full mb-2 object-cover">
-                            <span class="font-bold">Marquinhos</span>
-                        </div>
-                        <div class="flex flex-col items-center">
-                            <img src="https://placehold.co/150x150/111827/9ca3af?text=Zé" alt="Zé" class="w-24 h-24 sm:w-32 sm:h-32 rounded-full mb-2 object-cover">
-                            <span class="font-bold">Zé</span>
-                        </div>
-                        <div class="flex flex-col items-center">
-                            <img src="https://placehold.co/150x150/111827/9ca3af?text=Danilo" alt="Danilo" class="w-24 h-24 sm:w-32 sm:h-32 rounded-full mb-2 object-cover">
-                            <span class="font-bold">Danilo</span>
+                        <div id="ac-panel" class="mt-4 space-y-4">
+                            <div id="ac-locked" class="space-y-3">
+                                <p class="text-gray-300">Conteúdo protegido. Insira a senha para acessar.</p>
+                                <div class="flex gap-3 items-center">
+                                    <input id="ac-password" type="password" placeholder="Senha" class="px-3 py-2 rounded bg-gray-800 border border-gray-700 text-gray-100" />
+                                    <button id="ac-unlock-btn" class="px-4 py-2 bg-amber-600 text-gray-900 font-bold rounded-full">Desbloquear</button>
+                                </div>
+                                <p id="ac-status" class="text-sm text-red-400 hidden">Senha incorreta.</p>
+                            </div>
+                                        <div id="ac-content" class="hidden">
+                                            <div class="space-y-4">
+                                                <h4 class="text-white font-bold">MANIFESTO SONS OF PEAKY<br>BORN FROM THE ROAD - HANDCRAFTED - BRAZILIAN MADE</h4>
+                                                <p class="text-gray-300">Este documento é a alma do Sons of Peaky. Ele não é uma lista de obrigações, mas sim um guia que honra a jornada de Erik, Ricardo (Brutos) e Kazulo, que transformaram uma ideia em um movimento, um galpão abandonado na Penha em nosso santuário.</p>
+                                                <p class="text-gray-300">Cada um de nós, da Alta Cúpula, carrega a responsabilidade de zelar por este espaço como se fosse uma extensão de nossa própria casa. Juntos, somos os guardiões do nosso legado e da nossa irmandade.</p>
+                                                <h5 class="text-amber-400 font-bold">ESTATUTO DA ALTA CÚPULA</h5>
+                                                <p class="text-gray-300"><b>Artigo 1: Os Pilares da Irmandade</b><br>Como membros da Alta Cúpula, nossa responsabilidade vai além de ter uma chave na mão. Ela se baseia em três pilares: Senso de Dono, Compromisso e Respeito.<br><br><b>Zelo pelo Patrimônio:</b> Trate cada item no galpão com o cuidado que ele merece. Da mesa de sinuca ao projetor, tudo foi conquistado com o nosso esforço. Se você sujou, limpe. Se bagunçou, organize. Se perceber uma necessidade de manutenção, comunique o grupo imediatamente.<br><br><b>Gestão de Estoque:</b> É responsabilidade de todos garantir que o bar esteja sempre abastecido. Se você consumiu um item, verifique se ele precisa ser reposto. As compras maiores devem ser discutidas em grupo para garantir que a geladeira e as prateleiras estejam sempre cheias.<br><br><b>O Galpão como Extensão do Lar:</b> O galpão é um espaço para a nossa família. Convidados são bem-vindos, mas a responsabilidade sobre eles é sua. Você é o único responsável pelo comportamento e pelo consumo do seu convidado. A chave do galpão é exclusiva para a Alta Cúpula e nunca deve ser entregue a terceiros.</p>
+                                                <p class="text-gray-300"><b>Artigo 2: Nossas Finanças, Nosso Futuro</b><br>A força do nosso movimento se reflete também na nossa disciplina financeira. Cada real arrecadado volta para o nosso galpão, tornando-o cada vez melhor.<br><br><b>Taxa Mensal:</b> A contribuição de R$ 250,00 é vital para a manutenção do espaço e deve ser paga até o dia 10 de cada mês. Pagamentos atrasados geram custos desnecessários que poderiam ser investidos em nosso sonho.<br><br><b>Conta do Bar:</b> A conta do bar deve ser quitada quinzenalmente, nos dias 15 e 30 de cada mês. Seja transparente com o seu consumo.<br><br><b>Valores:</b> Heineken: R$ 5,00 | Duplo Malte: R$ 4,50 | Coca Normal/Zero: R$ 4,00 | H2O Limoneto: R$ 4,50 | Água: R$ 2,00 | Energético: R$ 10,00.<br><br><b>Pagamento:</b> Todos os pagamentos são via Pix, para a chave <span class="text-amber-400">sonsofpeaky@gmail.com</span>.</p>
+                                                <p class="text-gray-300"><b>Artigo 3: O Guardião do Galpão</b><br>Quem fecha a porta por último carrega a responsabilidade de garantir que nosso espaço esteja em ordem para a próxima vez.<br><br><b>Checklist de Saída:</b> Ao sair, verifique se todas as luzes, TVs, projetor, e LEDs estão desligados.<br><br><b>Descarte de Lixo:</b> Se a lixeira estiver cheia ou com odor, recolha e coloque-a na calçada. O lixo passa às terças, quintas e sábados.<br><br><b>Fechamento:</b> Garanta que todas as janelas estejam fechadas e as portas, trancadas.</p>
+                                                <h5 class="text-amber-400 font-bold">O NOSSO CÓDIGO</h5>
+                                                <p class="text-gray-300"><b>Transparência e Honestidade:</b> Seja claro sobre suas ações e o consumo. A confiança mútua é o que nos mantém unidos.<br><br><b>Apoio e Camaragem:</b> Se um irmão precisa de ajuda, seja em uma reforma ou em um passeio de moto, o SOP está aqui para apoiar.<br><br><b>Comunicação:</b> Use os canais de comunicação do grupo para alinhar expectativas, planejar eventos ou simplesmente para compartilhar a sua paixão. Nossa voz é o que constrói nosso futuro.</p>
+                                                <p class="text-gray-300">Este estatuto é a nossa promessa. A promessa de que o sonho que construímos juntos nunca irá parar de evoluir.</p>
+                                            </div>
+                                        </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </section>
 
-        <!-- Seção da Agenda de Eventos -->
+                    <!-- Membros -->
+                    <div class="p-4 rounded-md bg-gray-900 border border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-white font-bold text-lg">Estatuto — Membros</h3>
+                            <button class="text-sm text-amber-500 hover:text-amber-400" data-toggle="#membros-panel">Mostrar/Ocultar</button>
+                        </div>
+                                    <div id="membros-panel" class="mt-4">
+                                        <div class="space-y-4">
+                                            <h4 class="text-white font-bold">Estatuto do Membro</h4>
+                                            <p class="text-gray-300">Para a nossa irmandade, ser um Membro é mais do que um título: é um compromisso com o coração do grupo. Este estatuto define as expectativas e os privilégios daqueles que escolheram se dedicar ao nosso propósito.</p>
+                                            <p class="text-gray-300"><b>Artigo 1: Compromisso Financeiro</b><br>O Membro é parte ativa na sustentação do galpão.<br><br><b>Contribuição Mensal:</b> O Membro deve honrar a contribuição mensal de R$ 100,00. Este valor é essencial para manter nossa casa funcionando, cobrindo despesas como aluguel, luz, água e internet e deve ser feito todo dia 10.<br><br><b>Consumo do Bar:</b> O consumo de bebidas deve ser pago via Pix todo dia 15 e dia 30.<br><br>Os valores devem ser pagos através da chave pix: <span class="text-amber-400">sonsofpeaky@gmail.com</span>.</p>
+                                            <p class="text-gray-300"><b>Artigo 2: Responsabilidades de Zeladoria</b><br>O galpão é nossa casa, e a responsabilidade por ele é de todos.<br><br><b>Cuidado com o Espaço:</b> O Membro deve ajudar a zelar pela limpeza e organização do galpão, especialmente após os eventos.<br><br><b>Manutenção:</b> É dever do Membro reportar à Alta Cúpula qualquer problema ou necessidade de reparo.<br><br><b>Bens da Irmandade:</b> O Membro é responsável por usar e cuidar dos equipamentos e bens do galpão com respeito.</p>
+                                            <p class="text-gray-300"><b>Artigo 3: Participação Ativa</b><br>A força da irmandade está na união, e a presença do Membro é fundamental.<br><br><b>Reuniões:</b> O Membro deve participar das reuniões de planejamento do grupo, contribuindo com ideias e opiniões para o crescimento da irmandade.</p>
+                                            <p class="text-gray-300"><b>Artigo 4: Privilégios do Membro</b><br>Como reconhecimento pelo seu comprometimento, o Membro desfruta de benefícios exclusivos:<br><br><b>Voz Ativa:</b> O Membro tem o direito de participar das reuniões e de opinar sobre os rumos do galpão e as decisões da irmandade.<br><br><b>Indicação:</b> O Membro pode propor a um Membro da Alta Cúpula que um frequentador seja convidado a se tornar Membro.<br><br><b>Acesso:</b> A contribuição garante o acesso ilimitado para as quintas-feiras e a participação prioritária em eventos fechados e/ou aleatórios.</p>
+                                            <p class="text-gray-300"><b>Artigo 5: Respeito à Alta Cúpula</b><br>A Alta Cúpula é formada por aqueles que, pelo exemplo, se tornaram referências.<br><br><b>Respeito e Lealdade:</b> O Membro deve respeitar as decisões da Alta Cúpula e apoiar suas iniciativas, entendendo que a liderança é exercida pelo bem maior da irmandade.</p>
+                                        </div>
+                                    </div>
+                    </div>
+
+                    <!-- Frequentadores -->
+                    <div class="p-4 rounded-md bg-gray-900 border border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-white font-bold text-lg">Estatuto — Frequentadores</h3>
+                            <button class="text-sm text-amber-500 hover:text-amber-400" data-toggle="#freq-panel">Mostrar/Ocultar</button>
+                        </div>
+                                    <div id="freq-panel" class="mt-4">
+                                        <div class="space-y-4">
+                                            <h4 class="text-white font-bold">Estatuto para Frequentadores</h4>
+                                            <p class="text-gray-300">Para manter a ordem e o espírito de união no galpão, todos os frequentadores devem seguir estas regras. Respeite o espaço e as pessoas que o mantêm.</p>
+                                            <p class="text-gray-300"><b>Artigo 1: Conduta e Respeito</b><br><b>Convidado e Responsável:</b> O frequentador é bem-vindo, mas a responsabilidade pela sua conduta é do membro da Alta Cúpula que o convidou. Qualquer problema, o membro convidado será o primeiro a ser acionado.<br><br><b>Zero Tolerância:</b> Comportamento desrespeitoso, brigas ou qualquer atitude que ameace a paz no galpão não serão tolerados. O infrator será convidado a se retirar imediatamente.<br><br><b>Mantenha a Ordem:</b> Use a regra básica: se sujou, limpe. Se bagunçou, organize. Ajude a manter o espaço em condições para todos.</p>
+                                            <p class="text-gray-300"><b>Artigo 2: Uso das Instalações</b><br><b>Prioridade da Alta Cúpula:</b> O galpão é a sede da irmandade. Em qualquer momento, se um membro da Alta Cúpula precisar usar um equipamento (mesa de sinuca, televisão, etc.), a prioridade é sempre dele.<br><br><b>Uso Consciente:</b> Utilize todos os recursos do galpão (TVs, fliperama, etc.) com responsabilidade. Reporte qualquer dano ou problema imediatamente a um dos membros da Alta Cúpula.</p>
+                                            <p class="text-gray-300"><b>Artigo 3: Consumo e Pagamento</b><br><b>Honestidade Acima de Tudo:</b> Todo o consumo de bebidas e comidas deve ser registrado e pago. A honestidade é um pilar fundamental.<br><br><b>Pagamento Imediato:</b> A conta do bar não será fiada. Todos os pagamentos devem ser feitos na hora, via Pix para a chave <span class="text-amber-400">sonsofpeaky@gmail.com</span>.</p>
+                                            <p class="text-gray-300"><b>Artigo 4: Convidados e Eventos</b><br><b>Anúncio de Convidados:</b> Se for levar um convidado, avise com antecedência. A presença de pessoas de fora deve ser conhecida e aprovada pelos membros da Alta Cúpula presentes.<br><br><b>Respeito aos Eventos:</b> O galpão é usado para reuniões e eventos. Respeite os encontros em andamento. Caso um evento privado esteja ocorrendo, os frequentadores serão informados e convidados a se retirarem, com a devida cortesia.</p>
+                                            <p class="text-gray-300"><b>Artigo 5: Estacionamento</b><br><b>Respeito aos Vizinhos:</b> Ao estacionar, seja de carro ou moto, certifique-se de não bloquear a entrada ou a passagem de veículos vizinhos. Nossa boa relação com a comunidade local é essencial.<br><br><b>Passagem Livre:</b> Não estacione de forma a impedir a passagem de outros veículos na rua ou no acesso ao galpão.<br><br><b>Vagas Disponíveis:</b> Se as vagas no galpão estiverem ocupadas, encontre um local de estacionamento seguro e legal em outro lugar. A porta do galpão e as áreas próximas devem estar sempre livres para a circulação.</p>
+                                            <p class="text-gray-300"><b>Artigo 6: Respeito e Boa Vizinhança</b><br><b>Nível de Ruído:</b> Após as 22h30, evite barulhos excessivos, seja no galpão ou na rua. Mantenha as conversas e a música em um volume que não incomode a vizinhança.<br><br><b>Proibição de Ilicitos:</b> É terminantemente proibido o consumo ou o porte de qualquer tipo de substância ilícita dentro ou nos arredores do espaço.<br><br><b>Modos e Comportamento:</b> Mantenha a cortesia e o respeito em todas as interações. Excessos de qualquer tipo (verbais, de consumo ou de atitude) não serão tolerados.</p>
+                                            <p class="text-gray-300">Ao entrar no galpão, o frequentador concorda automaticamente com este estatuto. Agradecemos a colaboração e a compreensão.</p>
+                                        </div>
+                                    </div>
+                    </div>
+                </div>
+            </section>
+
+        <!-- Agenda + Geradores -->
         <section id="agenda" class="py-16 md:py-24">
-            <div class="container">
-                <h2 class="section-title">Agenda de Eventos</h2>
-                <div id="agenda-container" class="card space-y-6 text-gray-300">
-                    <p class="mb-6">Fique por dentro dos próximos encontros e celebrações da irmandade.</p>
-                    <div class="space-y-4">
-                        <div class="p-4 rounded-md bg-gray-900 border border-gray-700">
-                            <h3 class="text-lg font-bold text-amber-500">22 de Setembro - Churrasco de Aniversário SOP</h3>
-                            <p class="text-gray-400">Celebração de mais um ano de estrada, com churrasco especial e música ao vivo no galpão.</p>
-                            <button class="mt-2 px-4 py-2 bg-amber-600 text-gray-900 font-bold rounded-full transition-transform duration-300 hover:scale-105 confirmar-btn">Confirmar Presença</button>
-                        </div>
-                        <div class="p-4 rounded-md bg-gray-900 border border-gray-700">
-                            <h3 class="text-lg font-bold text-amber-500">5 de Outubro - Rota dos Lobos Solitários</h3>
-                            <p class="text-gray-400">Viagem de um dia para o interior de São Paulo. Ponto de encontro: Galpão, 8h da manhã.</p>
-                            <button class="mt-2 px-4 py-2 bg-amber-600 text-gray-900 font-bold rounded-full transition-transform duration-300 hover:scale-105 confirmar-btn">Confirmar Presença</button>
-                        </div>
-                        <div class="p-4 rounded-md bg-gray-900 border border-gray-700">
-                            <h3 class="text-lg font-bold text-amber-500">18 de Outubro - Noite do Poker</h3>
-                            <p class="text-gray-400">Torneio anual de poker com grandes prêmios para os membros da Alta Cúpula. Inscrições abertas!</p>
-                            <button class="mt-2 px-4 py-2 bg-amber-600 text-gray-900 font-bold rounded-full transition-transform duration-300 hover:scale-105 confirmar-btn">Confirmar Presença</button>
-                        </div>
+            <div class="container space-y-10">
+                <h2 class="section-title">Agenda</h2>
+
+                <!-- Gerador de Rolê -->
+                <div class="space-y-3 p-4 rounded-md bg-gray-900 border border-gray-700">
+                    <h3 class="text-xl font-bold text-white">Gerador de Rolê</h3>
+                    <div class="grid md:grid-cols-3 gap-3">
+                        <input id="role-input" type="text" class="px-3 py-2 rounded bg-gray-800 border border-gray-700 text-gray-100" placeholder="O que fazer (ex: bate e volta, serra, praia)" />
+                        <input id="role-km-input" type="number" class="px-3 py-2 rounded bg-gray-800 border border-gray-700 text-gray-100" placeholder="KM (ida e volta)" />
+                        <input id="role-date-input" type="date" class="px-3 py-2 rounded bg-gray-800 border border-gray-700 text-gray-100" />
                     </div>
+                    <div class="flex items-center gap-3">
+                        <button id="gerar-role-btn" class="px-4 py-2 bg-amber-600 text-gray-900 font-bold rounded-full">Gerar Rolê</button>
+                        <div id="loading-indicator-role" class="hidden items-center gap-2 text-gray-400"><span class="animate-pulse">Gerando...</span></div>
+                    </div>
+                    <div id="role-output" class="text-gray-300"></div>
                 </div>
+
+                <!-- Gerador de Ideias de Eventos -->
+                <div class="space-y-3 p-4 rounded-md bg-gray-900 border border-gray-700">
+                    <h3 class="text-xl font-bold text-white">Gerador de Ideias de Eventos</h3>
+                    <input id="evento-input" type="text" class="w-full px-3 py-2 rounded bg-gray-800 border border-gray-700 text-gray-100" placeholder="Descreva o tipo de evento" />
+                    <div class="flex items-center gap-3">
+                        <button id="gerar-evento-btn" class="px-4 py-2 bg-amber-600 text-gray-900 font-bold rounded-full">Gerar Ideias</button>
+                        <div id="loading-indicator-evento" class="hidden items-center gap-2 text-gray-400"><span class="animate-pulse">Gerando...</span></div>
+                    </div>
+                    <div id="evento-output" class="text-gray-300"></div>
+                </div>
+
+                <!-- Gerador de Post do Instagram -->
+                <div class="space-y-3 p-4 rounded-md bg-gray-900 border border-gray-700">
+                    <h3 class="text-xl font-bold text-white">Gerador de Post do Instagram</h3>
+                    <input id="instagram-input" type="text" class="w-full px-3 py-2 rounded bg-gray-800 border border-gray-700 text-gray-100" placeholder="Tema do post" />
+                    <div class="flex items-center gap-3">
+                        <button id="gerar-instagram-btn" class="px-4 py-2 bg-amber-600 text-gray-900 font-bold rounded-full">Gerar Post</button>
+                        <div id="loading-indicator-instagram" class="hidden items-center gap-2 text-gray-400"><span class="animate-pulse">Gerando...</span></div>
+                    </div>
+                    <div id="instagram-output" class="text-gray-300"></div>
+                </div>
+
+                <!-- Mensagem do Dia -->
+                <div class="space-y-3 p-4 rounded-md bg-gray-900 border border-gray-700">
+                    <h3 class="text-xl font-bold text-white">Mensagem do Dia</h3>
+                    <div class="flex items-center gap-3">
+                        <button id="gerar-mensagem-btn" class="px-4 py-2 bg-amber-600 text-gray-900 font-bold rounded-full">Gerar Mensagem</button>
+                        <div id="loading-indicator-mensagem" class="hidden items-center gap-2 text-gray-400"><span class="animate-pulse">Gerando...</span></div>
+                    </div>
+                    <div id="mensagem-output" class="text-gray-300"></div>
+                </div>
+
+                        <!-- Lista da Agenda -->
+                        <div id="agenda-container" class="space-y-6">
+                            <h3 class="text-xl font-bold text-white">Próximos Eventos</h3>
+                            <div class="space-y-4"></div>
+                        </div>
+
+                        <!-- RSVP Modal -->
+                        <div id="rsvp-modal" class="modal-overlay hidden">
+                            <div class="modal-content">
+                                <h3 class="text-xl font-bold text-white mb-4">Confirme sua presença</h3>
+                                <p id="rsvp-event-title" class="text-gray-300 mb-2"></p>
+                                <input id="rsvp-name" type="text" placeholder="Seu nome completo" class="w-full px-3 py-2 rounded bg-gray-800 border border-gray-700 text-gray-100 mb-4" />
+                                <div class="flex gap-3">
+                                    <button id="rsvp-confirm-btn" class="px-6 py-2 bg-amber-600 text-gray-900 font-bold rounded-full">Confirmar</button>
+                                    <button id="rsvp-cancel-btn" class="px-6 py-2 bg-gray-700 text-gray-300 font-bold rounded-full">Cancelar</button>
+                                </div>
+                                <p id="rsvp-status" class="text-sm text-red-400 mt-2 hidden">Digite seu nome para confirmar.</p>
+                            </div>
+                        </div>
             </div>
         </section>
 
-        <!-- Seção do Estatuto -->
-        <section id="estatuto" class="py-16 md:py-24">
-            <div class="container">
-                <h2 class="section-title">Estatuto da Alta Cúpula</h2>
-                <div class="card space-y-6 text-gray-300">
-                    <p class="mb-6 font-semibold">Este estatuto é um guia para garantir que o espírito que construiu este lugar continue vivo, e que a responsabilidade de mantê-lo seja compartilhada por todos.</p>
-                    <h3 class="text-xl font-bold text-amber-500">Artigo 1: Os Pilares da Irmandade</h3>
-                    <ul class="list-disc pl-6 space-y-2">
-                        <li>**Zelo pelo Patrimônio:** Trate cada item com o cuidado de dono. Se sujou, limpe. Se bagunçou, organize. Comunique problemas imediatamente.</li>
-                        <li>**Gestão de Estoque:** É responsabilidade de todos garantir que o bar esteja sempre abastecido. O valor da reposição deve ser adicionado à sua conta.</li>
-                        <li>**O Galpão como Extensão do Lar:** Convidados são bem-vindos, mas a responsabilidade sobre eles é **sua**. A chave é exclusiva para a Alta Cúpula.</li>
-                    </ul>
-                    <h3 class="text-xl font-bold text-amber-500 mt-6">Artigo 2: Nossas Finanças, Nosso Futuro</h3>
-                    <ul class="list-disc pl-6 space-y-2">
-                        <li>**Taxa Mensal:** R$ 250,00, paga até o dia **10 de cada mês**.</li>
-                        <li>**Conta do Bar:** Quitada quinzenalmente, nos dias **15 e 30**.</li>
-                        <li>**Valores:** Heineken: R$ 5,00 | Duplo Malte: R$ 4,50 | Coca: R$ 4,00 | H2O: R$ 4,50 | Água: R$ 2,00 | Energético: R$ 10,00.</li>
-                        <li>**Pagamento:** Via Pix, para a chave **sonsofpeaky@gmail.com**.</li>
-                    </ul>
-                    <script src="app.js" defer></script>
-                if (!generatedText) {
-                    generatedText = localGenerateRide({ input, km: Number(km), date });
-                }
+        <!-- Preços do Bar -->
+            <section id="bar" class="py-16 md:py-24">
+                <div class="container space-y-8">
+                    <h2 class="section-title">Preços do Bar</h2>
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div class="p-4 rounded-md bg-gray-900 border border-gray-700 flex flex-col items-center">
+                            <img src="assets/img/heineken.jpg" alt="Heineken" class="mb-2 rounded shadow-md" style="max-width:80px;max-height:80px;" />
+                            <span class="text-white font-bold">Heineken</span>
+                            <span class="text-amber-400 font-bold text-lg">R$ 5,00</span>
+                        </div>
+                        <div class="p-4 rounded-md bg-gray-900 border border-gray-700 flex flex-col items-center">
+                            <img src="assets/img/duplo-malte.jpg" alt="Duplo Malte" class="mb-2 rounded shadow-md" style="max-width:80px;max-height:80px;" />
+                            <span class="text-white font-bold">Duplo Malte</span>
+                            <span class="text-amber-400 font-bold text-lg">R$ 4,50</span>
+                        </div>
+                        <div class="p-4 rounded-md bg-gray-900 border border-gray-700 flex flex-col items-center">
+                            <img src="assets/img/coca.jpg" alt="Coca-Cola" class="mb-2 rounded shadow-md" style="max-width:80px;max-height:80px;" />
+                            <span class="text-white font-bold">Coca-Cola Normal/Zero</span>
+                            <span class="text-amber-400 font-bold text-lg">R$ 4,00</span>
+                        </div>
+                        <div class="p-4 rounded-md bg-gray-900 border border-gray-700 flex flex-col items-center">
+                            <img src="assets/img/h2o.jpg" alt="H2O Limoneto" class="mb-2 rounded shadow-md" style="max-width:80px;max-height:80px;" />
+                            <span class="text-white font-bold">H2O Limoneto</span>
+                            <span class="text-amber-400 font-bold text-lg">R$ 4,50</span>
+                        </div>
+                        <div class="p-4 rounded-md bg-gray-900 border border-gray-700 flex flex-col items-center">
+                            <img src="assets/img/agua.jpg" alt="Água" class="mb-2 rounded shadow-md" style="max-width:80px;max-height:80px;" />
+                            <span class="text-white font-bold">Água</span>
+                            <span class="text-amber-400 font-bold text-lg">R$ 2,00</span>
+                        </div>
+                        <div class="p-4 rounded-md bg-gray-900 border border-gray-700 flex flex-col items-center">
+                            <img src="assets/img/energetico.jpg" alt="Energético" class="mb-2 rounded shadow-md" style="max-width:80px;max-height:80px;" />
+                            <span class="text-white font-bold">Energético</span>
+                            <span class="text-amber-400 font-bold text-lg">R$ 10,00</span>
+                        </div>
+                    </div>
+                    <div class="mt-8 flex flex-col md:flex-row items-center gap-6">
+                        <div class="flex flex-col items-center">
+                            <span class="text-gray-300">Pagamento via Pix:</span>
+                            <span class="text-amber-400 font-bold text-lg">sonsofpeaky@gmail.com</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <span class="text-gray-300">QR Code Pix:</span>
+                            <img src="assets/img/pix-qr.png" alt="QR Code Pix" class="rounded shadow-md" style="max-width:120px;max-height:120px;" />
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-                // Image generation only if API_KEY provided
-                if (API_KEY && API_URL_GENERATE_IMAGE) {
-                    const promptImage = `Cartaz de convite para rolê de moto Sons of Peaky`;
-                    const payloadImage = { instances: { prompt: promptImage }, parameters: { sampleCount: 1 } };
-                    try {
-                        const responseImage = await fetchWithExponentialBackoff(API_URL_GENERATE_IMAGE, {
-                            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payloadImage)
-                        });
-                        const base64Data = responseImage?.predictions?.[0]?.bytesBase64Encoded;
-                        if (base64Data) imageUrl = `data:image/png;base64,${base64Data}`;
-                    } catch (e) {
-                        console.warn('Imagem remota não gerada, usando fallback.');
-                    }
-                }
+        <!-- Redes Sociais -->
+            <section id="redes" class="py-16 md:py-24">
+                <div class="container space-y-8">
+                    <h2 class="section-title">Redes Sociais</h2>
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <a href="https://www.tiktok.com/@sonsofpeaky?_t=ZM-8zywTjumGD5&_r=1" target="_blank" rel="noopener" class="p-4 rounded-md bg-gray-900 border border-gray-700 flex flex-col items-center hover:bg-gray-800 transition">
+                            <img src="assets/img/tiktok.png" alt="TikTok" class="mb-2" style="max-width:60px;max-height:60px;" />
+                            <span class="text-white font-bold">TikTok</span>
+                            <span class="text-gray-400 text-sm">@sonsofpeaky</span>
+                        </a>
+                        <a href="https://www.instagram.com/sonsofpeaky?igsh=d3c0Z2p2Z3J2bmJp&utm_source=qr" target="_blank" rel="noopener" class="p-4 rounded-md bg-gray-900 border border-gray-700 flex flex-col items-center hover:bg-gray-800 transition">
+                            <img src="assets/img/instagram.png" alt="Instagram" class="mb-2" style="max-width:60px;max-height:60px;" />
+                            <span class="text-white font-bold">Instagram</span>
+                            <span class="text-gray-400 text-sm">@sonsofpeaky</span>
+                        </a>
+                        <a href="https://youtube.com/@sonsofpeakytv2852?si=2Hj8DIm3Nfx_Nhjt" target="_blank" rel="noopener" class="p-4 rounded-md bg-gray-900 border border-gray-700 flex flex-col items-center hover:bg-gray-800 transition">
+                            <img src="assets/img/youtube.png" alt="YouTube" class="mb-2" style="max-width:60px;max-height:60px;" />
+                            <span class="text-white font-bold">YouTube</span>
+                            <span class="text-gray-400 text-sm">@sonsofpeakytv2852</span>
+                        </a>
+                    </div>
+                </div>
+            </section>
+    </main>
 
-                // Fallback image (placeholder) if none
-                if (!imageUrl) imageUrl = 'https://placehold.co/600x300/111827/fb923c?text=Convite+Rol%C3%AA';
-
-                if (outputDiv) outputDiv.innerHTML = `\n                    <div class="space-y-4">\n                        <h4 class="text-lg font-bold text-white">Detalhes do Rolê:</h4>\n                        <div class="p-4 rounded-md bg-gray-900 border border-gray-700 whitespace-pre-wrap">${generatedText}</div>\n                        <h4 class="text-lg font-bold text-white">Convite Gerado:</h4>\n                        <div class="flex justify-center">\n                            <img src="${imageUrl}" alt="Convite para o Rolê" class="rounded-lg shadow-md max-w-full h-auto">\n                        </div>\n                    </div>\n                `;
-
-                // Adicionar o rolê à agenda
-                const agendaContainer = document.querySelector('#agenda-container .space-y-4');
-                if (agendaContainer) {
-                    const newEventHTML = `\n                        <div class="p-4 rounded-md bg-gray-900 border border-gray-700">\n                            <h3 class="text-lg font-bold text-amber-500">${new Date(date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' })} - ${input}</h3>\n                            <p class="text-gray-400">Ponto de encontro: Galpão. Distância: ${km}km.</p>\n                            <button class="mt-2 px-4 py-2 bg-amber-600 text-gray-900 font-bold rounded-full transition-transform duration-300 hover:scale-105 confirmar-btn">Confirmar Presença</button>\n                        </div>\n                    `;
-                    agendaContainer.insertAdjacentHTML('afterbegin', newEventHTML);
-                    addConfirmButtonListeners();
-                }
-
-            } catch (error) {
-                console.error('Erro ao gerar rolê:', error);
-                if ($('role-output')) $('role-output').textContent = 'Ocorreu um erro ao conectar com o serviço. Tente novamente mais tarde.';
-            } finally {
-                if ($('loading-indicator-role')) $('loading-indicator-role').style.display = 'none';
-            }
-        });
-
-        // Gerador de Ideias de Eventos
-        const gerarEventoBtn = $('gerar-evento-btn');
-        if (gerarEventoBtn) gerarEventoBtn.addEventListener('click', async function () {
-            const input = $('evento-input')?.value.trim();
-            const outputDiv = $('evento-output');
-            const loadingIndicator = $('loading-indicator-evento');
-            if (!input) { if (outputDiv) outputDiv.textContent = 'Por favor, descreva o tipo de evento que você quer planejar.'; return; }
-            if (outputDiv) outputDiv.textContent = '';
-            if (loadingIndicator) loadingIndicator.style.display = 'flex';
-            try {
-                let text = null;
-                if (API_KEY && API_URL_GENERATE_TEXT) {
-                    const prompt = `Atue como um planejador de eventos...`;
-                    const payload = { contents: [{ parts: [{ text: prompt }] }] };
-                    const response = await fetchWithExponentialBackoff(API_URL_GENERATE_TEXT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                    text = response?.candidates?.[0]?.content?.parts?.[0]?.text;
-                }
-                if (!text) text = localGenerateEvent({ input });
-                if (outputDiv) outputDiv.textContent = text;
-            } catch (error) {
-                console.error('Erro ao gerar ideias de evento:', error);
-                if ($('evento-output')) $('evento-output').textContent = 'Ocorreu um erro ao conectar com o serviço. Tente novamente mais tarde.';
-            } finally { if (loadingIndicator) loadingIndicator.style.display = 'none'; }
-        });
-
-        // Gerador de Posts do Instagram
-        const gerarInstagramBtn = $('gerar-instagram-btn');
-        if (gerarInstagramBtn) gerarInstagramBtn.addEventListener('click', async function () {
-            const input = $('instagram-input')?.value.trim();
-            const outputDiv = $('instagram-output');
-            const loadingIndicator = $('loading-indicator-instagram');
-            if (!input) { if (outputDiv) outputDiv.textContent = 'Por favor, descreva o conteúdo do post para gerar a legenda e hashtags.'; return; }
-            if (outputDiv) outputDiv.textContent = '';
-            if (loadingIndicator) loadingIndicator.style.display = 'flex';
-            try {
-                let text = null;
-                if (API_KEY && API_URL_GENERATE_TEXT) {
-                    const prompt = `Atue como um especialista em marketing digital...`;
-                    const payload = { contents: [{ parts: [{ text: prompt }] }] };
-                    const response = await fetchWithExponentialBackoff(API_URL_GENERATE_TEXT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                    text = response?.candidates?.[0]?.content?.parts?.[0]?.text;
-                }
-                if (!text) text = localGenerateInstagram({ input });
-                if (outputDiv) outputDiv.textContent = text;
-            } catch (error) {
-                console.error('Erro ao gerar post do Instagram:', error);
-                if ($('instagram-output')) $('instagram-output').textContent = 'Ocorreu um erro ao conectar com o serviço. Tente novamente mais tarde.';
-            } finally { if (loadingIndicator) loadingIndicator.style.display = 'none'; }
-        });
-
-        // Mensagem do Dia
-        const gerarMensagemBtn = $('gerar-mensagem-btn');
-        if (gerarMensagemBtn) gerarMensagemBtn.addEventListener('click', async function () {
-            const outputDiv = $('mensagem-output');
-            const loadingIndicator = $('loading-indicator-mensagem');
-            if (outputDiv) outputDiv.textContent = '';
-            if (loadingIndicator) loadingIndicator.style.display = 'flex';
-            try {
-                let text = null;
-                if (API_KEY && API_URL_GENERATE_TEXT) {
-                    const prompt = `Gere uma mensagem curta e inspiradora...`;
-                    const payload = { contents: [{ parts: [{ text: prompt }] }] };
-                    const response = await fetchWithExponentialBackoff(API_URL_GENERATE_TEXT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                    text = response?.candidates?.[0]?.content?.parts?.[0]?.text;
-                }
-                if (!text) text = localGenerateMessage();
-                if (outputDiv) outputDiv.textContent = text;
-            } catch (error) {
-                console.error('Erro ao gerar mensagem do dia:', error);
-                if ($('mensagem-output')) $('mensagem-output').textContent = 'Ocorreu um erro ao conectar com o serviço. Tente novamente mais tarde.';
-            } finally { if (loadingIndicator) loadingIndicator.style.display = 'none'; }
-        });
-
-        // Lógica para a Assinatura (substituído 'alert' por 'showModal')
-        const assinarBtn = $('assinar-btn');
-        if (assinarBtn) assinarBtn.addEventListener('click', function () {
-            const assinaturaInput = $('assinatura');
-            const nome = assinaturaInput?.value.trim();
-            if (nome) {
-                showModal(`Obrigado, ${nome}! Seu acordo foi registrado. Bem-vindo à família Sons of Peaky.`);
-                if (assinaturaInput) assinaturaInput.value = '';
-            } else {
-                showModal('Por favor, digite seu nome completo para assinar.');
-            }
-        });
-
-    });
-    </script>
+    <!-- Scripts -->
+    <script src="config.js"></script>
+    <script src="app.js" defer></script>
 </body>
-
 </html>

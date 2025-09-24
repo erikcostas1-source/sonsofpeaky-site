@@ -5,6 +5,9 @@
   --card: #1a1a1a;
   --muted: #9ca3af;
   --accent: #fb923c;
+  --gold: #c9a14a;
+  --parchment: #f2e6c9;
+  --parchment-ink: #3b2f1a;
   --text: #e5e7eb;
 }
 
@@ -23,8 +26,9 @@ section { padding: 4rem 0; }
 .container { max-width: 900px; margin: 0 auto; padding: 0 1rem; }
 
 .section-title {
-  font-size: 2.5rem; font-weight: 700; color: #ffffff;
+  font-size: 2.5rem; font-weight: 700; color: var(--gold);
   border-bottom: 2px solid var(--accent); padding-bottom: 0.5rem; margin-bottom: 2rem; text-align: center;
+  font-family: 'Pirata One', 'Carnevalee Freakshow', serif;
 }
 
 .card { background-color: var(--card); border-radius: 0.75rem; padding: 2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
@@ -52,12 +56,23 @@ section { padding: 4rem 0; }
 .confirmar-btn, #assinar-btn, .px-8.py-3 { background-color: var(--accent); color: #08121a; font-weight:700; }
 
 /* Ensure header small size on mobile */
-.site-nav .container img { width:48px; height:48px; }
-.site-nav h1 { font-size:1.125rem; }
+.site-nav .container img { width:120px; height:auto; max-width:320px; }
+.site-nav h1 { font-size:2.5rem; color: var(--gold); font-family: 'Pirata One', 'Carnevalee Freakshow', serif; }
 
 /* Hero banner */
 .hero h2 { letter-spacing: -0.02em; }
 .hero p { max-width: 720px; margin: 0 auto; }
+
+/* Wanted poster card without external image */
+.wanted-card {
+  background: radial-gradient(1200px 300px at 50% -200px, rgba(0,0,0,0.15), transparent 60%),
+              radial-gradient(800px 200px at 0% 100%, rgba(0,0,0,0.08), transparent 50%),
+              radial-gradient(800px 200px at 100% 100%, rgba(0,0,0,0.08), transparent 50%),
+              linear-gradient(180deg, #f6edd6 0%, #f1e2b8 60%, #e7d6a4 100%);
+  color: var(--parchment-ink);
+  border-color: #7a4f1d !important;
+}
+.wanted-card h3, .wanted-card p { color: var(--parchment-ink); }
 
 /* Nav link hover/active */
 #main-nav-menu a { transition: color 0.15s ease, transform 0.12s ease; }
