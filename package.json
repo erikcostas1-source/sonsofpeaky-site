@@ -1,0 +1,8 @@
+{
+  "name": "sonsofpeaky-functions",
+  "version": "1.0.0",
+  "description": "Netlify Functions para Sons of Peaky",
+  "dependencies": {
+    "node-fetch": "^2.6.7"
+  }
+}

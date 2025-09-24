@@ -1,10 +1,25 @@
-# Node (if you later add tooling)
+# Node dependencies
 node_modules/
 .DS_Store
+
+# Environment variables (NUNCA fazer commit das chaves!)
 .env
+.env.local
+.env.production
+.env.development
 
 # OS files
 Thumbs.db
 
 # IDE
 .vscode/
+
+# Build artifacts
+dist/
+build/
+
+# Netlify
+.netlify/
+
+# Local development
+config.local.js

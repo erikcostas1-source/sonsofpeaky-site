@@ -3,19 +3,24 @@
  * Sistema completo de geração de roteiros personalizados
  */
 
-// Configuração da API - usando config.js centralizado
+// Configuração da API - usando função serverless para segurança
 function getAPIConfig() {
-    if (typeof window !== 'undefined' && window.SOP_CONFIG) {
+    // Detecta se está em produção (GitHub Pages/Netlify) ou desenvolvimento local
+    const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    
+    if (isDevelopment) {
+        // Para desenvolvimento local, fallback para API direta (apenas para testes)
         return {
-            apiKey: window.SOP_CONFIG.apiKey,
-            apiUrl: window.SOP_CONFIG.textUrl
+            apiUrl: window.SOP_CONFIG?.textUrl || 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyCiHRVozYYmHB-5W64QdJzn9dQYAyRl9Tk',
+            useServerless: false
+        };
+    } else {
+        // Em produção, usa função serverless do Netlify/GitHub Pages
+        return {
+            apiUrl: '/api/generate-role',
+            useServerless: true
         };
     }
-    // Fallback caso config.js não esteja carregado
-    return {
-        apiKey: 'AIzaSyCiHRVozYYmHB-5W64QdJzn9dQYAyRl9Tk',
-        apiUrl: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=AIzaSyCiHRVozYYmHB-5W64QdJzn9dQYAyRl9Tk'
-    };
 }
 
 // Cache para melhor performance
@@ -41,6 +46,9 @@ document.addEventListener('DOMContentLoaded', function() {
  */
 function initializeApp() {
     console.log('🚀 Gerador de Rolês iniciado');
+    
+    // Verifica se é um link colaborativo
+    checkCollaborativeLink();
     
     // Define data atual
     const today = new Date().toISOString().split('T')[0];
@@ -166,30 +174,51 @@ async function generateRole(formData) {
     console.log('🔧 Usando API:', apiConfig.apiUrl.substring(0, 100) + '...');
     
     try {
-        const requestBody = {
-            contents: [{
-                parts: [{
-                    text: prompt
-                }]
-            }],
-            generationConfig: {
-                temperature: 0.8,
-                topK: 40,
-                topP: 0.95,
-                maxOutputTokens: 2048,
-            }
-        };
+        let requestBody, response;
         
-        console.log('📤 Request body:', JSON.stringify(requestBody, null, 2));
-        console.log('📡 URL:', apiConfig.apiUrl);
-        
-        const response = await fetch(apiConfig.apiUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(requestBody)
-        });
+        if (apiConfig.useServerless) {
+            // Usando função serverless (produção)
+            requestBody = {
+                prompt: prompt
+            };
+            
+            console.log('📤 Using serverless function');
+            console.log('📡 URL:', apiConfig.apiUrl);
+            
+            response = await fetch(apiConfig.apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody)
+            });
+        } else {
+            // Usando API direta (desenvolvimento local)
+            requestBody = {
+                contents: [{
+                    parts: [{
+                        text: prompt
+                    }]
+                }],
+                generationConfig: {
+                    temperature: 0.8,
+                    topK: 40,
+                    topP: 0.95,
+                    maxOutputTokens: 2048,
+                }
+            };
+            
+            console.log('📤 Using direct API (development)');
+            console.log('📡 URL:', apiConfig.apiUrl);
+            
+            response = await fetch(apiConfig.apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody)
+            });
+        }
         
         console.log('📨 Response received:', response.status, response.statusText);
         console.log('📨 Response headers:', [...response.headers.entries()]);
@@ -318,7 +347,7 @@ Para cada destino em cada sugestão, forneça:
    - Distância e tempo de viagem desde o ponto anterior
    - Descrição detalhada do que fazer/ver
    - Custo estimado por pessoa
-   - Dicas específicas para motociclistas
+   - Dicas específicas para motociclistas (condições da estrada, melhor horário, equipamentos, segurança)
    - Horário sugerido de chegada e permanência
 
 Calcule custos realistas para cada sugestão:
@@ -328,11 +357,15 @@ Calcule custos realistas para cada sugestão:
    - Estacionamento para moto
 
 Considere a logística:
-   - Condições das estradas
+   - Condições das estradas (asfalto, terra, curvas, subidas)
    - Locais para parar e descansar
    - Postos de combustível no trajeto
-   - Segurança para motos
+   - Segurança para motos (guarda-volumes, vigilância)
    - TEMPO TOTAL compatível com horários de saída e volta
+   - Condições climáticas da região
+   - Equipamentos recomendados (capacete, proteção, capa de chuva)
+   - Documentação necessária
+   - Telefone de emergência local
 
 5. Formate a resposta em JSON válido com esta estrutura:
 {
@@ -356,7 +389,13 @@ Considere a logística:
           "tempo_permanencia": "XX min",
           "descricao": "O que fazer/ver",
           "custo_estimado": "R$ XX",
-          "dicas_motociclista": ["dica1", "dica2"],
+          "dicas_motociclista": [
+            "Condições da estrada (ex: 'Asfalto em bom estado, mas cuidado com curvas acentuadas')",
+            "Segurança local (ex: 'Local com boa vigilância, estacionamento gratuito para motos')",
+            "Equipamentos (ex: 'Recomendado capacete extra para trilha, protetor de joelho')",
+            "Melhor horário (ex: 'Evite entre 12h-14h devido ao sol forte na subida')",
+            "Emergência (ex: 'Posto de saúde a 5km, sinal de celular instável na serra')"
+          ],
           "coordenadas": "lat,lng (se souber)"
         }
       ],
@@ -549,6 +588,7 @@ function displayResults(results) {
     // Salva os roteiros globalmente para compartilhamento  
     generatedRoteiros = results;
     
+    // Limpa completamente o container
     container.innerHTML = '';
     
     // Cria header de seleção
@@ -557,6 +597,13 @@ function displayResults(results) {
     header.innerHTML = `
         <h2 class="text-3xl font-bold text-gold-primary mb-4">🎯 Escolha Sua Aventura</h2>
         <p class="text-gray-300 text-lg">Gerou 3 sugestões personalizadas para você. Escolha a que mais combina com seu estilo!</p>
+        
+        <div class="mt-6">
+            <button onclick="shareForVoting()" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors shadow-lg">
+                🗳️ Compartilhar para Votação
+            </button>
+            <p class="text-gray-400 text-sm mt-2">Deixe seu grupo votar na melhor opção!</p>
+        </div>
     `;
     container.appendChild(header);
     
@@ -578,6 +625,10 @@ function displayResults(results) {
     selectedContainer.className = 'hidden';
     container.appendChild(selectedContainer);
     
+    // Cria checklist de dicas
+    const checklistContainer = createChecklistSummary(results);
+    container.appendChild(checklistContainer);
+    
     // Mostra seção de resultados
     resultsSection.classList.remove('hidden');
     resultsSection.classList.add('slide-in-up');
@@ -589,6 +640,117 @@ function displayResults(results) {
             block: 'start' 
         });
     }, 300);
+}
+
+/**
+ * Cria resumo checklist de todas as dicas
+ */
+function createChecklistSummary(roteiros) {
+    const checklistContainer = document.createElement('div');
+    checklistContainer.className = 'bg-gradient-to-r from-blue-900 to-purple-900 rounded-xl p-6 mb-8';
+    checklistContainer.innerHTML = `
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-2xl font-bold text-white">📋 Checklist do Role</h3>
+            <button onclick="toggleChecklist()" class="text-white hover:text-blue-300 transition-colors">
+                <i class="fas fa-chevron-down" id="checklist-arrow"></i>
+            </button>
+        </div>
+        <p class="text-blue-200 mb-4">Todas as dicas importantes para não esquecer nada!</p>
+        <div id="checklist-content" class="hidden">
+            ${generateFullChecklist(roteiros)}
+        </div>
+    `;
+    
+    return checklistContainer;
+}
+
+/**
+ * Gera checklist completo com todas as dicas
+ */
+function generateFullChecklist(roteiros) {
+    const allTips = new Set();
+    
+    // Coleta todas as dicas únicas de todos os roteiros
+    roteiros.forEach(roteiro => {
+        if (roteiro.destinos) {
+            roteiro.destinos.forEach(destino => {
+                if (destino.dicas_motociclista) {
+                    destino.dicas_motociclista.forEach(dica => {
+                        // Extrai a dica limpa (remove prefixos como "Condições da estrada:")
+                        const cleanTip = dica.replace(/^[^:]+:\s*/, '').trim();
+                        if (cleanTip.length > 10) { // Só adiciona dicas significativas
+                            allTips.add(cleanTip);
+                        }
+                    });
+                }
+            });
+        }
+    });
+    
+    // Categoriza as dicas
+    const categories = {
+        '🛡️ Equipamentos': [],
+        '📞 Reservas e Contatos': [],
+        '🛣️ Estrada e Navegação': [],
+        '⏰ Horários e Clima': [],
+        '🚨 Segurança e Emergência': [],
+        '💡 Outras Dicas': []
+    };
+    
+    allTips.forEach(tip => {
+        const lowerTip = tip.toLowerCase();
+        if (lowerTip.includes('equipamento') || lowerTip.includes('capacete') || lowerTip.includes('proteção') || lowerTip.includes('roupas') || lowerTip.includes('lanterna')) {
+            categories['🛡️ Equipamentos'].push(tip);
+        } else if (lowerTip.includes('reserva') || lowerTip.includes('ligar') || lowerTip.includes('telefone') || lowerTip.includes('contato')) {
+            categories['📞 Reservas e Contatos'].push(tip);
+        } else if (lowerTip.includes('estrada') || lowerTip.includes('trajeto') || lowerTip.includes('curva') || lowerTip.includes('subida') || lowerTip.includes('asfalto')) {
+            categories['🛣️ Estrada e Navegação'].push(tip);
+        } else if (lowerTip.includes('horário') || lowerTip.includes('clima') || lowerTip.includes('sol') || lowerTip.includes('chuva') || lowerTip.includes('evite')) {
+            categories['⏰ Horários e Clima'].push(tip);
+        } else if (lowerTip.includes('emergência') || lowerTip.includes('segurança') || lowerTip.includes('saúde') || lowerTip.includes('sinal')) {
+            categories['🚨 Segurança e Emergência'].push(tip);
+        } else {
+            categories['💡 Outras Dicas'].push(tip);
+        }
+    });
+    
+    let checklistHTML = '<div class="grid md:grid-cols-2 gap-4">';
+    
+    Object.entries(categories).forEach(([category, tips]) => {
+        if (tips.length > 0) {
+            checklistHTML += `
+                <div class="bg-white bg-opacity-10 rounded-lg p-4">
+                    <h4 class="text-lg font-bold text-white mb-3">${category}</h4>
+                    <div class="space-y-2">
+                        ${tips.map(tip => `
+                            <label class="flex items-start gap-3 text-blue-100 hover:text-white cursor-pointer transition-colors">
+                                <input type="checkbox" class="mt-1 rounded border-blue-300 text-blue-600 focus:ring-blue-500">
+                                <span class="text-sm">${tip}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+    });
+    
+    checklistHTML += '</div>';
+    
+    return checklistHTML;
+}
+
+/**
+ * Toggle do checklist
+ */
+function toggleChecklist() {
+    const content = document.getElementById('checklist-content');
+    const arrow = document.getElementById('checklist-arrow');
+    
+    if (content && arrow) {
+        content.classList.toggle('hidden');
+        arrow.classList.toggle('fa-chevron-down');
+        arrow.classList.toggle('fa-chevron-up');
+    }
 }
 
 /**
@@ -726,11 +888,21 @@ function createResultCard(roteiro, index) {
                     </div>
                     
                     ${destino.dicas_motociclista && destino.dicas_motociclista.length > 0 ? `
-                        <div class="mt-3">
-                            <h6 class="text-gold-primary font-semibold mb-2">🏍️ Dicas para Motociclistas:</h6>
-                            <ul class="text-sm text-gray-300 space-y-1">
-                                ${destino.dicas_motociclista.map(dica => `<li>• ${dica}</li>`).join('')}
-                            </ul>
+                        <div class="mt-4">
+                            <h6 class="text-gold-primary font-semibold mb-3">🏍️ Dicas Especializadas:</h6>
+                            <div class="space-y-2">
+                                ${destino.dicas_motociclista.map(dica => {
+                                    const icon = dica.toLowerCase().includes('estrada') ? '🛣️' :
+                                               dica.toLowerCase().includes('segurança') ? '🔒' :
+                                               dica.toLowerCase().includes('equipamento') ? '🛡️' :
+                                               dica.toLowerCase().includes('horário') ? '⏰' :
+                                               dica.toLowerCase().includes('emergência') ? '🚨' : '💡';
+                                    return `<div class="bg-gray-600 rounded-lg p-2">
+                                        <span class="text-lg mr-2">${icon}</span>
+                                        <span class="text-gray-200 text-sm">${dica}</span>
+                                    </div>`;
+                                }).join('')}
+                            </div>
                         </div>
                     ` : ''}
                 </div>
@@ -951,10 +1123,23 @@ function clearFieldError(event) {
 function showLoading() {
     const loading = document.getElementById('loading-role');
     const resultsSection = document.getElementById('results-section');
+    const submitButton = document.querySelector('button[type="submit"]');
     
     if (loading && resultsSection) {
         loading.classList.remove('hidden');
         resultsSection.classList.remove('hidden');
+        
+        // Atualiza o botão
+        if (submitButton) {
+            submitButton.disabled = true;
+            submitButton.innerHTML = `
+                <div class="flex items-center justify-center">
+                    <div class="animate-spin w-5 h-5 border-3 border-white border-t-transparent rounded-full mr-3"></div>
+                    🤖 Gerando 3 Sugestões...
+                </div>
+            `;
+            submitButton.classList.add('opacity-75', 'cursor-not-allowed');
+        }
         
         // Scroll para loading
         setTimeout(() => {
@@ -963,13 +1148,28 @@ function showLoading() {
                 block: 'center' 
             });
         }, 100);
+        
+        // Mostra notificação
+        showNotification('🧠 IA analisando suas preferências...', 'info');
     }
 }
 
 function hideLoading() {
     const loading = document.getElementById('loading-role');
+    const submitButton = document.querySelector('button[type="submit"]');
+    
     if (loading) {
         loading.classList.add('hidden');
+    }
+    
+    // Restaura o botão
+    if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.innerHTML = `
+            <i class="fas fa-magic mr-2"></i>
+            🚀 Criar Rolê Perfeito
+        `;
+        submitButton.classList.remove('opacity-75', 'cursor-not-allowed');
     }
 }
 
@@ -978,6 +1178,10 @@ function hideResults() {
     if (resultsSection) {
         resultsSection.classList.add('hidden');
     }
+    
+    // Reset global variables
+    generatedRoteiros = [];
+    currentResults = [];
 }
 
 function showError(message) {
@@ -1144,6 +1348,231 @@ function initializePWA() {
 let generatedRoteiros = []; // Armazena os roteiros gerados
 
 /**
+ * Gerar link único para votação colaborativa
+ */
+function generateCollaborativeLink(roteiros, formData) {
+    const roteiroData = {
+        id: Date.now().toString(36) + Math.random().toString(36).substr(2),
+        roteiros: roteiros,
+        formData: formData,
+        criado: new Date().toISOString(),
+        votos: {},
+        status: 'voting' // voting, decided
+    };
+    
+    // Salva na lista de roteiros colaborativos
+    const colaborativos = JSON.parse(localStorage.getItem('sop_roteiros_colaborativos') || '[]');
+    colaborativos.push(roteiroData);
+    localStorage.setItem('sop_roteiros_colaborativos', JSON.stringify(colaborativos));
+    
+    return `${window.location.origin}${window.location.pathname}?collaborative=${roteiroData.id}`;
+}
+
+/**
+ * Compartilhar para votação colaborativa
+ */
+function shareForVoting() {
+    if (!generatedRoteiros || generatedRoteiros.length === 0) return;
+    
+    const collaborativeLink = generateCollaborativeLink(generatedRoteiros, lastFormData);
+    
+    const texto = `🏍️ *Votação de Role - Sons of Peaky*\n\n` +
+        `Ajude a escolher o melhor roteiro entre 3 opções:\n\n` +
+        `📅 *Saída:* ${lastFormData.pontoPartida}\n` +
+        `🕐 *Horário:* ${lastFormData.horarioPreferido}\n` +
+        `🎯 *Experiência:* ${lastFormData.experienciaDesejada}\n\n` +
+        `🗳️ *Vote aqui:* ${collaborativeLink}\n\n` +
+        `#SonsOfPeaky #MotoRole`;
+    
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(texto)}`;
+    window.open(whatsappUrl, '_blank');
+    
+    // Copia o link também
+    navigator.clipboard.writeText(collaborativeLink).then(() => {
+        showNotification('🔗 Link de votação copiado e WhatsApp aberto!', 'success');
+    });
+    
+    trackEvent('share_collaborative_voting', { link: collaborativeLink });
+}
+
+/**
+ * Verifica se é um link colaborativo
+ */
+function checkCollaborativeLink() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const collaborativeId = urlParams.get('collaborative');
+    
+    if (collaborativeId) {
+        loadCollaborativeVoting(collaborativeId);
+    }
+}
+
+/**
+ * Carrega interface de votação colaborativa
+ */
+function loadCollaborativeVoting(collaborativeId) {
+    const colaborativos = JSON.parse(localStorage.getItem('sop_roteiros_colaborativos') || '[]');
+    const roteiroData = colaborativos.find(r => r.id === collaborativeId);
+    
+    if (!roteiroData) {
+        showNotification('❌ Link de votação não encontrado ou expirado!', 'error');
+        return;
+    }
+    
+    // Esconde o formulário e mostra interface de votação
+    const formContainer = document.querySelector('.form-container, form').parentElement;
+    if (formContainer) {
+        formContainer.style.display = 'none';
+    }
+    
+    // Cria interface de votação
+    const votingContainer = document.createElement('div');
+    votingContainer.className = 'container mx-auto px-4 py-8';
+    votingContainer.innerHTML = `
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gold-primary mb-4">🗳️ Votação de Role</h1>
+            <p class="text-gray-300 text-lg">Vote no melhor roteiro para o grupo!</p>
+            <div class="bg-gray-800 rounded-lg p-4 mt-4 inline-block">
+                <p class="text-sm text-gray-400">📅 Saída: ${roteiroData.formData.pontoPartida}</p>
+                <p class="text-sm text-gray-400">🕐 Horário: ${roteiroData.formData.horarioPreferido}</p>
+                <p class="text-sm text-gray-400">🎯 Experiência: ${roteiroData.formData.experienciaDesejada}</p>
+            </div>
+        </div>
+        
+        <div class="grid md:grid-cols-3 gap-6 mb-8" id="voting-suggestions">
+            ${roteiroData.roteiros.map((roteiro, index) => createVotingCard(roteiro, index, collaborativeId, roteiroData.votos)).join('')}
+        </div>
+        
+        <div class="text-center">
+            <div class="bg-gray-800 rounded-lg p-4 inline-block">
+                <h3 class="text-lg font-bold text-gold-primary mb-2">📊 Resultado da Votação</h3>
+                <div id="voting-results">
+                    ${generateVotingResults(roteiroData.votos, roteiroData.roteiros)}
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(votingContainer);
+}
+
+/**
+ * Cria card de votação
+ */
+function createVotingCard(roteiro, index, collaborativeId, votos) {
+    const voteCount = Object.values(votos).filter(v => v === index).length;
+    const hasVoted = localStorage.getItem(`voted_${collaborativeId}`) !== null;
+    const userVote = localStorage.getItem(`voted_${collaborativeId}`);
+    const isUserChoice = userVote == index;
+    
+    return `
+        <div class="bg-gray-800 rounded-xl p-6 hover:bg-gray-750 transition-colors ${isUserChoice ? 'ring-2 ring-gold-primary' : ''}">
+            <div class="text-center mb-4">
+                <div class="bg-gradient-to-r ${index === 0 ? 'from-green-600 to-green-700' : index === 1 ? 'from-blue-600 to-blue-700' : 'from-purple-600 to-purple-700'} text-white px-3 py-1 rounded-full text-sm font-bold inline-block">
+                    ${roteiro.tipo}
+                </div>
+            </div>
+            
+            <h3 class="text-xl font-bold text-white mb-3 text-center">${roteiro.titulo}</h3>
+            
+            <div class="space-y-2 mb-6">
+                <div class="flex justify-between">
+                    <span class="text-gray-400">💰 Custo:</span>
+                    <span class="text-gold-secondary font-semibold">${roteiro.custo_total_estimado}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-400">📍 Distância:</span>
+                    <span class="text-white">${roteiro.distancia_total}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-400">⏱️ Tempo:</span>
+                    <span class="text-white">${roteiro.tempo_total}</span>
+                </div>
+            </div>
+            
+            <p class="text-gray-300 text-sm mb-6">${roteiro.resumo}</p>
+            
+            <div class="text-center">
+                ${hasVoted ? 
+                    `<div class="mb-4">
+                        <span class="text-lg">📊 ${voteCount} voto${voteCount !== 1 ? 's' : ''}</span>
+                        ${isUserChoice ? '<div class="text-gold-primary text-sm mt-1">✅ Seu voto</div>' : ''}
+                    </div>` 
+                    : 
+                    `<button onclick="voteForRoteiro('${collaborativeId}', ${index})" class="bg-gold-primary hover:bg-gold-secondary text-black px-6 py-3 rounded-lg font-bold transition-colors w-full">
+                        🗳️ Votar Neste
+                    </button>`
+                }
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * Votar em roteiro
+ */
+function voteForRoteiro(collaborativeId, roteiroIndex) {
+    const userId = localStorage.getItem('sop_user_id') || generateUserId();
+    localStorage.setItem('sop_user_id', userId);
+    
+    // Carrega dados colaborativos
+    const colaborativos = JSON.parse(localStorage.getItem('sop_roteiros_colaborativos') || '[]');
+    const roteiroData = colaborativos.find(r => r.id === collaborativeId);
+    
+    if (!roteiroData) return;
+    
+    // Registra o voto
+    roteiroData.votos[userId] = roteiroIndex;
+    localStorage.setItem('sop_roteiros_colaborativos', JSON.stringify(colaborativos));
+    
+    // Marca que o usuário votou
+    localStorage.setItem(`voted_${collaborativeId}`, roteiroIndex);
+    
+    // Recarrega a interface
+    loadCollaborativeVoting(collaborativeId);
+    
+    showNotification('✅ Voto registrado com sucesso!', 'success');
+}
+
+/**
+ * Gera ID único do usuário
+ */
+function generateUserId() {
+    return Date.now().toString(36) + Math.random().toString(36).substr(2);
+}
+
+/**
+ * Gera resultados da votação
+ */
+function generateVotingResults(votos, roteiros) {
+    const results = [0, 1, 2].map(index => ({
+        index,
+        count: Object.values(votos).filter(v => v === index).length,
+        roteiro: roteiros[index]
+    }));
+    
+    results.sort((a, b) => b.count - a.count);
+    
+    const totalVotes = Object.keys(votos).length;
+    
+    if (totalVotes === 0) {
+        return '<p class="text-gray-400">Nenhum voto ainda</p>';
+    }
+    
+    return results.map((result, position) => {
+        const percentage = totalVotes > 0 ? (result.count / totalVotes * 100).toFixed(1) : 0;
+        const medal = position === 0 ? '🥇' : position === 1 ? '🥈' : '🥉';
+        
+        return `
+            <div class="flex justify-between items-center py-2 ${position === 0 ? 'text-gold-primary font-bold' : 'text-gray-300'}">
+                <span>${medal} ${result.roteiro.tipo}</span>
+                <span>${result.count} voto${result.count !== 1 ? 's' : ''} (${percentage}%)</span>
+            </div>
+        `;
+    }).join('');
+}
+
+/**
  * Compartilhar no WhatsApp
  */
 function shareWhatsApp(index) {
@@ -1255,16 +1684,151 @@ function addToCalendar(index) {
         return;
     }
     
+    // Cria modal de confirmação para múltiplas entradas
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4';
+    modal.innerHTML = `
+        <div class="bg-gray-800 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-auto">
+            <div class="p-6 border-b border-gray-700">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold text-gold-primary">📅 Adicionar ao Google Calendar</h2>
+                    <button onclick="closeCalendarModal()" class="text-gray-400 hover:text-white text-xl">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="p-6">
+                <div class="mb-6">
+                    <h3 class="text-lg font-bold text-white mb-3">Escolha como adicionar:</h3>
+                    <div class="space-y-3">
+                        <button onclick="createSingleEvent(${index})" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg transition-colors text-left">
+                            <div class="font-bold">📍 Evento Único</div>
+                            <div class="text-sm text-blue-200">Um evento para todo o rolê (${formData.horarioSaida} - ${formData.horarioVolta})</div>
+                        </button>
+                        
+                        <button onclick="createMultipleEvents(${index})" class="w-full bg-purple-600 hover:bg-purple-700 text-white px-4 py-3 rounded-lg transition-colors text-left">
+                            <div class="font-bold">🎯 Paradas Separadas</div>
+                            <div class="text-sm text-purple-200">Uma entrada para cada destino com horários específicos</div>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-700 rounded-lg p-4">
+                    <h4 class="text-gold-primary font-bold mb-3">📋 Checklist será incluído:</h4>
+                    <div class="text-sm text-gray-300 space-y-1">
+                        ${generateCalendarChecklist(roteiro)}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Funções do modal
+    window.closeCalendarModal = () => {
+        document.body.removeChild(modal);
+        delete window.closeCalendarModal;
+        delete window.createSingleEvent;
+        delete window.createMultipleEvents;
+    };
+    
+    window.createSingleEvent = (idx) => {
+        createSingleCalendarEvent(idx);
+        closeCalendarModal();
+    };
+    
+    window.createMultipleEvents = (idx) => {
+        createMultipleCalendarEvents(idx);
+        closeCalendarModal();
+    };
+}
+
+/**
+ * Gera checklist para o calendário
+ */
+function generateCalendarChecklist(roteiro) {
+    const allTips = new Set();
+    
+    if (roteiro.destinos) {
+        roteiro.destinos.forEach(destino => {
+            if (destino.dicas_motociclista) {
+                destino.dicas_motociclista.forEach(dica => {
+                    const cleanTip = dica.replace(/^[^:]+:\s*/, '').trim();
+                    if (cleanTip.length > 10) {
+                        allTips.add(`• ${cleanTip}`);
+                    }
+                });
+            }
+        });
+    }
+    
+    return Array.from(allTips).slice(0, 5).join('\\n') + (allTips.size > 5 ? '\\n• E mais...' : '');
+}
+
+/**
+ * Cria evento único no Google Calendar
+ */
+function createSingleCalendarEvent(index) {
+    const roteiro = generatedRoteiros[index];
+    const formData = getLastFormData();
+    
     const startDate = new Date(`${formData.dataRole}T${formData.horarioSaida}`);
     const endDate = new Date(`${formData.dataRole}T${formData.horarioVolta}`);
     
     const eventTitle = `🏍️ ${roteiro.titulo}`;
-    const eventDescription = `${roteiro.resumo}\\n\\nDestinos:\\n${roteiro.destinos.map(d => `• ${d.nome} - ${d.endereco}`).join('\\n')}\\n\\nCusto Total: ${roteiro.custo_total_estimado}\\nDistância: ${roteiro.distancia_total}`;
+    const checklist = generateCalendarChecklist(roteiro);
+    const eventDescription = `${roteiro.resumo}\\n\\n📍 DESTINOS:\\n${roteiro.destinos.map(d => `• ${d.nome} - ${d.endereco}`).join('\\n')}\\n\\n📋 CHECKLIST:\\n${checklist}\\n\\n💰 Custo: ${roteiro.custo_total_estimado}\\n📏 Distância: ${roteiro.distancia_total}`;
     
-    const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventTitle)}&dates=${startDate.toISOString().replace(/[-:]/g, '').split('.')[0]}Z/${endDate.toISOString().replace(/[-:]/g, '').split('.')[0]}Z&details=${encodeURIComponent(eventDescription)}&location=${encodeURIComponent(formData.enderecoPartida)}`;
+    const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventTitle)}&dates=${startDate.toISOString().replace(/[-:]/g, '').split('.')[0]}Z/${endDate.toISOString().replace(/[-:]/g, '').split('.')[0]}Z&details=${encodeURIComponent(eventDescription)}&location=${encodeURIComponent(formData.pontoPartida)}`;
     
     window.open(googleCalendarUrl, '_blank');
-    trackEvent('calendar_export', { roteiro: roteiro.titulo });
+    showNotification('📅 Evento único criado no Google Calendar!', 'success');
+    trackEvent('calendar_export', { roteiro: roteiro.titulo, type: 'single' });
+}
+
+/**
+ * Cria múltiplos eventos no Google Calendar
+ */
+function createMultipleCalendarEvents(index) {
+    const roteiro = generatedRoteiros[index];
+    const formData = getLastFormData();
+    
+    let currentTime = new Date(`${formData.dataRole}T${formData.horarioSaida}`);
+    
+    // Evento principal de partida
+    const mainEventTitle = `🏍️ ${roteiro.titulo} - SAÍDA`;
+    const checklist = generateCalendarChecklist(roteiro);
+    const mainEventDescription = `🚀 INÍCIO DO ROLÊ\\n\\n📋 CHECKLIST COMPLETO:\\n${checklist}\\n\\n🎯 ROTEIRO:\\n${roteiro.destinos.map(d => `• ${d.nome}`).join('\\n')}\\n\\n💰 Custo Total: ${roteiro.custo_total_estimado}`;
+    
+    const mainEventEnd = new Date(currentTime.getTime() + 30 * 60000); // 30 min depois
+    
+    const mainUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(mainEventTitle)}&dates=${currentTime.toISOString().replace(/[-:]/g, '').split('.')[0]}Z/${mainEventEnd.toISOString().replace(/[-:]/g, '').split('.')[0]}Z&details=${encodeURIComponent(mainEventDescription)}&location=${encodeURIComponent(formData.pontoPartida)}`;
+    
+    window.open(mainUrl, '_blank');
+    
+    // Eventos para cada destino (com delay para não sobrecarregar)
+    roteiro.destinos.forEach((destino, idx) => {
+        setTimeout(() => {
+            if (destino.horario_chegada) {
+                const [hours, minutes] = destino.horario_chegada.split(':');
+                const eventStart = new Date(`${formData.dataRole}T${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`);
+                const eventEnd = new Date(eventStart.getTime() + (parseInt(destino.tempo_permanencia) || 60) * 60000);
+                
+                const eventTitle = `📍 ${destino.nome}`;
+                const destinoDicas = destino.dicas_motociclista ? destino.dicas_motociclista.map(d => `• ${d}`).join('\\n') : '';
+                const eventDescription = `${destino.descricao}\\n\\n⏱️ Tempo de permanência: ${destino.tempo_permanencia || '60'} min\\n\\n💰 Custo estimado: ${destino.custo_estimado}\\n\\n🏍️ DICAS ESPECÍFICAS:\\n${destinoDicas}`;
+                
+                const destUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventTitle)}&dates=${eventStart.toISOString().replace(/[-:]/g, '').split('.')[0]}Z/${eventEnd.toISOString().replace(/[-:]/g, '').split('.')[0]}Z&details=${encodeURIComponent(eventDescription)}&location=${encodeURIComponent(destino.endereco)}`;
+                
+                window.open(destUrl, '_blank');
+            }
+        }, idx * 1000); // Delay de 1s entre cada abertura
+    });
+    
+    showNotification(`📅 ${roteiro.destinos.length + 1} eventos criados no Google Calendar!`, 'success');
+    trackEvent('calendar_export', { roteiro: roteiro.titulo, type: 'multiple', count: roteiro.destinos.length + 1 });
 }
 
 /**
@@ -1505,6 +2069,13 @@ function saveRoteiro(index) {
     
     const favoritos = JSON.parse(localStorage.getItem('sop_roteiros_favoritos') || '[]');
     
+    // Verifica se já existe
+    const jaExiste = favoritos.some(fav => fav.roteiro.titulo === roteiro.titulo);
+    if (jaExiste) {
+        showNotification(`⚠️ "${roteiro.titulo}" já está nos favoritos!`, 'warning');
+        return;
+    }
+    
     const roteiroFavorito = {
         id: Date.now().toString(36),
         roteiro: roteiro,
@@ -1516,8 +2087,119 @@ function saveRoteiro(index) {
     favoritos.push(roteiroFavorito);
     localStorage.setItem('sop_roteiros_favoritos', JSON.stringify(favoritos));
     
-    showNotification(`✅ "${roteiro.titulo}" salvo nos favoritos!`, 'success');
+    showNotification(`✅ "${roteiro.titulo}" salvo nos favoritos! Clique em "Favoritos" no menu para ver.`, 'success');
     trackEvent('save_favorite', { roteiro: roteiro.titulo });
+}
+
+/**
+ * Mostrar modal de favoritos
+ */
+function showFavoritos() {
+    const favoritos = JSON.parse(localStorage.getItem('sop_roteiros_favoritos') || '[]');
+    
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4';
+    modal.innerHTML = `
+        <div class="bg-gray-800 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-auto">
+            <div class="p-6 border-b border-gray-700">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold text-gold-primary">❤️ Seus Rolês Favoritos</h2>
+                    <button onclick="closeFavoritosModal()" class="text-gray-400 hover:text-white text-xl">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <p class="text-gray-400 mt-2">${favoritos.length} rolês salvos</p>
+            </div>
+            
+            <div class="p-6">
+                ${favoritos.length === 0 ? `
+                    <div class="text-center py-12">
+                        <div class="text-6xl mb-4">💔</div>
+                        <h3 class="text-xl text-gray-400 mb-2">Nenhum rolê salvo ainda</h3>
+                        <p class="text-gray-500">Gere um rolê e clique em "Salvar Favorito" para começar sua coleção!</p>
+                    </div>
+                ` : `
+                    <div class="grid gap-4">
+                        ${favoritos.map((fav, index) => `
+                            <div class="bg-gray-700 rounded-lg p-4 hover:bg-gray-650 transition-colors">
+                                <div class="flex justify-between items-start mb-3">
+                                    <div>
+                                        <h3 class="text-lg font-bold text-white">${fav.roteiro.titulo}</h3>
+                                        <p class="text-gray-400 text-sm">${fav.roteiro.tipo || 'Roteiro'} • Salvo em ${new Date(fav.dataSalvo).toLocaleDateString('pt-BR')}</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-gold-primary font-bold">${fav.roteiro.custo_total_estimado}</div>
+                                        <div class="text-gray-400 text-sm">${fav.roteiro.distancia_total}</div>
+                                    </div>
+                                </div>
+                                
+                                <p class="text-gray-300 text-sm mb-3">${fav.roteiro.resumo}</p>
+                                
+                                <div class="flex gap-2">
+                                    <button onclick="reuseRoteiro('${fav.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm">
+                                        🔄 Reutilizar
+                                    </button>
+                                    <button onclick="shareRoteiroFavorito('${fav.id}')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm">
+                                        📱 Compartilhar
+                                    </button>
+                                    <button onclick="deleteFavorito('${fav.id}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm">
+                                        🗑️ Excluir
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `}
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Funções do modal
+    window.closeFavoritosModal = () => {
+        document.body.removeChild(modal);
+        delete window.closeFavoritosModal;
+        delete window.reuseRoteiro;
+        delete window.shareRoteiroFavorito;
+        delete window.deleteFavorito;
+    };
+    
+    window.reuseRoteiro = (id) => {
+        const favoritos = JSON.parse(localStorage.getItem('sop_roteiros_favoritos') || '[]');
+        const favorito = favoritos.find(f => f.id === id);
+        if (favorito) {
+            // Preenche o formulário com os dados salvos
+            if (favorito.formData) {
+                Object.keys(favorito.formData).forEach(key => {
+                    const element = document.getElementById(key.replace(/([A-Z])/g, '-$1').toLowerCase());
+                    if (element) {
+                        element.value = favorito.formData[key];
+                    }
+                });
+            }
+            closeFavoritosModal();
+            showNotification('📝 Formulário preenchido com dados do favorito!', 'success');
+        }
+    };
+    
+    window.shareRoteiroFavorito = (id) => {
+        const favoritos = JSON.parse(localStorage.getItem('sop_roteiros_favoritos') || '[]');
+        const favorito = favoritos.find(f => f.id === id);
+        if (favorito) {
+            generatedRoteiros = [favorito.roteiro];
+            shareWhatsApp(0);
+        }
+    };
+    
+    window.deleteFavorito = (id) => {
+        const favoritos = JSON.parse(localStorage.getItem('sop_roteiros_favoritos') || '[]');
+        const updatedFavoritos = favoritos.filter(f => f.id !== id);
+        localStorage.setItem('sop_roteiros_favoritos', JSON.stringify(updatedFavoritos));
+        closeFavoritosModal();
+        showFavoritos(); // Reabre com lista atualizada
+        showNotification('🗑️ Favorito excluído!', 'success');
+    };
 }
 
 /**
