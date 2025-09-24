@@ -507,38 +507,50 @@ DADOS:
 - Interesses: ${preferencias.join(', ') || 'Variados'}
 - Experiência: ${experienciaDesejada}
 
-CRIAR 3 ROTEIROS:
-1. ECONÔMICA: Baixo custo, locais gratuitos
-2. EQUILIBRADA: Custo-benefício balanceado
-3. PREMIUM: Experiência completa
+REGRAS OBRIGATÓRIAS:
+1. DESTINOS ESPECÍFICOS: Nomes reais + endereços completos (nunca genéricos)
+2. DISTÂNCIAS REAIS: Calculadas cumulativamente do ponto de partida
+3. TEMPO REALISTA: Máximo ${calcularTempoDisponivel(formData)}h disponíveis (${formData.horarioSaida}-${formData.horarioVolta})
+4. DICAS ESPECÍFICAS: 2-3 dicas reais do local (não genéricas)
+5. CUSTOS REAIS: Valores atuais de 2024
 
-CADA ROTEIRO COM:
-- 2-3 destinos reais e específicos
-- Horários respeitando saída/volta
-- Custos realistas (combustível R$5,50/l)
-- Dicas para motociclistas
+CRIAR 3 ROTEIROS:
+1. ECONÔMICA: Locais gratuitos/baratos, distância menor
+2. EQUILIBRADA: Custo-benefício, distância média  
+3. PREMIUM: Experiência completa, sem limite de distância
 
 FORMATO JSON:
 {
   "sugestoes": [
     {
       "tipo": "ECONÔMICA",
-      "titulo": "Nome Roteiro",
-      "resumo": "Descrição",
+      "titulo": "Nome Específico do Roteiro",
+      "resumo": "Descrição dos destinos reais",
       "distancia_total": "XXX km",
       "tempo_total": "X horas",
       "custo_total_estimado": "R$ XXX",
-      "nivel_dificuldade": "Fácil",
       "destinos": [
         {
-          "nome": "Local",
-          "endereco": "Endereço",
-          "distancia": "XX km",
-          "tempo_parada": "XX min",
-          "descricao": "Atividade",
-          "custo_estimado": "R$ XX"
+          "nome": "Nome ESPECÍFICO do Local Real",
+          "endereco": "Endereço COMPLETO (rua, número, cidade, estado)",
+          "distancia_anterior": "XX km (do ponto anterior)",
+          "tempo_permanencia": "Xh",
+          "horario_chegada": "HH:MM",
+          "descricao": "O que fazer especificamente neste local",
+          "custo_estimado": "R$ XX (valor real de entrada/consumo)",
+          "dicas_motociclista": [
+            "Dica ESPECÍFICA sobre a estrada/acesso",
+            "Dica ESPECÍFICA sobre estacionamento",
+            "Dica ESPECÍFICA sobre o local"
+          ]
         }
-      ]
+      ],
+      "custos_detalhados": {
+        "combustivel": "R$ XX",
+        "alimentacao": "R$ XX",
+        "entradas": "R$ XX",
+        "outros": "R$ XX"
+      }
     }
   ]
 }
@@ -625,27 +637,37 @@ function parseAIResponse(response, formData) {
 }
 
 /**
- * Calcula custos por categoria baseado no tipo de roteiro
+ * Calcula custos realistas por categoria baseado no tipo de roteiro
  */
 function calculateCostByType(formData, tipo, categoria) {
-    const baseOrcamento = formData.orcamento || 200;
-    const multipliers = {
-        'ECONÔMICA': 0.7,
-        'EQUILIBRADA': 1.0,
-        'PREMIUM': 1.4
+    const tempoDisponivel = calcularTempoDisponivel(formData);
+    const distanciaEstimada = tipo === 'ECONÔMICA' ? 120 : tipo === 'EQUILIBRADA' ? 200 : 300;
+    
+    // Custos base realistas para 2024
+    const custosBase = {
+        'combustivel': {
+            'ECONÔMICA': Math.round(distanciaEstimada / 25 * 5.50), // 25km/l, R$5,50/l
+            'EQUILIBRADA': Math.round(distanciaEstimada / 22 * 5.50), // Motos maiores
+            'PREMIUM': Math.round(distanciaEstimada / 18 * 5.50) // Motos premium
+        },
+        'alimentacao': {
+            'ECONÔMICA': tempoDisponivel >= 8 ? 60 : 35, // Lanchonete/padaria
+            'EQUILIBRADA': tempoDisponivel >= 8 ? 120 : 80, // Restaurante simples
+            'PREMIUM': tempoDisponivel >= 8 ? 250 : 150 // Restaurante premium
+        },
+        'entradas': {
+            'ECONÔMICA': 0, // Apenas locais gratuitos
+            'EQUILIBRADA': 25, // Algumas atrações pagas
+            'PREMIUM': 80 // Experiências premium
+        },
+        'outros': {
+            'ECONÔMICA': 20, // Estacionamento, pedágio
+            'EQUILIBRADA': 45, // + lembrancinha
+            'PREMIUM': 100 // Gorjetas, serviços extras
+        }
     };
     
-    const percentages = {
-        'combustivel': 0.35,  // 35% do orçamento
-        'alimentacao': 0.40,  // 40% do orçamento
-        'entradas': 0.15,     // 15% do orçamento
-        'outros': 0.10        // 10% do orçamento
-    };
-    
-    const multiplier = multipliers[tipo] || 1.0;
-    const percentage = percentages[categoria] || 0.25;
-    const custo = Math.round(baseOrcamento * multiplier * percentage);
-    
+    const custo = custosBase[categoria]?.[tipo] || 30;
     return `R$ ${custo}`;
 }
 
@@ -703,38 +725,183 @@ function getTypeCharacteristics(tipo) {
 }
 
 /**
+ * Banco de destinos reais com endereços específicos e características
+ */
+const DESTINOS_REAIS = {
+    'ECONÔMICA': [
+        {
+            nome: 'Mirante da Serra da Cantareira',
+            endereco: 'Estrada da Cantareira, km 12 - Horto Florestal, São Paulo - SP',
+            distancia_sp: 35,
+            custo_entrada: 0,
+            tempo_permanencia: '1h',
+            dicas_reais: [
+                'Estrada sinuosa com curvas fechadas - reduzir velocidade',
+                'Estacionamento gratuito no Horto Florestal',
+                'Melhor vista pela manhã (menos neblina)'
+            ]
+        },
+        {
+            nome: 'Centro Histórico de Atibaia',
+            endereco: 'Praça Bento Paes, Centro - Atibaia, SP',
+            distancia_sp: 65,
+            custo_entrada: 0,
+            tempo_permanencia: '1h30',
+            dicas_reais: [
+                'Estacionamento fácil na região central',
+                'Visite a Igreja do Rosário (marco histórico)',
+                'Café da manhã na Padaria Central (tradicional)'
+            ]
+        }
+    ],
+    'EQUILIBRADA': [
+        {
+            nome: 'Pico do Itapeva - Campos do Jordão',
+            endereco: 'Estrada do Itapeva, s/n - Campos do Jordão, SP',
+            distancia_sp: 180,
+            custo_entrada: 15,
+            tempo_permanencia: '2h',
+            dicas_reais: [
+                'Estrada de terra nos últimos 3km - moto trail ideal',
+                'Temperatura 10°C menor que na cidade',
+                'Melhor pôr do sol da região (17h no inverno)'
+            ]
+        },
+        {
+            nome: 'Cachoeira dos Pretos - Joanópolis',
+            endereco: 'Estrada Municipal JNP-364, km 8 - Joanópolis, SP',
+            distancia_sp: 120,
+            custo_entrada: 20,
+            tempo_permanencia: '2h30',
+            dicas_reais: [
+                'Trilha de 15min a pé após estacionar a moto',
+                'Proibido banho na cachoeira (área de preservação)',
+                'Leve repelente - muitos mosquitos na mata'
+            ]
+        }
+    ],
+    'PREMIUM': [
+        {
+            nome: 'Hotel Toriba - Campos do Jordão',
+            endereco: 'Av. Ernesto Diederichsen, 2962 - Campos do Jordão, SP',
+            distancia_sp: 185,
+            custo_entrada: 180,
+            tempo_permanencia: '3h',
+            dicas_reais: [
+                'Valet parking gratuito para motos no hotel',
+                'Brunch servido até 12h nos fins de semana',
+                'Reserve com antecedência (alta procura)'
+            ]
+        },
+        {
+            nome: 'Restaurante Baden Baden - Campos do Jordão',
+            endereco: 'Rua Djalma Forjaz, 93 - Capivari, Campos do Jordão, SP',
+            distancia_sp: 182,
+            custo_entrada: 250,
+            tempo_permanencia: '2h',
+            dicas_reais: [
+                'Estacionamento privativo seguro para motos',
+                'Cerveja artesanal produzida no local',
+                'Prato típico: joelho de porco com chucrute'
+            ]
+        }
+    ]
+};
+
+/**
+ * Calcula tempo disponível baseado nos horários
+ */
+function calcularTempoDisponivel(formData) {
+    const saida = parseHorario(formData.horarioSaida || '08:00');
+    const volta = parseHorario(formData.horarioVolta || '18:00');
+    
+    let tempoDisponivel = volta - saida;
+    if (tempoDisponivel < 0) tempoDisponivel += 24 * 60; // Caso passe da meia-noite
+    
+    return Math.floor(tempoDisponivel / 60); // Retorna em horas
+}
+
+/**
+ * Converte horário "HH:MM" para minutos desde 00:00
+ */
+function parseHorario(horario) {
+    const [horas, minutos] = horario.split(':').map(Number);
+    return horas * 60 + (minutos || 0);
+}
+
+/**
+ * Converte minutos para formato "HH:MM"
+ */
+function formatarHorario(minutos) {
+    const horas = Math.floor(minutos / 60) % 24;
+    const mins = minutos % 60;
+    return `${horas.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+}
+
+/**
+ * Calcula distância entre dois destinos
+ */
+function calcularDistanciaEntre(destinoA, destinoB) {
+    // Matriz simplificada de distâncias entre destinos conhecidos
+    const distancias = {
+        'Mirante da Serra da Cantareira': { 'Centro Histórico de Atibaia': 45 },
+        'Pico do Itapeva - Campos do Jordão': { 'Cachoeira dos Pretos - Joanópolis': 85 },
+        'Hotel Toriba - Campos do Jordão': { 'Restaurante Baden Baden - Campos do Jordão': 8 }
+    };
+    
+    return distancias[destinoA.nome]?.[destinoB.nome] || 30; // Fallback 30km
+}
+
+/**
  * Gera destinos realistas quando IA não fornece
  */
 function generateFallbackDestinos(formData, tipo) {
-    const destinosBase = [
-        // Destinos próximos de São Paulo
-        { nome: 'Campos do Jordão', regiao: 'Serra da Mantiqueira', tipo: 'serra' },
-        { nome: 'Ubatuba', regiao: 'Litoral Norte', tipo: 'praia' },
-        { nome: 'Atibaia', regiao: 'Interior SP', tipo: 'interior' },
-        { nome: 'São Roque', regiao: 'Interior SP', tipo: 'interior' },
-        { nome: 'Bertioga', regiao: 'Litoral', tipo: 'praia' },
-        { nome: 'Monte Verde', regiao: 'Sul de Minas', tipo: 'serra' },
-        { nome: 'Cunha', regiao: 'Vale do Paraíba', tipo: 'serra' },
-        { nome: 'Ilhabela', regiao: 'Litoral Norte', tipo: 'praia' }
-    ];
+    const destinosDisponiveis = DESTINOS_REAIS[tipo] || DESTINOS_REAIS['EQUILIBRADA'];
 
-    const quantidade = tipo === 'ECONÔMICA' ? 2 : tipo === 'EQUILIBRADA' ? 3 : 4;
-    const destinosSelecionados = destinosBase.slice(0, quantidade);
+    // Validar janela de tempo disponível
+    const tempoDisponivel = calcularTempoDisponivel(formData);
+    let quantidadeDestinos = destinosDisponiveis.length;
+    
+    // Ajustar quantidade baseado no tempo disponível
+    if (tempoDisponivel <= 6) {
+        quantidadeDestinos = Math.min(2, quantidadeDestinos); // Máximo 2 destinos em 6h
+    } else if (tempoDisponivel <= 8) {
+        quantidadeDestinos = Math.min(3, quantidadeDestinos); // Máximo 3 destinos em 8h
+    }
+    
+    const destinosSelecionados = destinosDisponiveis.slice(0, quantidadeDestinos);
+    let distanciaAcumulada = 0;
+    let horarioAtual = parseHorario(formData.horarioSaida || '08:00');
 
-    return destinosSelecionados.map((dest, index) => ({
-        nome: dest.nome,
-        endereco: `${dest.regiao}, ${dest.nome}`,
-        distancia_anterior: `${60 + (index * 25)} km`,
-        tempo_permanencia: tipo === 'PREMIUM' ? '2h' : tipo === 'EQUILIBRADA' ? '1h30' : '1h',
-        horario_chegada: `${9 + index}:${index % 2 === 0 ? '00' : '30'}`,
-        descricao: `Destino ${dest.tipo} na região ${dest.regiao}. Local ideal para ${tipo.toLowerCase() === 'econômica' ? 'economizar' : tipo.toLowerCase() === 'premium' ? 'experiência premium' : 'equilibrar custo e diversão'}.`,
-        custo_estimado: `R$ ${30 + (index * 15)}`,
-        dicas_motociclista: [
-            `Estrada ${dest.tipo === 'serra' ? 'serrana com curvas' : dest.tipo === 'praia' ? 'litorânea plana' : 'interior asfaltada'}`,
-            'Estacionamento seguro disponível',
-            `Melhor horário: ${dest.tipo === 'serra' ? 'manhã cedo' : 'qualquer período'}`
-        ]
-    }));
+    return destinosSelecionados.map((dest, index) => {
+        // Calcular distância real do ponto anterior
+        const distanciaDestino = index === 0 ? 
+            dest.distancia_sp : // Distância de SP para primeiro destino
+            calcularDistanciaEntre(destinosSelecionados[index-1], dest); // Entre destinos
+        
+        distanciaAcumulada += distanciaDestino;
+        
+        // Calcular tempo de viagem (60km/h média)
+        const tempoViagem = Math.ceil(distanciaDestino / 60 * 60); // em minutos
+        horarioAtual += tempoViagem;
+        
+        const horarioChegada = formatarHorario(horarioAtual);
+        
+        // Adicionar tempo de permanência para próximo cálculo
+        const tempoPermanencia = parseInt(dest.tempo_permanencia) * 60; // converter para minutos
+        horarioAtual += tempoPermanencia;
+
+        return {
+            nome: dest.nome,
+            endereco: dest.endereco,
+            distancia_anterior: `${distanciaDestino} km`,
+            tempo_permanencia: dest.tempo_permanencia,
+            horario_chegada: horarioChegada,
+            descricao: `${dest.nome} - Local específico com entrada ${dest.custo_entrada > 0 ? `R$ ${dest.custo_entrada}` : 'gratuita'}.`,
+            custo_estimado: `R$ ${dest.custo_entrada}`,
+            dicas_motociclista: dest.dicas_reais
+        };
+    });
 }
 
 /**
