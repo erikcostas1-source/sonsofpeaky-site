@@ -413,6 +413,7 @@ svg {
 
 /* ===== SEÇÕES COLAPSÁVEIS ===== */
 .section-toggle {
+  position: relative;
   transition: all 0.3s ease;
 }
 
@@ -424,6 +425,11 @@ svg {
 .section-content {
   transition: max-height 0.5s ease-in-out;
   overflow: hidden;
+}
+
+/* Quando a seção está expandida, usar overflow visível para permitir conteúdo dinâmico */
+.section-content[style*="max-height: none"] {
+  overflow: visible;
 }
 
 .section-toggle i {

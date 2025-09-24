@@ -175,9 +175,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const API_URL_GENERATE_TEXT = (window.SOP_CONFIG && window.SOP_CONFIG.textUrl)
         ? window.SOP_CONFIG.textUrl
         : (API_KEY ? `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${API_KEY}` : null);
-    const API_URL_GENERATE_IMAGE = (window.SOP_CONFIG && window.SOP_CONFIG.imageUrl)
-        ? window.SOP_CONFIG.imageUrl
-        : (API_KEY ? `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${API_KEY}` : null);
 
     // Safe DOM helpers
     const $ = id => document.getElementById(id);
@@ -521,7 +518,6 @@ Que as estradas nos levem e nos tragam em segurança!
 
         try {
             let generatedText = null;
-            let imageUrl = '';
 
             if (API_URL_GENERATE_TEXT) {
                 const promptText = `Atue como um especialista em roteiros de viagem de moto para o grupo Sons of Peaky. 
@@ -568,39 +564,35 @@ Escreva de forma clara e objetiva, mantendo o tom fraternal do grupo Sons of Pea
                 generatedText = localGenerateRide({ input, km: Number(km), date });
             }
 
-            // Image generation only if API available
-            if (API_URL_GENERATE_IMAGE) {
-                const promptImage = `Criar um cartaz de convite para rolê de moto do grupo Sons of Peaky. Estilo vintage com motos clássicas, cores âmbar e preto. Incluir texto: "${input}" e "Sons of Peaky". Design profissional e atrativo.`;
-                const payloadImage = {
-                    instances: [{
-                        prompt: promptImage
-                    }],
-                    parameters: {
-                        sampleCount: 1,
-                        aspectRatio: "16:9"
-                    }
-                };
-                try {
-                    console.log('Tentando gerar imagem com payload:', payloadImage);
-                    const responseImage = await fetchWithExponentialBackoff(API_URL_GENERATE_IMAGE, {
-                        method: 'POST', 
-                        headers: { 'Content-Type': 'application/json' }, 
-                        body: JSON.stringify(payloadImage)
-                    });
-                    console.log('Resposta da API de imagem:', responseImage);
-                    const base64Data = responseImage?.predictions?.[0]?.bytesBase64Encoded;
-                    if (base64Data) {
-                        imageUrl = `data:image/png;base64,${base64Data}`;
-                    }
-                } catch (e) {
-                    console.warn('Imagem remota não gerada, usando fallback:', e);
-                }
-            }
+            // Gerar um convite visual elegante sem API de imagem
+            const conviteHtml = `
+                <div class="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 border-2 border-amber-500 rounded-xl p-8 max-w-2xl mx-auto shadow-2xl">
+                    <div class="text-center space-y-4">
+                        <div class="flex justify-center mb-4">
+                            <img src="assets/img/SONSOFPEAKY_TRANSPARENTE_BRANCO.png" alt="Sons of Peaky" class="h-16 w-auto">
+                        </div>
+                        <h2 class="text-3xl font-bold text-amber-400 mb-2">🏍️ CONVITE OFICIAL 🏍️</h2>
+                        <h3 class="text-xl font-semibold text-white">${input}</h3>
+                        <div class="bg-amber-500 text-gray-900 py-2 px-4 rounded-lg font-bold inline-block">
+                            📅 ${date} | 🛣️ ${km}km
+                        </div>
+                        <p class="text-gray-300 text-lg mt-4">Ponto de Encontro:</p>
+                        <p class="text-amber-300 font-semibold">Galpão SOP - Rua José Flavio, 420</p>
+                        <div class="border-t border-amber-500 pt-4 mt-4">
+                            <p class="text-sm text-gray-400 italic">"Por Ordem dos Peaky Blinders"</p>
+                        </div>
+                    </div>
+                </div>
+            `;
 
-            // Fallback image (placeholder) if none
-            if (!imageUrl) imageUrl = 'https://placehold.co/600x300/111827/fb923c?text=Convite+Rol%C3%AA';
-
-            if (outputDiv) outputDiv.innerHTML = `\n                    <div class="space-y-4">\n                        <h4 class="text-lg font-bold text-white">Detalhes do Rolê:</h4>\n                        <div class="p-4 rounded-md bg-gray-900 border border-gray-700 whitespace-pre-wrap">${generatedText}</div>\n                        <h4 class="text-lg font-bold text-white">Convite Gerado:</h4>\n                        <div class="flex justify-center">\n                            <img src="${imageUrl}" alt="Convite para o Rolê" class="rounded-lg shadow-md max-w-full h-auto">\n                        </div>\n                    </div>\n                `;
+            if (outputDiv) outputDiv.innerHTML = `
+                    <div class="space-y-6">
+                        <h4 class="text-lg font-bold text-white">Detalhes do Rolê:</h4>
+                        <div class="p-4 rounded-md bg-gray-900 border border-gray-700 whitespace-pre-wrap">${generatedText}</div>
+                        <h4 class="text-lg font-bold text-white">Convite Visual:</h4>
+                        ${conviteHtml}
+                    </div>
+                `;
 
             // Adicionar o rolê à agenda
             const agendaContainer = document.querySelector('#agenda-container');
@@ -934,8 +926,16 @@ function toggleSection(contentId, iconId) {
         content.style.maxHeight = '0px';
         icon.style.transform = 'rotate(0deg)';
     } else {
-        // Abrir seção
-        content.style.maxHeight = content.scrollHeight + 'px';
+        // Abrir seção - usar 'none' em vez de altura fixa para permitir expansão dinâmica
+        content.style.maxHeight = 'none';
         icon.style.transform = 'rotate(180deg)';
+        
+        // Após um pequeno delay, definir altura real para manter animação de fechamento
+        setTimeout(() => {
+            if (content.style.maxHeight === 'none') {
+                const height = content.scrollHeight;
+                content.style.maxHeight = height + 'px';
+            }
+        }, 10);
     }
 }
