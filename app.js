@@ -190,20 +190,39 @@ document.addEventListener('DOMContentLoaded', function () {
     function hideModal() { const modal = $('modal'); if (modal) modal.classList.add('hidden'); }
     const modalCloseBtn = $('modal-close-btn'); if (modalCloseBtn) modalCloseBtn.addEventListener('click', hideModal);
 
-    async function fetchWithExponentialBackoff(url, options, retries = 5, delay = 1000) {
+    async function fetchWithExponentialBackoff(url, options, retries = 3, delay = 1000) {
+        console.log(`Tentando requisição para: ${url} (tentativas restantes: ${retries})`);
+        
         try {
             const response = await fetch(url, options);
+            
+            console.log(`Status da resposta: ${response.status}`);
+            
             if (response.status === 429 && retries > 0) {
+                console.log(`Rate limit hit, aguardando ${delay}ms...`);
                 await new Promise(resolve => setTimeout(resolve, delay));
                 return fetchWithExponentialBackoff(url, options, retries - 1, delay * 2);
             }
-            if (!response.ok) throw new Error(`API call failed with status: ${response.status}`);
-            return await response.json();
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error(`Erro na API: ${response.status} - ${errorText}`);
+                throw new Error(`API call failed with status: ${response.status} - ${errorText}`);
+            }
+            
+            const jsonResponse = await response.json();
+            console.log('Resposta da API recebida com sucesso');
+            return jsonResponse;
+            
         } catch (error) {
-            if (retries > 0) {
+            console.error(`Erro na requisição:`, error);
+            
+            if (retries > 0 && (error.name === 'TypeError' || error.message.includes('fetch'))) {
+                console.log(`Erro de rede, tentando novamente em ${delay}ms...`);
                 await new Promise(resolve => setTimeout(resolve, delay));
                 return fetchWithExponentialBackoff(url, options, retries - 1, delay * 2);
             }
+            
             throw error;
         }
     }
@@ -523,18 +542,32 @@ Escreva de forma clara e objetiva, mantendo o tom fraternal do grupo Sons of Pea
                 generatedText = localGenerateRide({ input, km: Number(km), date });
             }
 
-            // Image generation only if API_KEY provided
+            // Image generation only if API available
             if (API_URL_GENERATE_IMAGE) {
-                const promptImage = `Cartaz de convite para rolê de moto Sons of Peaky`;
-                const payloadImage = { instances: { prompt: promptImage }, parameters: { sampleCount: 1 } };
+                const promptImage = `Criar um cartaz de convite para rolê de moto do grupo Sons of Peaky. Estilo vintage com motos clássicas, cores âmbar e preto. Incluir texto: "${input}" e "Sons of Peaky". Design profissional e atrativo.`;
+                const payloadImage = {
+                    instances: [{
+                        prompt: promptImage
+                    }],
+                    parameters: {
+                        sampleCount: 1,
+                        aspectRatio: "16:9"
+                    }
+                };
                 try {
+                    console.log('Tentando gerar imagem com payload:', payloadImage);
                     const responseImage = await fetchWithExponentialBackoff(API_URL_GENERATE_IMAGE, {
-                        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payloadImage)
+                        method: 'POST', 
+                        headers: { 'Content-Type': 'application/json' }, 
+                        body: JSON.stringify(payloadImage)
                     });
+                    console.log('Resposta da API de imagem:', responseImage);
                     const base64Data = responseImage?.predictions?.[0]?.bytesBase64Encoded;
-                    if (base64Data) imageUrl = `data:image/png;base64,${base64Data}`;
+                    if (base64Data) {
+                        imageUrl = `data:image/png;base64,${base64Data}`;
+                    }
                 } catch (e) {
-                    console.warn('Imagem remota não gerada, usando fallback.');
+                    console.warn('Imagem remota não gerada, usando fallback:', e);
                 }
             }
 
@@ -631,9 +664,30 @@ Escreva de forma clara e objetiva, mantendo o tom fraternal do grupo Sons of Pea
         try {
             let text = null;
             if (API_URL_GENERATE_TEXT) {
-                const prompt = `Atue como um planejador de eventos...`;
+                const prompt = `Atue como um planejador de eventos especialista em atividades para grupos motociclísticos como o Sons of Peaky.
+
+Crie uma proposta detalhada para o seguinte tipo de evento: ${input}
+
+A proposta deve incluir:
+1. Nome criativo para o evento
+2. Programação completa com horários
+3. Atividades específicas para motociclistas
+4. Estimativa de custos por pessoa
+5. Lista de necessidades/preparativos
+6. Sugestões de comida e bebida
+7. Dicas para o ambiente do galpão
+8. Como divulgar o evento
+
+Mantenha o tom fraternal e use linguagem adequada ao grupo Sons of Peaky. Seja específico e prático.`;
+
                 const payload = { contents: [{ parts: [{ text: prompt }] }] };
-                const response = await fetchWithExponentialBackoff(API_URL_GENERATE_TEXT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                console.log('Gerando evento com API...');
+                const response = await fetchWithExponentialBackoff(API_URL_GENERATE_TEXT, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify(payload) 
+                });
+                console.log('Resposta da API para evento:', response);
                 text = response?.candidates?.[0]?.content?.parts?.[0]?.text;
             }
             if (!text) text = localGenerateEvent({ input });
@@ -676,9 +730,29 @@ Escreva de forma clara e objetiva, mantendo o tom fraternal do grupo Sons of Pea
         try {
             let text = null;
             if (API_URL_GENERATE_TEXT) {
-                const prompt = `Atue como um especialista em marketing digital...`;
+                const prompt = `Atue como um especialista em marketing digital e redes sociais para grupos motociclísticos.
+
+Crie uma legenda completa para Instagram sobre: ${input}
+
+A legenda deve incluir:
+1. Texto cativante e autêntico no estilo Sons of Peaky
+2. Call to action apropriado
+3. Hashtags relevantes (#sonsofpeaky #motociclismo #irmandade #peakyblinders)
+4. Emojis adequados ao tema motociclístico
+5. Menção ao galpão/local se aplicável
+6. Tom fraternal e inspirador
+
+Limite: máximo 300 caracteres para o texto principal + hashtags.
+Use linguagem que conecte com motociclistas e o público do grupo.`;
+
                 const payload = { contents: [{ parts: [{ text: prompt }] }] };
-                const response = await fetchWithExponentialBackoff(API_URL_GENERATE_TEXT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                console.log('Gerando post Instagram com API...');
+                const response = await fetchWithExponentialBackoff(API_URL_GENERATE_TEXT, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify(payload) 
+                });
+                console.log('Resposta da API para Instagram:', response);
                 text = response?.candidates?.[0]?.content?.parts?.[0]?.text;
             }
             if (!text) text = localGenerateInstagram({ input });
@@ -713,9 +787,27 @@ Escreva de forma clara e objetiva, mantendo o tom fraternal do grupo Sons of Pea
         try {
             let text = null;
             if (API_URL_GENERATE_TEXT) {
-                const prompt = `Gere uma mensagem curta e inspiradora...`;
+                const prompt = `Gere uma mensagem inspiradora e motivacional para o grupo de motociclistas Sons of Peaky.
+
+A mensagem deve:
+1. Ser concisa (máximo 2-3 frases)
+2. Ter tom fraternal e inspirador
+3. Conectar com temas como: estradas, liberdade, irmandade, aventura, lealdade
+4. Usar linguagem que ressoe com motociclistas
+5. Incluir uma referência sutil ao espírito Peaky Blinders (determinação, união)
+6. Terminar com alguma frase marcante ou call to action
+
+Exemplos de temas: superação, união do grupo, aventuras nas estradas, companheirismo, determinação.
+Crie algo original e impactante para motivar os irmãos do grupo.`;
+
                 const payload = { contents: [{ parts: [{ text: prompt }] }] };
-                const response = await fetchWithExponentialBackoff(API_URL_GENERATE_TEXT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                console.log('Gerando mensagem do dia com API...');
+                const response = await fetchWithExponentialBackoff(API_URL_GENERATE_TEXT, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify(payload) 
+                });
+                console.log('Resposta da API para mensagem:', response);
                 text = response?.candidates?.[0]?.content?.parts?.[0]?.text;
             }
             if (!text) text = localGenerateMessage();
