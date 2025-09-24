@@ -6,24 +6,19 @@
     <meta name="description" content="Gerador de Rolês de Moto - IA que cria roteiros personalizados para motociclistas. Descubra destinos únicos, calcule custos e planeje a aventura perfeita." />
     <meta name="theme-color" content="#0d0d0d" />
     <meta name="author" content="Gerador de Rolês" />
-    <title>Gerador de R        installBtn.addEventListener('click', (e) => {
-            installBtn.classList.add('hidden');
-            deferredPrompt.prompt();
-            deferredPrompt.userChoice.then((choiceResult) => {
-                deferredPrompt = null;
-            });
-        });
-
-        // Mobile menu toggle
-        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-        const mobileMenu = document.getElementById('mobile-menu');
-        
-        if (mobileMenuBtn && mobileMenu) {
-            mobileMenuBtn.addEventListener('click', () => {
-                mobileMenu.classList.toggle('hidden');
-            });
-        }
-    </script>Moto - IA para Motociclistas</title>
+    
+    <!-- Security Headers -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta http-equiv="X-Frame-Options" content="DENY" />
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
+    
+    <!-- Performance & Compatibility -->
+    <meta http-equiv="Cache-Control" content="public, max-age=31536000" />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+    <link rel="preconnect" href="https://generativelanguage.googleapis.com" />
+    <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+    <title>Gerador de Rolês de Moto - IA para Motociclistas</title>
     <link rel="icon" href="assets/img/moto-icon.png" />
     
     <!-- Open Graph Meta Tags -->
@@ -40,7 +35,7 @@
     <meta name="twitter:image" content="assets/img/moto-icon.png" />
     
     <!-- CSS Styling -->
-    <link rel="stylesheet" href="tailwind-prod.css" id="tailwind-prod" />
+    <link rel="stylesheet" href="tailwind-prod.css?v=2.0.1" id="tailwind-prod" />
     <script src="https://cdn.tailwindcss.com" id="tailwind-cdn" defer></script>
     
     <!-- Font Awesome -->
@@ -48,7 +43,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/brands.min.css">
     
     <!-- Custom Styles -->
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles.css?v=2.0.1" />
     
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
@@ -271,8 +266,8 @@
                     </div>
                     
                     <!-- Mobile Menu Button -->
-                    <button id="mobile-menu-btn" class="md:hidden text-white">
-                        <i class="fas fa-bars"></i>
+                    <button id="mobile-menu-btn" class="md:hidden text-white" aria-label="Abrir menu de navegação" aria-expanded="false" title="Menu de navegação">
+                        <i class="fas fa-bars" aria-hidden="true" aria-hidden="true"></i>
                     </button>
                     
                     <button id="install-btn" class="hidden bg-gold-primary text-black px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gold-secondary transition-colors">
@@ -586,17 +581,17 @@
     </footer>
     
     <!-- Scripts -->
-    <script src="config.js"></script>
+    <script src="config.js?v=2.0.1"></script>
     <!-- Configuração de desenvolvimento (apenas para localhost) -->
     <script>
         if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
             const devScript = document.createElement('script');
-            devScript.src = 'dev-config.js';
+            devScript.src = 'dev-config.js?v=2.0.1';
             document.head.appendChild(devScript);
         }
     </script>
-    <script src="destinos.js"></script>
-    <script src="gerador.js"></script>
+    <script src="destinos.js?v=2.0.1"></script>
+    <script src="gerador.js?v=2.0.1"></script>
     <script>
         // Initialize particles
         function createParticles() {
