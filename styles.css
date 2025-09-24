@@ -362,3 +362,51 @@ button:active {
 .prose li {
   margin: 0.5rem 0;
 }
+
+/* ===== LOGOS E IDENTIDADE VISUAL ===== */
+.logo-header {
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
+  transition: all 0.3s ease;
+  max-height: 80px;
+  width: auto;
+}
+
+.logo-header:hover {
+  filter: drop-shadow(0 6px 8px rgba(251, 146, 60, 0.4));
+  transform: scale(1.02);
+}
+
+.logo-principal {
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.4));
+  transition: all 0.3s ease;
+}
+
+.logo-watermark {
+  opacity: 0.1;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Garantir que as logos SVG tenham boa renderização */
+svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Estilos específicos para diferentes tamanhos de tela */
+@media (max-width: 768px) {
+  .logo-header {
+    max-height: 60px;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo-header {
+    max-height: 50px;
+  }
+}
