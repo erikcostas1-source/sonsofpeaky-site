@@ -1016,23 +1016,45 @@ function parseResponseManually(response, formData) {
         'Roteiro completo com experiências premium'
     ];
     
-    return tipos.map((tipo, index) => ({
-        tipo: tipo,
-        titulo: nomes[index],
-        resumo: resumos[index],
-        distancia_total: `${120 + (index * 40)} km`,
-        tempo_total: `${6 + index} horas`,
-        custo_total_estimado: calculateFallbackCost(formData, tipo),
-        nivel_dificuldade: ['Fácil', 'Moderado', 'Moderado'][index],
-        destinos: generateFallbackDestinos(formData, tipo),
-        dicas_importantes: [
-            'Verificar combustível antes da saída',
-            'Levar equipamentos de segurança',
-            'Conferir previsão do tempo'
-        ],
-        horario_sugerido_saida: formData.horarioSaida || '08:00',
-        horario_estimado_volta: formData.horarioVolta || '18:00'
-    }));
+    return tipos.map((tipo, index) => {
+        // Calcular custos detalhados
+        const combustivel = calculateCostByType(formData, tipo, 'combustivel');
+        const alimentacao = calculateCostByType(formData, tipo, 'alimentacao');
+        const entradas = calculateCostByType(formData, tipo, 'entradas');
+        const outros = calculateCostByType(formData, tipo, 'outros');
+        
+        const totalValue = 
+            parseInt(combustivel.replace('R$ ', '')) +
+            parseInt(alimentacao.replace('R$ ', '')) +
+            parseInt(entradas.replace('R$ ', '')) +
+            parseInt(outros.replace('R$ ', ''));
+
+        return {
+            tipo: tipo,
+            titulo: nomes[index],
+            resumo: resumos[index],
+            distancia_total: `${120 + (index * 40)} km`,
+            tempo_total: `${6 + index} horas`,
+            custo_total_estimado: calculateFallbackCost(formData, tipo),
+            nivel_dificuldade: ['Fácil', 'Moderado', 'Moderado'][index],
+            destinos: generateFallbackDestinos(formData, tipo),
+            custos_detalhados: {
+                combustivel,
+                alimentacao,
+                entradas,
+                outros,
+                total: `R$ ${totalValue}`
+            },
+            observacoes: generateObservacoesPercurso(formData, tipo, generateFallbackDestinos(formData, tipo)),
+            dicas_importantes: [
+                'Verificar combustível antes da saída',
+                'Levar equipamentos de segurança',
+                'Conferir previsão do tempo'
+            ],
+            horario_sugerido_saida: formData.horarioSaida || '08:00',
+            horario_estimado_volta: formData.horarioVolta || '18:00'
+        };
+    });
 }
 
 /**
@@ -2591,10 +2613,48 @@ function selectRoteiro(index) {
         // Mostra o roteiro expandido
         const selectedContainer = document.getElementById('selected-roteiro');
         selectedContainer.classList.remove('hidden');
+        
+        // Formatar dados do passeio
+        const formData = lastFormData || {};
+        const dataFormatada = formData.dataRole ? new Date(formData.dataRole).toLocaleDateString('pt-BR', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        }) : 'Data não informada';
+        
         selectedContainer.innerHTML = `
             <div class="text-center mb-6">
                 <h2 class="text-3xl font-bold text-gold-primary mb-2">🎉 Roteiro Selecionado!</h2>
-                <p class="text-gray-300">Agora você pode compartilhar com seus amigos e organizar o grupo</p>
+                <p class="text-gray-300 mb-4">Agora você pode compartilhar com seus amigos e organizar o grupo</p>
+                
+                <!-- Dados do Passeio -->
+                <div class="bg-card rounded-lg p-4 mb-4 text-left max-w-2xl mx-auto">
+                    <h3 class="text-lg font-semibold text-gold-primary mb-3 text-center">📋 Dados do Passeio</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                        <div class="flex items-center">
+                            <span class="text-gold-primary mr-2">📅</span>
+                            <span class="text-gray-300">Data: <strong class="text-white">${dataFormatada}</strong></span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-gold-primary mr-2">🕐</span>
+                            <span class="text-gray-300">Saída: <strong class="text-white">${formData.horarioSaida || 'Não informado'}</strong></span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-gold-primary mr-2">🕕</span>
+                            <span class="text-gray-300">Retorno: <strong class="text-white">${formData.horarioVolta || 'Não informado'}</strong></span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-gold-primary mr-2">🏍️</span>
+                            <span class="text-gray-300">Moto: <strong class="text-white">${formData.tipoMoto || 'Não informada'}</strong></span>
+                        </div>
+                        <div class="flex items-center md:col-span-2">
+                            <span class="text-gold-primary mr-2">📍</span>
+                            <span class="text-gray-300">Ponto de Saída: <strong class="text-white">${formData.enderecoPartida || 'Não informado'}</strong></span>
+                        </div>
+                    </div>
+                </div>
+                
                 <button onclick="showSuggestions()" class="text-blue-400 underline mt-2 hover:text-blue-300">
                     ← Voltar para as opções
                 </button>
