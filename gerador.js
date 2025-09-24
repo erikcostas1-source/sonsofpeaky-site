@@ -602,16 +602,17 @@ function parseAIResponse(response, formData) {
                 resumo: sugestao.resumo || 'Roteiro gerado pela IA',
                 distancia_total: sugestao.distancia_total || '-- km',
                 tempo_total: sugestao.tempo_total || '-- horas',
-                custo_total_estimado: sugestao.custo_total_estimado || 'R$ --',
+                custo_total_estimado: sugestao.custo_total_estimado || calculateFallbackCost(formData, tipos[index]),
                 nivel_dificuldade: sugestao.nivel_dificuldade || 'Moderado',
-                destinos: Array.isArray(sugestao.destinos) ? sugestao.destinos.map(d => ({
-                    nome: d?.nome || 'Destino',
-                    endereco: d?.endereco || 'Endereço não especificado',
-                    distancia: d?.distancia || '-- km',
-                    tempo_parada: d?.tempo_parada || '30 min',
-                    descricao: d?.descricao || 'Local interessante',
-                    custo_estimado: d?.custo_estimado || 'R$ --'
-                })) : [],
+                destinos: Array.isArray(sugestao.destinos) && sugestao.destinos.length > 0 ? 
+                    sugestao.destinos.map(d => ({
+                        nome: d?.nome || 'Destino',
+                        endereco: d?.endereco || 'Endereço não especificado',
+                        distancia: d?.distancia || '-- km',
+                        tempo_parada: d?.tempo_parada || '30 min',
+                        descricao: d?.descricao || 'Local interessante',
+                        custo_estimado: d?.custo_estimado || 'R$ --'
+                    })) : generateFallbackDestinos(formData, tipos[index]),
                 dicas_importantes: Array.isArray(sugestao.dicas_importantes) ? sugestao.dicas_importantes : [
                     'Verificar combustível',
                     'Levar equipamentos de segurança',
@@ -631,6 +632,88 @@ function parseAIResponse(response, formData) {
         // Fallback para parsing manual
         return parseResponseManually(response, formData);
     }
+}
+
+/**
+ * Calcula custo estimado quando IA não fornece
+ */
+function calculateFallbackCost(formData, tipo) {
+    const baseOrcamento = formData.orcamento || 200;
+    const multipliers = {
+        'ECONÔMICA': 0.7,
+        'EQUILIBRADA': 1.0,
+        'PREMIUM': 1.4
+    };
+    const custo = Math.round(baseOrcamento * (multipliers[tipo] || 1.0));
+    return `R$ ${custo}`;
+}
+
+/**
+ * Retorna características distintivas por tipo de roteiro
+ */
+function getTypeCharacteristics(tipo) {
+    const characteristics = {
+        'ECONÔMICA': {
+            icon: '💰',
+            features: ['Menor custo', 'Postos baratos', 'Lanchonetes locais', 'Roteiro otimizado'],
+            color: 'text-green-400'
+        },
+        'EQUILIBRADA': {
+            icon: '⚖️',
+            features: ['Custo-benefício', 'Mix de experiências', 'Paradas estratégicas', 'Tempo ideal'],
+            color: 'text-blue-400'
+        },
+        'PREMIUM': {
+            icon: '👑',
+            features: ['Experiência completa', 'Restaurantes premium', 'Hospedagem', 'Máximo conforto'],
+            color: 'text-purple-400'
+        }
+    };
+    
+    const char = characteristics[tipo] || characteristics['EQUILIBRADA'];
+    
+    return `
+        <div class="bg-black bg-opacity-30 p-3 rounded-lg">
+            <div class="text-white font-semibold mb-2">${char.icon} Diferenciais:</div>
+            <div class="grid grid-cols-2 gap-1 text-xs">
+                ${char.features.map(feature => `
+                    <div class="flex items-center">
+                        <span class="w-2 h-2 bg-gold-primary rounded-full mr-2"></span>
+                        <span class="${char.color}">${feature}</span>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * Gera destinos realistas quando IA não fornece
+ */
+function generateFallbackDestinos(formData, tipo) {
+    const destinosBase = [
+        // Destinos próximos de São Paulo
+        { nome: 'Campos do Jordão', regiao: 'Serra da Mantiqueira', tipo: 'serra' },
+        { nome: 'Ubatuba', regiao: 'Litoral Norte', tipo: 'praia' },
+        { nome: 'Atibaia', regiao: 'Interior SP', tipo: 'interior' },
+        { nome: 'São Roque', regiao: 'Interior SP', tipo: 'interior' },
+        { nome: 'Bertioga', regiao: 'Litoral', tipo: 'praia' },
+        { nome: 'Monte Verde', regiao: 'Sul de Minas', tipo: 'serra' },
+        { nome: 'Cunha', regiao: 'Vale do Paraíba', tipo: 'serra' },
+        { nome: 'Ilhabela', regiao: 'Litoral Norte', tipo: 'praia' }
+    ];
+
+    const quantidade = tipo === 'ECONÔMICA' ? 2 : tipo === 'EQUILIBRADA' ? 3 : 4;
+    const destinosSelecionados = destinosBase.slice(0, quantidade);
+
+    return destinosSelecionados.map((dest, index) => ({
+        nome: dest.nome,
+        endereco: `${dest.regiao}, ${dest.nome}`,
+        distancia: `${60 + (index * 25)} km`,
+        tempo_parada: tipo === 'PREMIUM' ? '2h' : tipo === 'EQUILIBRADA' ? '1h30' : '1h',
+        descricao: `Destino ${dest.tipo} na região ${dest.regiao}`,
+        custo_estimado: `R$ ${30 + (index * 15)}`
+    }));
 }
 
 /**
@@ -785,7 +868,10 @@ function displayResults(results) {
     suggestionsContainer.className = 'grid md:grid-cols-3 gap-6 mb-8';
     suggestionsContainer.id = 'suggestions-grid';
     
+    console.log(`🔍 DEBUG: Recebidas ${results.length} sugestões para exibir:`, results);
+    
     results.forEach((roteiro, index) => {
+        console.log(`🔍 DEBUG: Criando card ${index + 1} para:`, roteiro.titulo);
         const suggestionCard = createSuggestionCard(roteiro, index);
         suggestionsContainer.appendChild(suggestionCard);
     });
@@ -997,6 +1083,8 @@ function createSuggestionCard(roteiro, index) {
                         ${safeRoteiro.destinos.length > 2 ? `<div class="text-gray-300 text-xs">+ ${safeRoteiro.destinos.length - 2} destinos...</div>` : ''}
                     </div>
                 </div>
+                
+                ${getTypeCharacteristics(safeRoteiro.tipo)}
             </div>
             
             <div class="text-center">
