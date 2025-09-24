@@ -303,13 +303,17 @@ PREFERÊNCIAS OPCIONAIS (use como balizadores):
 EXPERIÊNCIA DESEJADA:
 ${experienciaDesejada}
 
-INSTRUÇÕES PARA O ROTEIRO:
+INSTRUÇÕES PARA 3 SUGESTÕES DE ROTEIRO:
 1. PRIORIDADE MÁXIMA: Respeite rigorosamente os horários de saída e volta
-2. Se quilometragem foi especificada, mantenha-se dentro da faixa sugerida
-3. Se orçamento foi informado, use como limite máximo; se não, sugira opções variadas
-4. Sugira 2-3 destinos/paradas principais que atendam à experiência desejada
+2. Crie EXATAMENTE 3 sugestões diferentes baseadas na experiência desejada:
+   - SUGESTÃO 1 (ECONÔMICA): Foco em menor custo, destinos gratuitos/baratos
+   - SUGESTÃO 2 (EQUILIBRADA): Balance entre custo, aventura e conforto  
+   - SUGESTÃO 3 (PREMIUM): Experiência completa, sem limite de orçamento
 
-Para cada destino, forneça:
+3. Se quilometragem foi especificada, mantenha-se dentro da faixa para todas as 3
+4. Cada sugestão deve ter 2-3 destinos/paradas principais diferentes
+
+Para cada destino em cada sugestão, forneça:
    - Nome completo e endereço exato
    - Distância e tempo de viagem desde o ponto anterior
    - Descrição detalhada do que fazer/ver
@@ -317,7 +321,7 @@ Para cada destino, forneça:
    - Dicas específicas para motociclistas
    - Horário sugerido de chegada e permanência
 
-Calcule custos realistas:
+Calcule custos realistas para cada sugestão:
    - Combustível (preço atual ~R$ 5,50/litro)
    - Alimentação (café da manhã, almoço, lanche)
    - Eventuais taxas de entrada
@@ -332,36 +336,66 @@ Considere a logística:
 
 5. Formate a resposta em JSON válido com esta estrutura:
 {
-  "roteiro": {
-    "titulo": "Nome do Roteiro",
-    "resumo": "Descrição geral",
-    "distancia_total": "XXX km",
-    "tempo_total": "X horas",
-    "custo_total_estimado": "R$ XXX",
-    "nivel_dificuldade": "Fácil/Moderado/Difícil",
-    "destinos": [
-      {
-        "nome": "Nome do Local",
-        "endereco": "Endereço completo",
-        "distancia_anterior": "XX km",
-        "tempo_viagem": "XX min",
-        "horario_chegada": "HH:MM",
-        "tempo_permanencia": "XX min",
-        "descricao": "O que fazer/ver",
-        "custo_estimado": "R$ XX",
-        "dicas_motociclista": ["dica1", "dica2"],
-        "coordenadas": "lat,lng (se souber)"
-      }
-    ],
-    "custos_detalhados": {
-      "combustivel": "R$ XX",
-      "alimentacao": "R$ XX",
-      "entradas": "R$ XX",
-      "outros": "R$ XX",
-      "total": "R$ XXX"
+  "sugestoes": [
+    {
+      "id": 1,
+      "tipo": "ECONÔMICA",
+      "titulo": "Nome do Roteiro Econômico",
+      "resumo": "Descrição focada em baixo custo",
+      "distancia_total": "XXX km",
+      "tempo_total": "X horas", 
+      "custo_total_estimado": "R$ XXX",
+      "nivel_dificuldade": "Fácil/Moderado/Difícil",
+      "destinos": [
+        {
+          "nome": "Nome do Local",
+          "endereco": "Endereço completo",
+          "distancia_anterior": "XX km",
+          "tempo_viagem": "XX min",
+          "horario_chegada": "HH:MM",
+          "tempo_permanencia": "XX min",
+          "descricao": "O que fazer/ver",
+          "custo_estimado": "R$ XX",
+          "dicas_motociclista": ["dica1", "dica2"],
+          "coordenadas": "lat,lng (se souber)"
+        }
+      ],
+      "custos_detalhados": {
+        "combustivel": "R$ XX",
+        "alimentacao": "R$ XX", 
+        "entradas": "R$ XX",
+        "outros": "R$ XX",
+        "total": "R$ XXX"
+      },
+      "observacoes": ["observação1", "observação2"]
     },
-    "observacoes": ["observação1", "observação2"]
-  }
+    {
+      "id": 2,
+      "tipo": "EQUILIBRADA",
+      "titulo": "Nome do Roteiro Equilibrado",
+      "resumo": "Descrição balanceada",
+      "distancia_total": "XXX km",
+      "tempo_total": "X horas",
+      "custo_total_estimado": "R$ XXX",
+      "nivel_dificuldade": "Fácil/Moderado/Difícil",
+      "destinos": [...],
+      "custos_detalhados": {...},
+      "observacoes": [...]
+    },
+    {
+      "id": 3,
+      "tipo": "PREMIUM", 
+      "titulo": "Nome do Roteiro Premium",
+      "resumo": "Descrição experiência completa",
+      "distancia_total": "XXX km",
+      "tempo_total": "X horas",
+      "custo_total_estimado": "R$ XXX",
+      "nivel_dificuldade": "Fácil/Moderado/Difícil", 
+      "destinos": [...],
+      "custos_detalhados": {...},
+      "observacoes": [...]
+    }
+  ]
 }
 
 IMPORTANTE: Retorne APENAS o JSON válido, sem texto adicional antes ou depois. Use destinos reais e existentes no Brasil.
@@ -382,11 +416,11 @@ function parseAIResponse(response, formData) {
         const jsonStr = jsonMatch[0];
         const data = JSON.parse(jsonStr);
         
-        if (!data.roteiro) {
-            throw new Error('Formato de resposta inválido');
+        if (!data.sugestoes || !Array.isArray(data.sugestoes) || data.sugestoes.length !== 3) {
+            throw new Error('Formato de resposta inválido - esperado 3 sugestões');
         }
         
-        return [data.roteiro];
+        return data.sugestoes;
         
     } catch (error) {
         console.error('❌ Erro ao processar resposta da IA:', error);
@@ -512,15 +546,37 @@ function displayResults(results) {
         return;
     }
     
-    // Salva os roteiros globalmente para compartilhamento
+    // Salva os roteiros globalmente para compartilhamento  
     generatedRoteiros = results;
     
     container.innerHTML = '';
     
+    // Cria header de seleção
+    const header = document.createElement('div');
+    header.className = 'text-center mb-8';
+    header.innerHTML = `
+        <h2 class="text-3xl font-bold text-gold-primary mb-4">🎯 Escolha Sua Aventura</h2>
+        <p class="text-gray-300 text-lg">Gerou 3 sugestões personalizadas para você. Escolha a que mais combina com seu estilo!</p>
+    `;
+    container.appendChild(header);
+    
+    // Cria container das sugestões
+    const suggestionsContainer = document.createElement('div');
+    suggestionsContainer.className = 'grid md:grid-cols-3 gap-6 mb-8';
+    suggestionsContainer.id = 'suggestions-grid';
+    
     results.forEach((roteiro, index) => {
-        const resultCard = createResultCard(roteiro, index);
-        container.appendChild(resultCard);
+        const suggestionCard = createSuggestionCard(roteiro, index);
+        suggestionsContainer.appendChild(suggestionCard);
     });
+    
+    container.appendChild(suggestionsContainer);
+    
+    // Container para roteiro selecionado (inicialmente oculto)
+    const selectedContainer = document.createElement('div');
+    selectedContainer.id = 'selected-roteiro';
+    selectedContainer.className = 'hidden';
+    container.appendChild(selectedContainer);
     
     // Mostra seção de resultados
     resultsSection.classList.remove('hidden');
@@ -536,7 +592,80 @@ function displayResults(results) {
 }
 
 /**
- * Cria um card de resultado
+ * Cria um card de sugestão (preview)
+ */
+function createSuggestionCard(roteiro, index) {
+    const card = document.createElement('div');
+    card.className = 'suggestion-card cursor-pointer transform transition-all duration-300 hover:scale-105';
+    card.onclick = () => selectRoteiro(index);
+    
+    // Cores por tipo
+    const typeColors = {
+        'ECONÔMICA': 'from-green-600 to-green-800 border-green-500',
+        'EQUILIBRADA': 'from-blue-600 to-blue-800 border-blue-500', 
+        'PREMIUM': 'from-purple-600 to-purple-800 border-purple-500'
+    };
+    
+    const typeIcons = {
+        'ECONÔMICA': '💚',
+        'EQUILIBRADA': '⚖️',
+        'PREMIUM': '👑'
+    };
+    
+    const colorClass = typeColors[roteiro.tipo] || 'from-gray-600 to-gray-800 border-gray-500';
+    
+    card.innerHTML = `
+        <div class="bg-gradient-to-br ${colorClass} p-6 rounded-xl border-2 hover:border-opacity-100 border-opacity-50 transition-all">
+            <div class="text-center mb-4">
+                <div class="text-4xl mb-2">${typeIcons[roteiro.tipo]}</div>
+                <div class="bg-black bg-opacity-30 px-3 py-1 rounded-full text-sm font-bold text-white mb-2">
+                    ${roteiro.tipo}
+                </div>
+                <h3 class="text-xl font-bold text-white mb-2">${roteiro.titulo}</h3>
+                <p class="text-gray-200 text-sm">${roteiro.resumo}</p>
+            </div>
+            
+            <div class="space-y-3 mb-6">
+                <div class="flex justify-between items-center bg-black bg-opacity-30 p-3 rounded-lg">
+                    <span class="text-white font-semibold">💰 Custo Total</span>
+                    <span class="text-white font-bold text-lg">${roteiro.custo_total_estimado}</span>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-2 text-sm">
+                    <div class="bg-black bg-opacity-30 p-2 rounded text-center">
+                        <div class="text-white font-semibold">📍 ${roteiro.distancia_total}</div>
+                        <div class="text-gray-300">Distância</div>
+                    </div>
+                    <div class="bg-black bg-opacity-30 p-2 rounded text-center">
+                        <div class="text-white font-semibold">⏱️ ${roteiro.tempo_total}</div>
+                        <div class="text-gray-300">Tempo</div>
+                    </div>
+                </div>
+                
+                <div class="bg-black bg-opacity-30 p-3 rounded-lg">
+                    <div class="text-white font-semibold mb-2">📍 Principais Destinos:</div>
+                    <div class="space-y-1">
+                        ${roteiro.destinos.slice(0, 2).map(d => `
+                            <div class="text-gray-200 text-sm">• ${d.nome}</div>
+                        `).join('')}
+                        ${roteiro.destinos.length > 2 ? `<div class="text-gray-300 text-xs">+ ${roteiro.destinos.length - 2} destinos...</div>` : ''}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <button class="bg-white text-black font-bold py-3 px-6 rounded-full hover:bg-gray-100 transition-colors w-full">
+                    ✨ Escolher Este Roteiro
+                </button>
+            </div>
+        </div>
+    `;
+    
+    return card;
+}
+
+/**
+ * Cria um card de resultado completo (expandido)
  */
 function createResultCard(roteiro, index) {
     const card = document.createElement('div');
@@ -1293,6 +1422,78 @@ function generateInstagramCard(roteiro, index) {
 let lastFormData = null;
 function getLastFormData() {
     return lastFormData;
+}
+
+/**
+ * Seleciona um roteiro e expande com opções de compartilhamento
+ */
+function selectRoteiro(index) {
+    const roteiro = generatedRoteiros[index];
+    if (!roteiro) return;
+    
+    // Esconde as sugestões com animação
+    const suggestionsGrid = document.getElementById('suggestions-grid');
+    suggestionsGrid.style.transform = 'translateY(-20px)';
+    suggestionsGrid.style.opacity = '0';
+    
+    setTimeout(() => {
+        suggestionsGrid.classList.add('hidden');
+        
+        // Mostra o roteiro expandido
+        const selectedContainer = document.getElementById('selected-roteiro');
+        selectedContainer.classList.remove('hidden');
+        selectedContainer.innerHTML = `
+            <div class="text-center mb-6">
+                <h2 class="text-3xl font-bold text-gold-primary mb-2">🎉 Roteiro Selecionado!</h2>
+                <p class="text-gray-300">Agora você pode compartilhar com seus amigos e organizar o grupo</p>
+                <button onclick="showSuggestions()" class="text-blue-400 underline mt-2 hover:text-blue-300">
+                    ← Voltar para as opções
+                </button>
+            </div>
+        `;
+        
+        const expandedCard = createResultCard(roteiro, index);
+        expandedCard.classList.add('animate-fade-in');
+        selectedContainer.appendChild(expandedCard);
+        
+        // Scroll suave para o card expandido
+        setTimeout(() => {
+            selectedContainer.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start' 
+            });
+        }, 100);
+        
+    }, 300);
+    
+    trackEvent('roteiro_selected', { 
+        tipo: roteiro.tipo, 
+        titulo: roteiro.titulo 
+    });
+}
+
+/**
+ * Volta para as sugestões
+ */
+function showSuggestions() {
+    const suggestionsGrid = document.getElementById('suggestions-grid');
+    const selectedContainer = document.getElementById('selected-roteiro');
+    
+    // Esconde roteiro expandido
+    selectedContainer.classList.add('hidden');
+    
+    // Mostra sugestões novamente
+    suggestionsGrid.classList.remove('hidden');
+    suggestionsGrid.style.transform = 'translateY(0)';
+    suggestionsGrid.style.opacity = '1';
+    
+    // Scroll suave para as sugestões
+    setTimeout(() => {
+        suggestionsGrid.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start' 
+        });
+    }, 100);
 }
 
 /**
