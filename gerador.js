@@ -111,8 +111,11 @@ function initializeApp() {
         }
         
         // Carrega destinos se disponível
-        if (typeof destinos !== 'undefined') {
-            console.log(`📍 ${destinos.length} destinos carregados`);
+        if (window.destinos && window.destinos.length > 0) {
+            console.log(`📍 ${window.destinos.length} destinos carregados`);
+        } else if (window.DESTINOS_DATABASE) {
+            const totalDestinos = Object.values(window.DESTINOS_DATABASE).flat().length;
+            console.log(`📍 ${totalDestinos} destinos carregados via DESTINOS_DATABASE`);
         } else {
             console.warn('⚠️ Destinos não carregados - fallback será limitado');
         }
@@ -655,13 +658,21 @@ function parseResponseManually(response, formData) {
  * Gera resultados de fallback usando destinos locais
  */
 function generateFallbackResults(formData) {
-    if (!destinos || destinos.length === 0) {
-        throw new Error('Nenhum destino disponível');
+    // Verificar se destinos está disponível no window
+    const destinosArray = window.destinos || window.DESTINOS_DATABASE || [];
+    if (!destinosArray || destinosArray.length === 0) {
+        throw new Error('Nenhum destino disponível - destinos.js não carregado');
     }
     
     // Filtra destinos por orçamento e preferências
-    const destinosFiltrados = destinos.filter(d => {
-        const custoEstimado = d.custoMedio || 100;
+    let destinosParaFiltrar = destinosArray;
+    if (!Array.isArray(destinosParaFiltrar)) {
+        // Se for o DESTINOS_DATABASE, converter para array
+        destinosParaFiltrar = Object.values(destinosParaFiltrar).flat();
+    }
+    
+    const destinosFiltrados = destinosParaFiltrar.filter(d => {
+        const custoEstimado = d.custoMedio || d.custos?.total || 100;
         return custoEstimado <= formData.orcamento;
     });
     

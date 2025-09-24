@@ -36,7 +36,6 @@
     
     <!-- CSS Styling -->
     <link rel="stylesheet" href="tailwind-prod.css?v=2.0.1" id="tailwind-prod" />
-    <script src="https://cdn.tailwindcss.com" id="tailwind-cdn" defer></script>
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -53,25 +52,8 @@
     
     <!-- CSS Environment Control -->
     <script>
-        // Controla qual CSS usar baseado no ambiente
-        (function() {
-            const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-            const tailwindCdn = document.getElementById('tailwind-cdn');
-            const tailwindProd = document.getElementById('tailwind-prod');
-            
-            if (isLocalhost) {
-                // Em desenvolvimento, usa CDN
-                if (tailwindProd) tailwindProd.disabled = true;
-                console.log('🏠 Usando Tailwind CDN (desenvolvimento)');
-            } else {
-                // Em produção, remove CDN completamente e usa CSS local
-                if (tailwindCdn) {
-                    tailwindCdn.remove();
-                    console.log('🌐 Tailwind CDN removido - usando CSS local');
-                }
-                console.log('🌐 Usando Tailwind local (produção)');
-            }
-        })();
+        // Usar sempre CSS local - sem CDN
+        console.log('� Usando Tailwind CSS local');
     </script>
     
     <style>
