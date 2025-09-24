@@ -51,6 +51,9 @@ function initializeApp() {
         console.log(`📍 ${destinos.length} destinos carregados`);
     }
     
+    // Carrega roteiro compartilhado se houver
+    loadSharedRoteiro();
+    
     // Inicializa PWA
     initializePWA();
     
@@ -109,6 +112,9 @@ async function handleFormSubmit(event) {
     
     const formData = getFormData();
     console.log('📝 Dados do formulário:', formData);
+    
+    // Salva dados do formulário para compartilhamento
+    lastFormData = formData;
     
     try {
         isGenerating = true;
@@ -506,6 +512,9 @@ function displayResults(results) {
         return;
     }
     
+    // Salva os roteiros globalmente para compartilhamento
+    generatedRoteiros = results;
+    
     container.innerHTML = '';
     
     results.forEach((roteiro, index) => {
@@ -636,16 +645,45 @@ function createResultCard(roteiro, index) {
             </div>
         ` : ''}
         
-        <div class="flex flex-wrap gap-3 mt-6 pt-4 border-t border-gray-700">
-            <button onclick="shareRoteiro(${index})" class="btn-primary text-sm px-4 py-2">
-                <i class="fas fa-share-alt mr-2"></i>Compartilhar
-            </button>
-            <button onclick="saveRoteiro(${index})" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm transition-colors">
-                <i class="fas fa-bookmark mr-2"></i>Salvar
-            </button>
-            <button onclick="exportToPDF(${index})" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm transition-colors">
-                <i class="fas fa-file-pdf mr-2"></i>PDF
-            </button>
+        <!-- Botões de Ação -->
+        <div class="mt-6 pt-4 border-t border-gray-700">
+            <!-- Compartilhamento Social -->
+            <div class="mb-4">
+                <h5 class="text-gold-primary font-semibold mb-3">📱 Compartilhar com o Grupo</h5>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="shareWhatsApp(${index})" class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-sm transition-colors">
+                        <i class="fab fa-whatsapp mr-2"></i>WhatsApp
+                    </button>
+                    <button onclick="shareInstagram(${index})" class="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-3 py-2 rounded-lg text-sm transition-colors">
+                        <i class="fab fa-instagram mr-2"></i>Instagram
+                    </button>
+                    <button onclick="shareLink(${index})" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm transition-colors">
+                        <i class="fas fa-link mr-2"></i>Link de Convite
+                    </button>
+                    <button onclick="generateQRCode(${index})" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-lg text-sm transition-colors">
+                        <i class="fas fa-qrcode mr-2"></i>QR Code
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Ferramentas -->
+            <div class="mb-4">
+                <h5 class="text-gold-primary font-semibold mb-3">🛠️ Ferramentas</h5>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="addToCalendar(${index})" class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm transition-colors">
+                        <i class="fas fa-calendar-plus mr-2"></i>Google Calendar
+                    </button>
+                    <button onclick="showMap(${index})" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm transition-colors">
+                        <i class="fas fa-map-marked-alt mr-2"></i>Ver no Mapa
+                    </button>
+                    <button onclick="saveRoteiro(${index})" class="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-2 rounded-lg text-sm transition-colors">
+                        <i class="fas fa-bookmark mr-2"></i>Salvar Favorito
+                    </button>
+                    <button onclick="downloadPDF(${index})" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-lg text-sm transition-colors">
+                        <i class="fas fa-file-pdf mr-2"></i>Download PDF
+                    </button>
+                </div>
+            </div>
         </div>
     `;
     
@@ -967,6 +1005,352 @@ function initializePWA() {
         navigator.serviceWorker.register('sw.js').catch(err => {
             console.error('SW registration failed:', err);
         });
+    }
+}
+
+// ===============================
+// FUNÇÕES DE COMPARTILHAMENTO
+// ===============================
+
+let generatedRoteiros = []; // Armazena os roteiros gerados
+
+/**
+ * Compartilhar no WhatsApp
+ */
+function shareWhatsApp(index) {
+    const roteiro = generatedRoteiros[index];
+    if (!roteiro) return;
+    
+    const message = `🏍️ *${roteiro.titulo}* 🏍️
+
+📅 *Detalhes do Rolê:*
+📍 Distância: ${roteiro.distancia_total}
+⏱️ Tempo: ${roteiro.tempo_total}
+💰 Custo: ${roteiro.custo_total_estimado}
+🎢 Dificuldade: ${roteiro.nivel_dificuldade}
+
+🗺️ *Destinos:*
+${roteiro.destinos.map((d, i) => `${i + 1}. ${d.nome}\n   📍 ${d.endereco}\n   💰 ${d.custo_estimado}`).join('\n\n')}
+
+🔗 *Quer participar?* Acesse: ${generateRoleLink(index)}
+
+_Gerado por Sons of Peaky - Gerador de Rolês IA_`;
+
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+    
+    trackEvent('share', { type: 'whatsapp', roteiro: roteiro.titulo });
+}
+
+/**
+ * Compartilhar no Instagram (gera card visual)
+ */
+function shareInstagram(index) {
+    const roteiro = generatedRoteiros[index];
+    if (!roteiro) return;
+    
+    generateInstagramCard(roteiro, index);
+}
+
+/**
+ * Gerar link de convite
+ */
+function shareLink(index) {
+    const link = generateRoleLink(index);
+    
+    if (navigator.share) {
+        navigator.share({
+            title: generatedRoteiros[index].titulo,
+            text: `Participe do nosso rolê de moto: ${generatedRoteiros[index].titulo}`,
+            url: link
+        });
+    } else {
+        navigator.clipboard.writeText(link).then(() => {
+            showNotification('Link copiado para a área de transferência!', 'success');
+        });
+    }
+    
+    trackEvent('share', { type: 'link', roteiro: generatedRoteiros[index].titulo });
+}
+
+/**
+ * Gerar QR Code
+ */
+function generateQRCode(index) {
+    const link = generateRoleLink(index);
+    const qrModal = document.createElement('div');
+    qrModal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+    qrModal.innerHTML = `
+        <div class="bg-gray-800 p-6 rounded-lg max-w-sm w-full mx-4">
+            <h3 class="text-xl font-bold text-white mb-4 text-center">📱 QR Code do Rolê</h3>
+            <div class="bg-white p-4 rounded-lg mb-4 flex justify-center">
+                <canvas id="qr-canvas" width="200" height="200"></canvas>
+            </div>
+            <p class="text-gray-300 text-sm text-center mb-4">Compartilhe este QR Code para que seus amigos acessem os detalhes do rolê</p>
+            <div class="flex gap-2">
+                <button onclick="downloadQR()" class="flex-1 bg-blue-600 text-white py-2 rounded">Download</button>
+                <button onclick="closeModal()" class="flex-1 bg-gray-600 text-white py-2 rounded">Fechar</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(qrModal);
+    generateQRCanvas(link, 'qr-canvas');
+    
+    window.closeModal = () => {
+        document.body.removeChild(qrModal);
+        delete window.closeModal;
+        delete window.downloadQR;
+    };
+    
+    window.downloadQR = () => {
+        const canvas = document.getElementById('qr-canvas');
+        const link = document.createElement('a');
+        link.download = `role-qr-${generatedRoteiros[index].titulo.replace(/[^a-zA-Z0-9]/g, '-')}.png`;
+        link.href = canvas.toDataURL();
+        link.click();
+    };
+}
+
+/**
+ * Adicionar ao Google Calendar
+ */
+function addToCalendar(index) {
+    const roteiro = generatedRoteiros[index];
+    if (!roteiro) return;
+    
+    // Precisamos dos dados do formulário original para pegar data/horários
+    const formData = getLastFormData();
+    if (!formData) {
+        showNotification('Dados do formulário não encontrados', 'error');
+        return;
+    }
+    
+    const startDate = new Date(`${formData.dataRole}T${formData.horarioSaida}`);
+    const endDate = new Date(`${formData.dataRole}T${formData.horarioVolta}`);
+    
+    const eventTitle = `🏍️ ${roteiro.titulo}`;
+    const eventDescription = `${roteiro.resumo}\\n\\nDestinos:\\n${roteiro.destinos.map(d => `• ${d.nome} - ${d.endereco}`).join('\\n')}\\n\\nCusto Total: ${roteiro.custo_total_estimado}\\nDistância: ${roteiro.distancia_total}`;
+    
+    const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventTitle)}&dates=${startDate.toISOString().replace(/[-:]/g, '').split('.')[0]}Z/${endDate.toISOString().replace(/[-:]/g, '').split('.')[0]}Z&details=${encodeURIComponent(eventDescription)}&location=${encodeURIComponent(formData.enderecoPartida)}`;
+    
+    window.open(googleCalendarUrl, '_blank');
+    trackEvent('calendar_export', { roteiro: roteiro.titulo });
+}
+
+/**
+ * Mostrar no mapa
+ */
+function showMap(index) {
+    const roteiro = generatedRoteiros[index];
+    if (!roteiro) return;
+    
+    const mapModal = document.createElement('div');
+    mapModal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+    mapModal.innerHTML = `
+        <div class="bg-gray-800 p-6 rounded-lg max-w-4xl w-full mx-4 max-h-[90vh] overflow-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-white">🗺️ Mapa do Roteiro</h3>
+                <button onclick="closeMapModal()" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="space-y-3">
+                ${roteiro.destinos.map((destino, i) => `
+                    <div class="bg-gray-700 p-3 rounded flex items-center justify-between">
+                        <div>
+                            <strong class="text-white">${i + 1}. ${destino.nome}</strong>
+                            <p class="text-gray-400 text-sm">${destino.endereco}</p>
+                        </div>
+                        <button onclick="openGoogleMaps('${destino.endereco}')" class="bg-blue-600 text-white px-3 py-1 rounded text-sm">
+                            Abrir no Maps
+                        </button>
+                    </div>
+                `).join('')}
+            </div>
+            <div class="mt-4 text-center">
+                <button onclick="openFullRoute(${index})" class="bg-green-600 text-white px-6 py-2 rounded">
+                    🗺️ Ver Rota Completa no Google Maps
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(mapModal);
+    
+    window.closeMapModal = () => {
+        document.body.removeChild(mapModal);
+        delete window.closeMapModal;
+        delete window.openGoogleMaps;
+        delete window.openFullRoute;
+    };
+    
+    window.openGoogleMaps = (endereco) => {
+        window.open(`https://www.google.com/maps/search/${encodeURIComponent(endereco)}`, '_blank');
+    };
+    
+    window.openFullRoute = (roteiroIndex) => {
+        const formData = getLastFormData();
+        const roteiro = generatedRoteiros[roteiroIndex];
+        
+        const origem = encodeURIComponent(formData.enderecoPartida);
+        const destinos = roteiro.destinos.map(d => encodeURIComponent(d.endereco)).join('/');
+        
+        const mapsUrl = `https://www.google.com/maps/dir/${origem}/${destinos}`;
+        window.open(mapsUrl, '_blank');
+    };
+}
+
+/**
+ * Download PDF
+ */
+function downloadPDF(index) {
+    const roteiro = generatedRoteiros[index];
+    if (!roteiro) return;
+    
+    // Para implementação futura - usar jsPDF ou similar
+    showNotification('Funcionalidade de PDF em desenvolvimento', 'info');
+    trackEvent('pdf_download', { roteiro: roteiro.titulo });
+}
+
+// Funções auxiliares para compartilhamento
+function generateRoleLink(index) {
+    const roteiro = generatedRoteiros[index];
+    const baseUrl = window.location.origin + window.location.pathname;
+    
+    // Salva o roteiro no localStorage com ID único
+    const roteiroId = Date.now().toString(36) + Math.random().toString(36).substr(2);
+    localStorage.setItem(`role_${roteiroId}`, JSON.stringify({
+        roteiro: roteiro,
+        formData: getLastFormData(),
+        timestamp: Date.now()
+    }));
+    
+    return `${baseUrl}?role=${roteiroId}`;
+}
+
+function generateQRCanvas(text, canvasId) {
+    // Implementação básica de QR Code - para produção usar biblioteca como qrcode.js
+    const canvas = document.getElementById(canvasId);
+    const ctx = canvas.getContext('2d');
+    
+    // Placeholder - desenha um quadrado com texto
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, 200, 200);
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(20, 20, 160, 160);
+    ctx.fillStyle = '#000';
+    ctx.font = '12px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('QR CODE', 100, 100);
+    ctx.fillText('(Em desenvolvimento)', 100, 120);
+}
+
+function generateInstagramCard(roteiro, index) {
+    // Cria card visual para Instagram
+    const canvas = document.createElement('canvas');
+    canvas.width = 1080;
+    canvas.height = 1080;
+    const ctx = canvas.getContext('2d');
+    
+    // Background gradient
+    const gradient = ctx.createLinearGradient(0, 0, 0, 1080);
+    gradient.addColorStop(0, '#000000');
+    gradient.addColorStop(1, '#1a1a1a');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 1080, 1080);
+    
+    // Título
+    ctx.fillStyle = '#ffd700';
+    ctx.font = 'bold 48px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(roteiro.titulo, 540, 200);
+    
+    // Informações
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '32px Arial';
+    ctx.fillText(`💰 ${roteiro.custo_total_estimado}`, 540, 300);
+    ctx.fillText(`📍 ${roteiro.distancia_total}`, 540, 350);
+    ctx.fillText(`⏱️ ${roteiro.tempo_total}`, 540, 400);
+    
+    // QR Code placeholder
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(390, 500, 300, 300);
+    ctx.fillStyle = '#000000';
+    ctx.font = '24px Arial';
+    ctx.fillText('Sons of Peaky', 540, 650);
+    ctx.fillText('Gerador de Rolês', 540, 680);
+    
+    // Download
+    const link = document.createElement('a');
+    link.download = `instagram-${roteiro.titulo.replace(/[^a-zA-Z0-9]/g, '-')}.png`;
+    link.href = canvas.toDataURL();
+    link.click();
+    
+    showNotification('Card do Instagram baixado!', 'success');
+}
+
+let lastFormData = null;
+function getLastFormData() {
+    return lastFormData;
+}
+
+/**
+ * Salvar roteiro nos favoritos
+ */
+function saveRoteiro(index) {
+    const roteiro = generatedRoteiros[index];
+    if (!roteiro) return;
+    
+    const favoritos = JSON.parse(localStorage.getItem('sop_roteiros_favoritos') || '[]');
+    
+    const roteiroFavorito = {
+        id: Date.now().toString(36),
+        roteiro: roteiro,
+        formData: lastFormData,
+        dataSalvo: new Date().toISOString(),
+        titulo: roteiro.titulo
+    };
+    
+    favoritos.push(roteiroFavorito);
+    localStorage.setItem('sop_roteiros_favoritos', JSON.stringify(favoritos));
+    
+    showNotification(`✅ "${roteiro.titulo}" salvo nos favoritos!`, 'success');
+    trackEvent('save_favorite', { roteiro: roteiro.titulo });
+}
+
+/**
+ * Carregar roteiro compartilhado via URL
+ */
+function loadSharedRoteiro() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const roleId = urlParams.get('role');
+    
+    if (roleId) {
+        const sharedData = localStorage.getItem(`role_${roleId}`);
+        if (sharedData) {
+            try {
+                const data = JSON.parse(sharedData);
+                
+                // Verifica se não é muito antigo (7 dias)
+                if (Date.now() - data.timestamp < 7 * 24 * 60 * 60 * 1000) {
+                    generatedRoteiros = [data.roteiro];
+                    lastFormData = data.formData;
+                    displayResults([data.roteiro]);
+                    
+                    showNotification('🔗 Rolê compartilhado carregado!', 'info');
+                    
+                    // Remove o parâmetro da URL
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                } else {
+                    showNotification('❌ Link do rolê expirado (7 dias)', 'error');
+                }
+            } catch (error) {
+                showNotification('❌ Erro ao carregar rolê compartilhado', 'error');
+            }
+        } else {
+            showNotification('❌ Rolê compartilhado não encontrado', 'error');
+        }
     }
 }
 
