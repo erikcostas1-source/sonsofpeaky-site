@@ -258,6 +258,7 @@ function buildPrompt(formData) {
         horarioSaida, 
         horarioVolta,
         orcamento, 
+        quilometragemDesejada,
         tipoMoto, 
         perfilPilotagem,
         experienciaDesejada,
@@ -269,27 +270,40 @@ function buildPrompt(formData) {
     const consumoMoto = getConsumoMoto(tipoMoto);
     const velocidadeMedia = getVelocidadeMedia(perfilPilotagem);
     
+    // Monta informações de quilometragem
+    const quilometragemInfo = quilometragemDesejada ? getQuilometragemRange(quilometragemDesejada) : 'Não especificada';
+    
+    // Monta informações de orçamento
+    const orcamentoInfo = orcamento ? `R$ ${orcamento}` : 'Não especificado (sem limite definido)';
+    
     return `
 Você é um especialista em turismo rodoviário e motociclismo no Brasil. Crie um roteiro detalhado para um rolê de moto baseado nestas informações:
 
-DADOS DO ROLÊ:
+DADOS OBRIGATÓRIOS DO ROLÊ:
 - Ponto de partida: ${enderecoPartida}
 - Data: ${dataRole}
 - Horário de saída: ${horarioSaida}
 - Horário de volta: ${horarioVolta}
-- Orçamento total: R$ ${orcamento}
 - Tipo de moto: ${tipoMoto} (consumo: ${consumoMoto}km/l)
 - Perfil de pilotagem: ${perfilPilotagem} (velocidade média: ${velocidadeMedia}km/h)
+
+PREFERÊNCIAS OPCIONAIS (use como balizadores):
+- Quilometragem desejada: ${quilometragemInfo}
+- Orçamento: ${orcamentoInfo}
 - Nível de aventura: ${nivelAventura}
 - Companhia: ${companhia}
-- Preferências: ${preferencias.join(', ') || 'Nenhuma específica'}
+- Interesses específicos: ${preferencias.join(', ') || 'Nenhum específico'}
 
 EXPERIÊNCIA DESEJADA:
 ${experienciaDesejada}
 
 INSTRUÇÕES PARA O ROTEIRO:
-1. Sugira 2-3 destinos/paradas principais que atendam à experiência desejada
-2. Para cada destino, forneça:
+1. PRIORIDADE MÁXIMA: Respeite rigorosamente os horários de saída e volta
+2. Se quilometragem foi especificada, mantenha-se dentro da faixa sugerida
+3. Se orçamento foi informado, use como limite máximo; se não, sugira opções variadas
+4. Sugira 2-3 destinos/paradas principais que atendam à experiência desejada
+
+Para cada destino, forneça:
    - Nome completo e endereço exato
    - Distância e tempo de viagem desde o ponto anterior
    - Descrição detalhada do que fazer/ver
@@ -297,17 +311,18 @@ INSTRUÇÕES PARA O ROTEIRO:
    - Dicas específicas para motociclistas
    - Horário sugerido de chegada e permanência
 
-3. Calcule custos realistas:
+Calcule custos realistas:
    - Combustível (preço atual ~R$ 5,50/litro)
    - Alimentação (café da manhã, almoço, lanche)
    - Eventuais taxas de entrada
    - Estacionamento para moto
 
-4. Considere a logística:
+Considere a logística:
    - Condições das estradas
    - Locais para parar e descansar
    - Postos de combustível no trajeto
    - Segurança para motos
+   - TEMPO TOTAL compatível com horários de saída e volta
 
 5. Formate a resposta em JSON válido com esta estrutura:
 {
@@ -647,17 +662,25 @@ function getFormData() {
         preferencias.push(label);
     });
     
+    // Campos opcionais
+    const orcamentoValue = document.getElementById('orcamento-role').value;
+    const quilometragemValue = document.getElementById('quilometragem-desejada').value;
+    
     return {
+        // Obrigatórios
         enderecoPartida: document.getElementById('endereco-partida').value,
         dataRole: document.getElementById('data-role').value,
         horarioSaida: document.getElementById('horario-saida').value,
         horarioVolta: document.getElementById('horario-volta').value,
-        orcamento: parseInt(document.getElementById('orcamento-role').value) || 200,
         tipoMoto: document.getElementById('tipo-moto').value,
         perfilPilotagem: document.getElementById('perfil-pilotagem').value,
         experienciaDesejada: document.getElementById('experiencia-desejada').value,
-        nivelAventura: document.getElementById('nivel-aventura').value,
-        companhia: document.getElementById('companhia').value,
+        
+        // Opcionais (com valores padrão)
+        orcamento: orcamentoValue ? parseInt(orcamentoValue) : null,
+        quilometragemDesejada: quilometragemValue || null,
+        nivelAventura: document.getElementById('nivel-aventura').value || 'moderado',
+        companhia: document.getElementById('companhia').value || 'dupla',
         preferencias: preferencias
     };
 }
@@ -681,12 +704,22 @@ function getVelocidadeMedia(perfil) {
     return velocidades[perfil] || 70;
 }
 
+function getQuilometragemRange(tipo) {
+    const ranges = {
+        'curto': '50-100 km (ideal para meio período)',
+        'medio': '100-200 km (dia completo relaxado)',
+        'longo': '200-300 km (dia de aventura)',
+        'muito-longo': '300+ km (épico de longa distância)'
+    };
+    return ranges[tipo] || 'Não especificada';
+}
+
 function validateForm() {
+    // Apenas campos OBRIGATÓRIOS para traçar a rota
     const requiredFields = [
         'endereco-partida', 'data-role', 'horario-saida', 
-        'horario-volta', 'orcamento-role', 'tipo-moto', 
-        'perfil-pilotagem', 'experiencia-desejada', 
-        'nivel-aventura', 'companhia'
+        'horario-volta', 'tipo-moto', 'perfil-pilotagem', 
+        'experiencia-desejada'
     ];
     
     return requiredFields.every(fieldId => {

@@ -289,142 +289,179 @@
                             </p>
                         </div>
                         
-                        <form id="gerador-form" class="space-y-6">
-                            <div class="grid md:grid-cols-2 gap-6">
-                                <!-- Coluna 1: Configurações Básicas -->
-                                <div class="space-y-4">
-                                    <div>
-                                        <label for="endereco-partida" class="block text-sm font-medium text-gray-300 mb-2">
-                                            📍 Ponto de Partida
-                                        </label>
-                                        <input id="endereco-partida" 
-                                               type="text" 
-                                               class="input-field" 
-                                               placeholder="Ex: Penha, São Paulo, SP"
-                                               value="Penha, São Paulo, SP"
-                                               required>
-                                    </div>
-
-                                    <div class="grid grid-cols-3 gap-3">
+                        <form id="gerador-form" class="space-y-8">
+                            
+                            <!-- Seção 1: PLANEJAMENTO (Obrigatórios) -->
+                            <div class="card bg-gradient-to-r from-red-900/20 to-red-800/20 border-red-500/30">
+                                <h3 class="text-xl font-bold text-red-400 mb-4 flex items-center">
+                                    <i class="fas fa-map-marked-alt mr-2"></i>
+                                    🎯 PLANEJAMENTO (Obrigatório)
+                                </h3>
+                                <div class="grid md:grid-cols-2 gap-6">
+                                    <!-- Local e Horários -->
+                                    <div class="space-y-4">
                                         <div>
-                                            <label for="data-role" class="block text-sm font-medium text-gray-300 mb-2">📅 Data</label>
-                                            <input id="data-role" 
-                                                   type="date" 
-                                                   class="input-field text-sm"
+                                            <label for="endereco-partida" class="block text-sm font-medium text-gray-300 mb-2">
+                                                📍 Ponto de Partida *
+                                            </label>
+                                            <input id="endereco-partida" 
+                                                   type="text" 
+                                                   class="input-field" 
+                                                   placeholder="Ex: Penha, São Paulo, SP"
+                                                   value="Penha, São Paulo, SP"
                                                    required>
                                         </div>
-                                        <div>
-                                            <label for="horario-saida" class="block text-sm font-medium text-gray-300 mb-2">🌅 Saída</label>
-                                            <input id="horario-saida" 
-                                                   type="time" 
-                                                   class="input-field text-sm"
-                                                   value="08:00"
-                                                   required>
+
+                                        <div class="grid grid-cols-3 gap-3">
+                                            <div>
+                                                <label for="data-role" class="block text-sm font-medium text-gray-300 mb-2">📅 Data *</label>
+                                                <input id="data-role" 
+                                                       type="date" 
+                                                       class="input-field text-sm"
+                                                       required>
+                                            </div>
+                                            <div>
+                                                <label for="horario-saida" class="block text-sm font-medium text-gray-300 mb-2">🌅 Saída *</label>
+                                                <input id="horario-saida" 
+                                                       type="time" 
+                                                       class="input-field text-sm"
+                                                       value="08:00"
+                                                       required>
+                                            </div>
+                                            <div>
+                                                <label for="horario-volta" class="block text-sm font-medium text-gray-300 mb-2">� Volta *</label>
+                                                <input id="horario-volta" 
+                                                       type="time" 
+                                                       class="input-field text-sm"
+                                                       value="18:00"
+                                                       required>
+                                            </div>
                                         </div>
+                                    </div>
+
+                                    <!-- Moto e Experiência -->
+                                    <div class="space-y-4">
                                         <div>
-                                            <label for="horario-volta" class="block text-sm font-medium text-gray-300 mb-2">🌅 Volta</label>
-                                            <input id="horario-volta" 
-                                                   type="time" 
-                                                   class="input-field text-sm"
-                                                   value="18:00"
-                                                   required>
+                                            <label for="tipo-moto" class="block text-sm font-medium text-gray-300 mb-2">🏍️ Tipo da Moto *</label>
+                                            <select id="tipo-moto" class="input-field" required>
+                                                <option value="">Selecione sua moto</option>
+                                                <option value="125cc">🏍️ 125-150cc (~35km/l)</option>
+                                                <option value="250cc">⚡ 250-400cc (~25km/l)</option>
+                                                <option value="600cc">🚀 600-800cc (~18km/l)</option>
+                                                <option value="1000cc">🔥 1000cc+ (~15km/l)</option>
+                                            </select>
                                         </div>
-                                    </div>
 
-                                    <div>
-                                        <label for="orcamento-role" class="block text-sm font-medium text-gray-300 mb-2">💰 Orçamento (R$)</label>
-                                        <input id="orcamento-role" 
-                                               type="number" 
-                                               class="input-field" 
-                                               placeholder="Ex: 200"
-                                               min="50"
-                                               max="2000"
-                                               required>
-                                    </div>
-
-                                    <div>
-                                        <label for="tipo-moto" class="block text-sm font-medium text-gray-300 mb-2">🏍️ Tipo da Moto</label>
-                                        <select id="tipo-moto" class="input-field" required>
-                                            <option value="">Selecione sua moto</option>
-                                            <option value="125cc">🏍️ 125-150cc (~35km/l)</option>
-                                            <option value="250cc">⚡ 250-400cc (~25km/l)</option>
-                                            <option value="600cc">🚀 600-800cc (~18km/l)</option>
-                                            <option value="1000cc">🔥 1000cc+ (~15km/l)</option>
-                                        </select>
-                                    </div>
-
-                                    <div>
-                                        <label for="perfil-pilotagem" class="block text-sm font-medium text-gray-300 mb-2">🛣️ Perfil de Pilotagem</label>
-                                        <select id="perfil-pilotagem" class="input-field" required>
-                                            <option value="conservador">🐌 Conservador (50-60 km/h)</option>
-                                            <option value="moderado" selected>🏍️ Moderado (60-80 km/h)</option>
-                                            <option value="esportivo">⚡ Esportivo (80-100 km/h)</option>
-                                        </select>
+                                        <div>
+                                            <label for="perfil-pilotagem" class="block text-sm font-medium text-gray-300 mb-2">🛣️ Perfil de Pilotagem *</label>
+                                            <select id="perfil-pilotagem" class="input-field" required>
+                                                <option value="conservador">🐌 Conservador (50-60 km/h)</option>
+                                                <option value="moderado" selected>🏍️ Moderado (60-80 km/h)</option>
+                                                <option value="esportivo">⚡ Esportivo (80-100 km/h)</option>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <!-- Coluna 2: Experiência Desejada -->
-                                <div class="space-y-4">
-                                    <div>
-                                        <label for="experiencia-desejada" class="block text-sm font-medium text-gray-300 mb-2">
-                                            ✨ Experiência Desejada
-                                        </label>
-                                        <textarea id="experiencia-desejada" 
-                                                  class="input-field" 
-                                                  rows="6" 
-                                                  placeholder="Descreva o que você quer viver neste rolê. Exemplos:
+                                <div class="mt-4">
+                                    <label for="experiencia-desejada" class="block text-sm font-medium text-gray-300 mb-2">
+                                        ✨ Experiência Desejada *
+                                    </label>
+                                    <textarea id="experiencia-desejada" 
+                                              class="input-field" 
+                                              rows="4" 
+                                              placeholder="Descreva o que você quer viver neste rolê. Exemplos:
 • 'Quero conhecer um restaurante italiano autêntico no interior'
 • 'Busco uma cachoeira com trilha fácil para piquenique'
 • 'Gostaria de visitar uma vinícola com degustação e vista panorâmica'"
-                                                  required></textarea>
+                                              required></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Seção 2: PREFERÊNCIAS (Opcionais) -->
+                            <div class="card bg-gradient-to-r from-yellow-900/20 to-yellow-800/20 border-yellow-500/30">
+                                <h3 class="text-xl font-bold text-yellow-400 mb-4 flex items-center">
+                                    <i class="fas fa-sliders-h mr-2"></i>
+                                    ⚙️ PREFERÊNCIAS (Opcional - Balizadores)
+                                </h3>
+                                <div class="grid md:grid-cols-2 gap-6">
+                                    <div class="space-y-4">
+                                        <div>
+                                            <label for="quilometragem-desejada" class="block text-sm font-medium text-gray-300 mb-2">
+                                                📏 Quantos KM pretende rodar?
+                                                <span class="text-xs text-gray-400">(opcional)</span>
+                                            </label>
+                                            <select id="quilometragem-desejada" class="input-field">
+                                                <option value="">Não tenho preferência</option>
+                                                <option value="curto">🏠 Curto (50-100 km)</option>
+                                                <option value="medio">🛣️ Médio (100-200 km)</option>
+                                                <option value="longo">🗺️ Longo (200-300 km)</option>
+                                                <option value="muito-longo">🚀 Muito Longo (300+ km)</option>
+                                            </select>
+                                        </div>
+
+                                        <div>
+                                            <label for="orcamento-role" class="block text-sm font-medium text-gray-300 mb-2">
+                                                💰 Orçamento (R$)
+                                                <span class="text-xs text-gray-400">(opcional - apenas como balizador)</span>
+                                            </label>
+                                            <input id="orcamento-role" 
+                                                   type="number" 
+                                                   class="input-field" 
+                                                   placeholder="Ex: 200 (deixe vazio se não tem limite)"
+                                                   min="50"
+                                                   max="2000">
+                                        </div>
+
+                                        <div>
+                                            <label for="nivel-aventura" class="block text-sm font-medium text-gray-300 mb-2">🎢 Nível de Aventura</label>
+                                            <select id="nivel-aventura" class="input-field">
+                                                <option value="tranquilo">😌 Tranquilo - Estradas pavimentadas e locais conhecidos</option>
+                                                <option value="moderado" selected>🏞️ Moderado - Mix de asfalto e terra, lugares únicos</option>
+                                                <option value="aventureiro">🔥 Aventureiro - Trilhas, off-road e destinos selvagens</option>
+                                            </select>
+                                        </div>
                                     </div>
 
-                                    <div>
-                                        <label for="nivel-aventura" class="block text-sm font-medium text-gray-300 mb-2">🎢 Nível de Aventura</label>
-                                        <select id="nivel-aventura" class="input-field" required>
-                                            <option value="tranquilo">😌 Tranquilo - Estradas pavimentadas e locais conhecidos</option>
-                                            <option value="moderado" selected>🏞️ Moderado - Mix de asfalto e terra, lugares únicos</option>
-                                            <option value="aventureiro">🔥 Aventureiro - Trilhas, off-road e destinos selvagens</option>
-                                        </select>
-                                    </div>
+                                    <div class="space-y-4">
+                                        <div>
+                                            <label for="companhia" class="block text-sm font-medium text-gray-300 mb-2">👥 Companhia</label>
+                                            <select id="companhia" class="input-field">
+                                                <option value="solo">🏍️ Solo - Apenas eu</option>
+                                                <option value="dupla" selected>👫 Dupla - Eu + 1 pessoa</option>
+                                                <option value="grupo-pequeno">👥 Grupo pequeno (3-5 pessoas)</option>
+                                                <option value="grupo-grande">🎉 Grupo grande (6+ pessoas)</option>
+                                            </select>
+                                        </div>
 
-                                    <div>
-                                        <label for="companhia" class="block text-sm font-medium text-gray-300 mb-2">👥 Companhia</label>
-                                        <select id="companhia" class="input-field" required>
-                                            <option value="solo">🏍️ Solo - Apenas eu</option>
-                                            <option value="dupla" selected>👫 Dupla - Eu + 1 pessoa</option>
-                                            <option value="grupo-pequeno">👥 Grupo pequeno (3-5 pessoas)</option>
-                                            <option value="grupo-grande">🎉 Grupo grande (6+ pessoas)</option>
-                                        </select>
-                                    </div>
-
-                                    <div>
-                                        <label for="preferencias-extras" class="block text-sm font-medium text-gray-300 mb-2">🎯 Preferências Extras</label>
-                                        <div class="grid grid-cols-2 gap-2 text-sm">
-                                            <label class="flex items-center">
-                                                <input type="checkbox" id="pref-gastronomia" class="mr-2">
-                                                🍽️ Gastronomia
-                                            </label>
-                                            <label class="flex items-center">
-                                                <input type="checkbox" id="pref-natureza" class="mr-2">
-                                                🌿 Natureza
-                                            </label>
-                                            <label class="flex items-center">
-                                                <input type="checkbox" id="pref-historia" class="mr-2">
-                                                🏛️ História
-                                            </label>
-                                            <label class="flex items-center">
-                                                <input type="checkbox" id="pref-esportes" class="mr-2">
-                                                ⚽ Esportes
-                                            </label>
-                                            <label class="flex items-center">
-                                                <input type="checkbox" id="pref-compras" class="mr-2">
-                                                🛍️ Compras
-                                            </label>
-                                            <label class="flex items-center">
-                                                <input type="checkbox" id="pref-cultura" class="mr-2">
-                                                🎭 Cultura
-                                            </label>
+                                        <div>
+                                            <label for="preferencias-extras" class="block text-sm font-medium text-gray-300 mb-2">🎯 Interesses Específicos</label>
+                                            <div class="grid grid-cols-2 gap-2 text-sm">
+                                                <label class="flex items-center">
+                                                    <input type="checkbox" id="pref-gastronomia" class="mr-2">
+                                                    🍽️ Gastronomia
+                                                </label>
+                                                <label class="flex items-center">
+                                                    <input type="checkbox" id="pref-natureza" class="mr-2">
+                                                    🌿 Natureza
+                                                </label>
+                                                <label class="flex items-center">
+                                                    <input type="checkbox" id="pref-historia" class="mr-2">
+                                                    🏛️ História
+                                                </label>
+                                                <label class="flex items-center">
+                                                    <input type="checkbox" id="pref-esportes" class="mr-2">
+                                                    ⚽ Esportes
+                                                </label>
+                                                <label class="flex items-center">
+                                                    <input type="checkbox" id="pref-compras" class="mr-2">
+                                                    🛍️ Compras
+                                                </label>
+                                                <label class="flex items-center">
+                                                    <input type="checkbox" id="pref-cultura" class="mr-2">
+                                                    🎭 Cultura
+                                                </label>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
