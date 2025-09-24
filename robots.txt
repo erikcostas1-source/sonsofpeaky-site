@@ -1,0 +1,43 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://erikcostas1-source.github.io/sonsofpeaky-site/sitemap.xml
+
+# Sons of Peaky - Irmandade de Motociclistas
+# https://erikcostas1-source.github.io/sonsofpeaky-site/
+
+# Permitir indexação completa
+# Crawl-delay: 1
+
+# Crawlers de Redes Sociais
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /
+
+User-agent: WhatsApp
+Allow: /
+
+User-agent: Telegram
+Allow: /
+
+# Crawlers de Busca Específicos
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: YandexBot
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+# Otimizações para Performance
+# Cache-Control: public, max-age=86400
+# X-Robots-Tag: index, follow, max-image-preview:large

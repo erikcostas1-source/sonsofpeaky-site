@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+        xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+  
+  <!-- Página Principal -->
+  <url>
+    <loc>https://erikcostas1-source.github.io/sonsofpeaky-site/</loc>
+    <lastmod>2024-01-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://erikcostas1-source.github.io/sonsofpeaky-site/assets/img/SOP_LOGO_PRINCIPAL.svg</image:loc>
+      <image:title>Sons of Peaky - Logo Principal</image:title>
+      <image:caption>Logo oficial da irmandade Sons of Peaky</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://erikcostas1-source.github.io/sonsofpeaky-site/assets/img/PEAKY_OFICIAL.jpg</image:loc>
+      <image:title>Sons of Peaky - Foto Oficial</image:title>
+      <image:caption>Foto oficial da irmandade Sons of Peaky</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Seção História -->
+  <url>
+    <loc>https://erikcostas1-source.github.io/sonsofpeaky-site/#historia</loc>
+    <lastmod>2024-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Seção Irmandade -->
+  <url>
+    <loc>https://erikcostas1-source.github.io/sonsofpeaky-site/#irmandade</loc>
+    <lastmod>2024-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://erikcostas1-source.github.io/sonsofpeaky-site/assets/img/erik.jpeg</image:loc>
+      <image:title>Erik - Fundador Sons of Peaky</image:title>
+      <image:caption>Erik, fundador da irmandade Sons of Peaky</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://erikcostas1-source.github.io/sonsofpeaky-site/assets/img/gabriel.jpeg</image:loc>
+      <image:title>Gabriel - Membro Sons of Peaky</image:title>
+      <image:caption>Gabriel, membro da irmandade Sons of Peaky</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://erikcostas1-source.github.io/sonsofpeaky-site/assets/img/Danilo.jpeg</image:loc>
+      <image:title>Danilo - Membro Sons of Peaky</image:title>
+      <image:caption>Danilo, membro da irmandade Sons of Peaky</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://erikcostas1-source.github.io/sonsofpeaky-site/assets/img/Diogo.jpeg</image:loc>
+      <image:title>Diogo - Membro Sons of Peaky</image:title>
+      <image:caption>Diogo, membro da irmandade Sons of Peaky</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://erikcostas1-source.github.io/sonsofpeaky-site/assets/img/kazulo.jpeg</image:loc>
+      <image:title>Kazulo - Membro Sons of Peaky</image:title>
+      <image:caption>Kazulo, membro da irmandade Sons of Peaky</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://erikcostas1-source.github.io/sonsofpeaky-site/assets/img/Marquinhos.jpeg</image:loc>
+      <image:title>Marquinhos - Membro Sons of Peaky</image:title>
+      <image:caption>Marquinhos, membro da irmandade Sons of Peaky</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://erikcostas1-source.github.io/sonsofpeaky-site/assets/img/Rodrigao.jpeg</image:loc>
+      <image:title>Rodrigão - Membro Sons of Peaky</image:title>
+      <image:caption>Rodrigão, membro da irmandade Sons of Peaky</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://erikcostas1-source.github.io/sonsofpeaky-site/assets/img/zé.jpeg</image:loc>
+      <image:title>Zé - Membro Sons of Peaky</image:title>
+      <image:caption>Zé, membro da irmandade Sons of Peaky</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Seção Missão -->
+  <url>
+    <loc>https://erikcostas1-source.github.io/sonsofpeaky-site/#missao</loc>
+    <lastmod>2024-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Seção Agenda/Eventos -->
+  <url>
+    <loc>https://erikcostas1-source.github.io/sonsofpeaky-site/#agenda</loc>
+    <lastmod>2024-01-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- IA Assistant -->
+  <url>
+    <loc>https://erikcostas1-source.github.io/sonsofpeaky-site/#ia-assistant</loc>
+    <lastmod>2024-01-01</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Gerador de Rolês (página específica se existir) -->
+  <url>
+    <loc>https://erikcostas1-source.github.io/sonsofpeaky-site/novo_gerador.html</loc>
+    <lastmod>2024-01-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Ferramentas -->
+  <url>
+    <loc>https://erikcostas1-source.github.io/sonsofpeaky-site/#ferramentas</loc>
+    <lastmod>2024-01-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Contato -->
+  <url>
+    <loc>https://erikcostas1-source.github.io/sonsofpeaky-site/#contato</loc>
+    <lastmod>2024-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+</urlset>

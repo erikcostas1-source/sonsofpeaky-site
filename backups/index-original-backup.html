@@ -25,212 +25,30 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <!-- Custom Styles -->
     <link rel="stylesheet" href="styles.css" />
     
-    <!-- CSS Crítico para Legibilidade Total -->
+    <!-- Skip link para acessibilidade -->
     <style>
-        /* RESET E VARIÁVEIS ESSENCIAIS */
-        * {
-            box-sizing: border-box;
-        }
-        
-        :root {
-            --bg-primary: #000000;
-            --bg-secondary: #1a1a1a;  
-            --bg-tertiary: #2d2d2d;
-            --gold-primary: #ffd700;
-            --gold-secondary: #c9a14a;
-            --accent-primary: #ff6b35;
-            --text-white: #ffffff;
-            --text-gray: #cccccc;
-            --text-muted: #999999;
-        }
-        
-        /* CORPO E TEXTOS BASE */
-        body {
-            background-color: var(--bg-primary) !important;
-            color: var(--text-white) !important;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-            line-height: 1.6 !important;
-        }
-
-        /* HERO SECTION */
-        .hero-section {
-            background: linear-gradient(to bottom, var(--bg-primary), var(--bg-secondary), var(--bg-primary)) !important;
-        }
-
-        .hero-title {
-            background: linear-gradient(45deg, var(--gold-primary), var(--accent-primary)) !important;
-            -webkit-background-clip: text !important;
-            background-clip: text !important;
-            -webkit-text-fill-color: transparent !important;
-            /* Fallback para navegadores que não suportam text fill */
-            color: var(--gold-primary) !important;
-        }
-        
-        /* FORÇA LEGIBILIDADE DOS TEXTOS */
-        h1, h2, h3, h4, h5, h6 {
-            color: var(--text-white) !important;
-            font-weight: bold !important;
-        }
-        
-        p, span, div, a {
-            color: var(--text-white) !important;
-        }
-        
-        .text-amber-500, .text-amber-600 {
-            color: var(--gold-primary) !important;
-        }
-        
-        .text-gray-300, .text-gray-400 {
-            color: var(--text-gray) !important;
-        }
-        
-        /* BOTÕES TOTALMENTE LEGÍVEIS */
-        button {
-            font-weight: bold !important;
-            padding: 12px 24px !important;
-            border-radius: 8px !important;
-            cursor: pointer !important;
-            transition: all 0.3s ease !important;
-        }
-        
-        .bg-amber-600, .bg-amber-500 {
-            background-color: var(--gold-primary) !important;
-            color: #000000 !important;
-            border: none !important;
-        }
-        
-        .bg-amber-600:hover, .bg-amber-500:hover {
-            background-color: var(--accent-primary) !important;
-            color: #ffffff !important;
-        }
-        
-        /* NAVEGAÇÃO LEGÍVEL */
-        .nav-link {
-            color: var(--text-white) !important;
-            text-decoration: none !important;
-            font-weight: 500 !important;
-        }
-        
-        .nav-link:hover {
-            color: var(--gold-primary) !important;
-        }
-        
-        /* BACKGROUNDS SÓLIDOS */
-        .bg-black {
-            background-color: var(--bg-primary) !important;
-        }
-        
-        .bg-gray-900 {
-            background-color: var(--bg-secondary) !important;
-        }
-        
-        .bg-gray-800 {
-            background-color: var(--bg-tertiary) !important;
-        }
-        
-        /* CARDS E CONTAINERS */
-        .card {
-            background-color: var(--bg-secondary) !important;
-            border: 1px solid var(--bg-tertiary) !important;
-            padding: 24px !important;
-            border-radius: 12px !important;
-        }
-        
-        /* FORMULÁRIOS LEGÍVEIS */
-        input, textarea, select {
-            background-color: var(--bg-tertiary) !important;
-            color: var(--text-white) !important;
-            border: 2px solid var(--bg-tertiary) !important;
-            padding: 12px !important;
-            border-radius: 8px !important;
-        }
-        
-        input:focus, textarea:focus, select:focus {
-            border-color: var(--gold-primary) !important;
-            outline: none !important;
-        }
-        
-        input::placeholder, textarea::placeholder {
-            color: var(--text-muted) !important;
-        }
-        
-        /* GRADIENTES FUNCIONAIS */
-        .hero-title {
-            background: linear-gradient(45deg, var(--gold-primary), var(--accent-primary)) !important;
-            -webkit-background-clip: text !important;
-            -webkit-text-fill-color: transparent !important;
-            background-clip: text !important;
-        }
-        
-        /* LOADING E ANIMAÇÕES */
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-        
-        .animate-pulse {
-            animation: pulse 2s infinite !important;
-        }
-        
-        /* AI CHAT CONTAINER */
-        #ai-chat-container {
-            background-color: var(--bg-secondary) !important;
-            border: 2px solid var(--bg-tertiary) !important;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.8) !important;
-        }
-        
-        /* SEÇÕES DESTACADAS */
-        .section-title {
-            color: var(--gold-primary) !important;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8) !important;
-        }
-        
-        /* SKIP LINK */
         .skip-link {
             position: absolute;
             top: -40px;
             left: 6px;
-            background: var(--gold-primary);  
-            color: #000000;
-            padding: 8px 16px;
+            background: var(--accent);
+            color: black;
+            padding: 8px;
             text-decoration: none;
             font-weight: bold;
             border-radius: 4px;
             z-index: 1000;
             transition: top 0.3s;
         }
-        
         .skip-link:focus {
             top: 6px;
-        }
-        
-        /* FORÇA CONTRASTE MÁXIMO */
-        .hero-section {
-            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-primary) 100%) !important;
-        }
-        
-        /* REMOVE PROBLEMAS DE TAILWIND */
-        .text-transparent {
-            -webkit-text-fill-color: unset !important;
-            color: var(--text-white) !important;
         }
     </style>
 </head>
 <body class="pt-32 md:pt-40">
-    <!-- Loading Screen -->
-    <div id="loading-screen" class="fixed inset-0 bg-black z-50 flex items-center justify-center">
-        <div class="text-center">
-            <img src="assets/img/SONSOFPEAKY_TRANSPARENTE_BRANCO.png" alt="Sons of Peaky" class="w-24 h-24 mx-auto mb-4 animate-pulse">
-            <div style="color: #ffd700 !important; font-size: 1.25rem; font-weight: bold;">Carregando...</div>
-        </div>
-    </div>
-
     <!-- Skip link para acessibilidade -->
     <a href="#main-content" class="skip-link" aria-label="Pular para o conteúdo principal">Pular para o conteúdo</a>
 
@@ -264,9 +82,6 @@
                 <a href="#ferramentas" class="nav-link hover:text-amber-500 transition-colors duration-200 relative" aria-label="Ir para seção Ferramentas">Ferramentas</a>
                 <a href="#bar" class="nav-link hover:text-amber-500 transition-colors duration-200 relative" aria-label="Ir para seção Preços do Bar">Bar</a>
                 <a href="#redes" class="nav-link hover:text-amber-500 transition-colors duration-200 relative" aria-label="Ir para seção Redes Sociais">Redes</a>
-                <button id="ai-chat-toggle" class="bg-amber-600 hover:bg-amber-500 text-black px-4 py-2 rounded-full font-bold transition-colors ml-4" aria-label="Abrir IA Assistant">
-                    <i class="fas fa-robot mr-2"></i>IA Assistant
-                </button>
             </nav>
 
             <!-- Mobile menu -->
@@ -280,61 +95,11 @@
                     <a href="#agenda" class="nav-link text-white hover:text-amber-500 transition-colors duration-200 py-2 border-b border-gray-700" aria-label="Ir para seção Agenda">Agenda</a>
                     <a href="#ferramentas" class="nav-link text-white hover:text-amber-500 transition-colors duration-200 py-2 border-b border-gray-700" aria-label="Ir para seção Ferramentas">Ferramentas</a>
                     <a href="#bar" class="nav-link text-white hover:text-amber-500 transition-colors duration-200 py-2 border-b border-gray-700" aria-label="Ir para seção Preços do Bar">Bar</a>
-                    <a href="#redes" class="nav-link text-white hover:text-amber-500 transition-colors duration-200 py-2 border-b border-gray-700" aria-label="Ir para seção Redes Sociais">Redes</a>
-                    <button id="ai-chat-toggle-mobile" class="w-full bg-amber-600 hover:bg-amber-500 text-black px-4 py-2 rounded-full font-bold transition-colors mt-4" aria-label="Abrir IA Assistant">
-                        <i class="fas fa-robot mr-2"></i>IA Assistant
-                    </button>
+                    <a href="#redes" class="nav-link text-white hover:text-amber-500 transition-colors duration-200 py-2" aria-label="Ir para seção Redes Sociais">Redes</a>
                 </div>
             </nav>
         </div>
     </header>
-
-    <!-- AI Chat Interface -->
-    <div id="ai-chat-container" class="fixed bottom-4 right-4 z-50 transform translate-y-full opacity-0 transition-all duration-300">
-        <div class="bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl w-80 max-h-96 flex flex-col">
-            <div class="bg-amber-600 text-black p-4 rounded-t-2xl flex items-center justify-between">
-                <div class="flex items-center space-x-2">
-                    <i class="fas fa-robot text-xl"></i>
-                    <span class="font-bold">IA Assistant SOP</span>
-                </div>
-                <button id="ai-chat-close" class="text-black hover:text-gray-700">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div id="ai-chat-messages" class="flex-1 p-4 overflow-y-auto space-y-3 min-h-40 max-h-64">
-                <div class="ai-message bg-gray-800 p-3 rounded-lg">
-                    <div class="flex items-center space-x-2 mb-2">
-                        <i class="fas fa-robot text-amber-500"></i>
-                        <span class="font-bold text-amber-500">SOP Assistant</span>
-                    </div>
-                    <p class="text-sm">Olá! Sou o assistente da Sons of Peaky. Como posso te ajudar hoje?</p>
-                </div>
-            </div>
-            
-            <div class="p-4 border-t border-gray-700">
-                <div class="flex space-x-2">
-                    <input type="text" id="ai-chat-input" placeholder="Digite sua mensagem..." 
-                           class="flex-1 bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-amber-500">
-                    <button id="ai-chat-send" class="bg-amber-600 hover:bg-amber-500 text-black px-4 py-2 rounded-lg transition-colors">
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
-                </div>
-                
-                <div class="mt-3 flex flex-wrap gap-2">
-                    <button class="ai-quick-action bg-gray-800 hover:bg-gray-700 text-xs px-3 py-1 rounded-full border border-gray-600" data-action="gerar-role">
-                        🛣️ Gerar Rolê
-                    </button>
-                    <button class="ai-quick-action bg-gray-800 hover:bg-gray-700 text-xs px-3 py-1 rounded-full border border-gray-600" data-action="info-irmandade">
-                        👥 Sobre a Irmandade
-                    </button>
-                    <button class="ai-quick-action bg-gray-800 hover:bg-gray-700 text-xs px-3 py-1 rounded-full border border-gray-600" data-action="proximos-eventos">
-                        📅 Próximos Eventos
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Modal de confirmação -->
     <div id="modal" class="modal-overlay hidden" role="dialog" aria-labelledby="modal-title" aria-modal="true">
@@ -346,28 +111,6 @@
     </div>
 
     <main id="main-content" role="main" aria-label="Conteúdo principal do site">
-        <!-- Hero Section -->
-        <section id="hero" class="hero-section min-h-screen flex items-center justify-center relative -mt-32 md:-mt-40 pt-32 md:pt-40">
-            <div class="absolute inset-0 opacity-30" style="background-image: url('assets/img/PEAKY_OFICIAL.jpg'); background-size: cover; background-position: center;"></div>
-            <div class="relative z-10 text-center px-4">
-                <img src="assets/img/SONSOFPEAKY_TRANSPARENTE_BRANCO.png" alt="Sons of Peaky" class="w-32 h-32 mx-auto mb-8 animate-pulse">
-                <h1 class="hero-title text-5xl md:text-7xl font-bold mb-6">
-                    Sons of Peaky
-                </h1>
-                <p class="text-xl md:text-2xl text-gray-300 mb-8 max-w-2xl mx-auto">
-                    Irmandade de Motociclistas desde 2021
-                </p>
-                <div class="space-y-4 md:space-y-0 md:space-x-4 md:flex md:justify-center">
-                    <a href="#historia" class="inline-block bg-amber-600 hover:bg-amber-500 text-black px-8 py-3 rounded-full font-bold text-lg transition-colors">
-                        Conheça Nossa História
-                    </a>
-                    <button id="hero-ai-btn" class="inline-block bg-transparent border-2 border-amber-500 text-amber-500 hover:bg-amber-500 hover:text-black px-8 py-3 rounded-full font-bold text-lg transition-colors">
-                        <i class="fas fa-robot mr-2"></i>Falar com IA
-                    </button>
-                </div>
-            </div>
-        </section>
-
         <!-- História -->
         <section id="historia" class="py-12 md:py-16 lg:py-20 bg-gradient-to-b from-black via-gray-900 to-black">
             <div class="container mx-auto px-4 space-y-6">
@@ -1397,178 +1140,8 @@ Exemplos:
         </svg>
     </a>
 
-    <!-- Scripts Core -->
+    <!-- Scripts -->
     <script src="config.js"></script>
-    <script src="destinos.js"></script>
-    <script src="gerador_role_novo.js"></script>
-    
-    <!-- Revolutionary Features Script -->
-    <script>
-        // Loading screen
-        document.addEventListener('DOMContentLoaded', function() {
-            const loadingScreen = document.getElementById('loading-screen');
-            setTimeout(() => {
-                loadingScreen.style.opacity = '0';
-                setTimeout(() => {
-                    loadingScreen.style.display = 'none';
-                }, 300);
-            }, 1500);
-            
-            // Initialize AI Chat functionality
-            initializeAIChat();
-            
-            // Initialize Gerador de Rolês
-            initializeGeradorRoles();
-        });
-
-        // AI Chat functionality
-        function initializeAIChat() {
-            const aiChatToggle = document.getElementById('ai-chat-toggle');
-            const aiChatToggleMobile = document.getElementById('ai-chat-toggle-mobile');
-            const aiChatContainer = document.getElementById('ai-chat-container');
-            const aiChatClose = document.getElementById('ai-chat-close');
-            const aiChatSend = document.getElementById('ai-chat-send');
-            const aiChatInput = document.getElementById('ai-chat-input');
-            const heroAiBtn = document.getElementById('hero-ai-btn');
-            
-            // Toggle chat visibility
-            function toggleChat() {
-                aiChatContainer.classList.toggle('show');
-                if (aiChatContainer.classList.contains('show')) {
-                    aiChatContainer.style.transform = 'translateY(0)';
-                    aiChatContainer.style.opacity = '1';
-                } else {
-                    aiChatContainer.style.transform = 'translateY(100%)';
-                    aiChatContainer.style.opacity = '0';
-                }
-            }
-            
-            // Event listeners
-            if (aiChatToggle) aiChatToggle.addEventListener('click', toggleChat);
-            if (aiChatToggleMobile) aiChatToggleMobile.addEventListener('click', toggleChat);
-            if (heroAiBtn) heroAiBtn.addEventListener('click', toggleChat);
-            if (aiChatClose) aiChatClose.addEventListener('click', toggleChat);
-            
-            // Send message functionality
-            function sendMessage() {
-                const message = aiChatInput.value.trim();
-                if (message) {
-                    addMessage('user', message);
-                    aiChatInput.value = '';
-                    
-                    // Simulate AI response
-                    setTimeout(() => {
-                        addMessage('ai', 'Obrigado pela mensagem! Estou aqui para ajudar com qualquer dúvida sobre a Sons of Peaky.');
-                    }, 1000);
-                }
-            }
-            
-            // Add message to chat
-            function addMessage(type, text) {
-                const messagesContainer = document.getElementById('ai-chat-messages');
-                const messageDiv = document.createElement('div');
-                messageDiv.className = `${type}-message bg-gray-800 p-3 rounded-lg`;
-                
-                if (type === 'ai') {
-                    messageDiv.innerHTML = `
-                        <div class="flex items-center space-x-2 mb-2">
-                            <i class="fas fa-robot text-amber-500"></i>
-                            <span class="font-bold text-amber-500">SOP Assistant</span>
-                        </div>
-                        <p class="text-sm">${text}</p>
-                    `;
-                } else {
-                    messageDiv.innerHTML = `
-                        <div class="flex items-center space-x-2 mb-2">
-                            <i class="fas fa-user text-blue-500"></i>
-                            <span class="font-bold text-blue-500">Você</span>
-                        </div>
-                        <p class="text-sm">${text}</p>
-                    `;
-                }
-                
-                messagesContainer.appendChild(messageDiv);
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
-            }
-            
-            // Send button and enter key
-            if (aiChatSend) aiChatSend.addEventListener('click', sendMessage);
-            if (aiChatInput) {
-                aiChatInput.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        sendMessage();
-                    }
-                });
-            }
-            
-            // Quick actions
-            document.querySelectorAll('.ai-quick-action').forEach(button => {
-                button.addEventListener('click', function() {
-                    const action = this.dataset.action;
-                    let message = '';
-                    
-                    switch(action) {
-                        case 'gerar-role':
-                            message = 'Como posso gerar um rolê personalizado?';
-                            break;
-                        case 'info-irmandade':
-                            message = 'Conte-me mais sobre a irmandade Sons of Peaky';
-                            break;
-                        case 'proximos-eventos':
-                            message = 'Quais são os próximos eventos da irmandade?';
-                            break;
-                    }
-                    
-                    if (message) {
-                        addMessage('user', message);
-                        setTimeout(() => {
-                            let response = '';
-                            switch(action) {
-                                case 'gerar-role':
-                                    response = 'Para gerar um rolê personalizado, vá até a seção Ferramentas e use nosso Gerador de Rolês IA! Ele criará sugestões baseadas no seu perfil e preferências.';
-                                    break;
-                                case 'info-irmandade':
-                                    response = 'A Sons of Peaky é uma irmandade de motociclistas fundada em 2021. Somos unidos pelos valores de respeito, lealdade e paixão pelas duas rodas. Nossa sede fica na Penha/SP.';
-                                    break;
-                                case 'proximos-eventos':
-                                    response = 'Confira nossa seção Agenda para ver os próximos eventos! Sempre temos rolês aos fins de semana e encontros especiais mensais.';
-                                    break;
-                            }
-                            addMessage('ai', response);
-                        }, 1000);
-                    }
-                });
-            });
-        }
-
-        // Initialize Gerador de Rolês functionality
-        function initializeGeradorRoles() {
-            const sugerirBtn = document.getElementById('sugerir-destinos-btn');
-            if (sugerirBtn) {
-                sugerirBtn.addEventListener('click', function() {
-                    console.log('Botão de gerar rolê clicado');
-                    if (typeof gerarRoleDeMoto === 'function') {
-                        gerarRoleDeMoto();
-                    } else {
-                        console.error('Função gerarRoleDeMoto não encontrada');
-                        alert('Erro: Função do gerador não carregada. Verifique se os scripts estão funcionando.');
-                    }
-                });
-            } else {
-                console.error('Botão sugerir-destinos-btn não encontrado');
-            }
-        }
-
-        // Service Worker
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(registration => console.log('SW registered'))
-                    .catch(error => console.log('SW registration failed'));
-            });
-        }
-    </script>
-    
     <script src="app.js" defer></script>
 </body>
 </html>

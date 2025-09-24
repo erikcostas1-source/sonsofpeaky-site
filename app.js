@@ -170,11 +170,11 @@ document.addEventListener('DOMContentLoaded', function () {
     // ===== CONFIGURAÇÃO API E FUNCIONALIDADES EXISTENTES =====
     
     // Configuração para chamadas Gemini API.
-    // Preferir URLs vindas de window.SOP_CONFIG (config.js). Caso não existam, usar API_KEY local (opcional) ou fallback local.
-    const API_KEY = ""; // opcional; deixe vazio para usar as URLs definidas em config.js
+    // Usar URLs definidas em config.js com nova chave da API
+    const API_KEY = "AIzaSyCiHRVozYYmHB-5W64QdJzn9dQYAyRl9Tk"; // Nova chave da API
     const API_URL_GENERATE_TEXT = (window.SOP_CONFIG && window.SOP_CONFIG.textUrl)
         ? window.SOP_CONFIG.textUrl
-        : (API_KEY ? `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${API_KEY}` : null);
+        : `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${API_KEY}`;
 
     // Safe DOM helpers
     const $ = id => document.getElementById(id);
@@ -493,6 +493,579 @@ Que as estradas nos levem e nos tragam em segurança!
 
     // ===== GERADOR DE ROLÊ AVANÇADO =====
     
+    // Função para sugerir destinos baseado nos critérios do usuário
+    async function gerarRoleDeMoto() {
+        const experienciaDesejada = $('experiencia-desejada')?.value.trim() || '';
+        const enderecoPartida = $('endereco-partida')?.value.trim() || 'Penha, São Paulo, SP';
+        const cilindrada = $('role-cilindrada')?.value || '600';
+        const capacidadeTanque = parseInt($('role-tanque')?.value) || 17;
+        const incluirPedagio = $('role-pedagio')?.checked !== false;
+        
+        const sugestoesContainer = $('sugestoes-container');
+        const sugestoesList = $('sugestoes-list');
+        
+        if (!sugestoesContainer || !sugestoesList) return;
+        
+        // Validação básica
+        if (!experienciaDesejada) {
+            const loadingIndicator = $('loading-indicator');
+            if (loadingIndicator) loadingIndicator.classList.add('hidden');
+            
+            const experienciasList = $('experiencias-list');
+            if (experienciasList) {
+                experienciasList.innerHTML = '<div class="text-red-400 text-center py-4">⚠️ Por favor, descreva que tipo de rolê você quer fazer!</div>';
+                sugestoesContainer.classList.remove('hidden');
+            }
+            return;
+        }
+        
+        // Mostrar loading
+        const loadingIndicator = $('loading-indicator');
+        if (loadingIndicator) {
+            loadingIndicator.classList.remove('hidden');
+        }
+        sugestoesContainer.classList.add('hidden');
+        
+        try {
+            // Assumir tempo padrão de um dia de rolê
+            const tempoDisponivel = { horas: 10, minutos: 0 };
+            
+            // Consumo da moto baseado na cilindrada
+            const consumoMoto = {
+                '125': { litrosPor100km: 2.8, descricao: '125-150cc (econômica)' },
+                '250': { litrosPor100km: 4.0, descricao: '250-400cc (média)' },
+                '600': { litrosPor100km: 5.5, descricao: '600-800cc (esportiva)' },
+                '1000': { litrosPor100km: 6.7, descricao: '1000cc+ (big trail/esportiva)' }
+            }[cilindrada] || { litrosPor100km: 5.5, descricao: 'moto média' };
+            
+            let promptIA = `Você é um especialista mundial em rolês de motociclismo. Sua missão é sugerir rolês perfeitos baseados no que o motociclista realmente quer vivenciar.
+
+🏍️ INFORMAÇÕES DO MOTOCICLISTA:
+- Rolê desejado: "${experienciaDesejada}"
+- Ponto de partida: ${enderecoPartida}
+- Moto: ${consumoMoto.descricao}
+- Capacidade do tanque: ${capacidadeTanque}L
+- Incluir pedágios: ${incluirPedagio ? 'Sim' : 'Não'}
+- Tempo disponível: ${tempoDisponivel.horas}h para o rolê
+
+🎯 SUA MISSÃO:
+Consulte seu conhecimento mundial e sugira 3 experiências REAIS e específicas que atendam exatamente ao que foi pedido. Para cada sugestão, forneça:
+
+1. NOME DO LOCAL (estabelecimento específico, atração, restaurante, etc.)
+2. ENDEREÇO COMPLETO (rua, número, cidade, estado, CEP se possível)
+3. EXPERIÊNCIA DETALHADA (o que exatamente vai vivenciar lá)
+4. DISTÂNCIA E TEMPO (km de ${enderecoPartida} e tempo de viagem de moto)
+5. CUSTOS DETALHADOS:
+   - Gasolina (considere consumo de ${consumoMoto.litrosPor100km}L/100km, preço R$6,50/L)
+   - Pedágios de moto (valores reais das rodovias)
+   - Gastos no local (alimentação, ingressos, etc.)
+   - Total estimado
+5. LOGÍSTICA (melhor rota, horários recomendados, dicas importantes)
+6. POR QUE É PERFEITO (como atende à experiência desejada)
+
+6. LOGÍSTICA (melhor rota, horários recomendados, dicas importantes)
+7. POR QUE É PERFEITO (como atende à experiência desejada)
+
+IMPORTANTE - OBRIGATÓRIO:
+- Use lugares REAIS e específicos (nomes de estabelecimentos, cidades, atrações)
+- SEMPRE inclua ENDEREÇO COMPLETO com rua, número, cidade, estado
+- Considere o tempo disponível para ser viável
+- Seja preciso nos custos e distâncias reais
+- Foque na EXPERIÊNCIA, não apenas no destino
+- Se o orçamento for limitado, respeite-o
+
+Formato de resposta: JSON com array "sugestoes", cada item com: nome, endereco, experiencia, distancia, tempoViagem, custos{gasolina, pedagio, local, total}, logistica, porquePerfeito`;
+
+            let sugestoesIA = null;
+            
+            if (API_URL_GENERATE_TEXT) {
+                const payloadText = { contents: [{ parts: [{ text: promptIA }] }] };
+                const responseText = await fetchWithExponentialBackoff(API_URL_GENERATE_TEXT, {
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify(payloadText)
+                });
+                
+                if (responseText?.candidates?.[0]?.content?.parts?.[0]?.text) {
+                    const textoResposta = responseText.candidates[0].content.parts[0].text;
+                    try {
+                        // Tentar extrair JSON da resposta
+                        const jsonMatch = textoResposta.match(/\{[\s\S]*\}/);
+                        if (jsonMatch) {
+                            sugestoesIA = JSON.parse(jsonMatch[0]);
+                        }
+                    } catch (e) {
+                        console.log('IA retornou texto, processando manualmente...');
+                        sugestoesIA = processarRespostaTextoIA(textoResposta);
+                    }
+                }
+            }
+            
+            // Se IA falhar, mostrar erro
+            if (!sugestoesIA || !sugestoesIA.sugestoes || sugestoesIA.sugestoes.length === 0) {
+                const avisosDiv = $('avisos-viabilidade');
+                if (avisosDiv) {
+                    avisosDiv.innerHTML = `
+                        <div class="bg-red-900 border border-red-600 rounded-lg p-6 text-center">
+                            <h6 class="text-red-300 font-bold text-lg mb-3">🤖 IA temporariamente indisponível</h6>
+                            <p class="text-red-200 mb-4">Não conseguimos processar sua solicitação no momento. Tente novamente em alguns instantes.</p>
+                            <div class="bg-red-800 rounded-lg p-3 mb-4">
+                                <p class="text-red-100 font-bold mb-2">💡 Dicas:</p>
+                                <ul class="text-red-200 text-sm text-left space-y-1">
+                                    <li>• Seja mais específico na descrição da experiência</li>
+                                    <li>• Verifique sua conexão com a internet</li>
+                                    <li>• Tente reformular sua solicitação</li>
+                                </ul>
+                            </div>
+                        </div>
+                    `;
+                }
+                sugestoesList.innerHTML = '';
+                return;
+            }
+            
+            // Ocultar loading e mostrar resultados
+            const loadingIndicator = $('loading-indicator');
+            if (loadingIndicator) loadingIndicator.classList.add('hidden');
+            
+            renderizarSugestoes(sugestoesIA.sugestoes);
+            sugestoesContainer.classList.remove('hidden');
+            
+        } catch (error) {
+            console.error('Erro ao sugerir rolês:', error);
+            const loadingIndicator = $('loading-indicator');
+            if (loadingIndicator) loadingIndicator.classList.add('hidden');
+            
+            const experienciasList = $('experiencias-list');
+            if (experienciasList) {
+                experienciasList.innerHTML = '<div class="text-red-400 text-center py-4">❌ Erro ao consultar IA. Verifique sua conexão e tente novamente.</div>';
+                sugestoesContainer.classList.remove('hidden');
+            }
+        }
+    }
+
+    // Função para calcular tempo disponível
+    function calcularTempoDisponivel(saida, volta) {
+        const [saidaH, saidaM] = saida.split(':').map(Number);
+        const [voltaH, voltaM] = volta.split(':').map(Number);
+        
+        const saidaMinutos = saidaH * 60 + saidaM;
+        const voltaMinutos = voltaH * 60 + voltaM;
+        
+        const diferencaMinutos = voltaMinutos - saidaMinutos;
+        const horas = Math.floor(diferencaMinutos / 60);
+        const minutos = diferencaMinutos % 60;
+        
+        return { horas, minutos, totalMinutos: diferencaMinutos };
+    }
+
+    // Nova função para renderizar experiências da IA
+    function renderizarSugestoes(sugestoes) {
+        const experienciasList = $('experiencias-list');
+        if (!experienciasList) return;
+        
+        experienciasList.innerHTML = sugestoes.map((sugestao, index) => {
+            const custos = sugestao.custos || {};
+            
+            return `
+                <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 hover:from-gray-700 hover:to-gray-800 transition-all duration-300 experiencia-card border border-gray-700 hover:border-amber-500/50 shadow-xl"
+                     data-experiencia='${JSON.stringify(sugestao)}'>
+                    
+                    <!-- Header da Experiência -->
+                    <div class="flex items-start justify-between mb-6 pb-4 border-b border-gray-700">
+                        <div class="flex-1">
+                            <h6 class="text-2xl font-bold text-transparent bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text mb-2">${sugestao.nome}</h6>
+                            ${sugestao.endereco ? `
+                            <div class="bg-gray-800/60 rounded-lg p-3 mb-3 border border-gray-600">
+                                <div class="flex items-start gap-2">
+                                    <span class="text-amber-400 text-sm">📍</span>
+                                    <div>
+                                        <p class="text-gray-200 text-sm font-medium">Endereço:</p>
+                                        <p class="text-gray-300 text-sm">${sugestao.endereco}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            ` : ''}
+                            <div class="flex items-center gap-4 text-sm text-gray-400">
+                                <span class="flex items-center gap-1">� ${sugestao.distancia || '~200'}km</span>
+                                <span class="flex items-center gap-1">⏱️ ${sugestao.tempoViagem || '~3h'}</span>
+                            </div>
+                        </div>
+                        <div class="bg-gradient-to-r from-green-600 to-green-700 text-white px-4 py-2 rounded-full font-bold text-lg shadow-lg">
+                            R$ ${custos.total || '150'}
+                        </div>
+                    </div>
+                    
+                    <!-- Experiência Detalhada -->
+                    <div class="bg-gradient-to-r from-amber-900/20 to-orange-900/20 rounded-lg p-4 mb-6 border border-amber-700/30">
+                        <h7 class="text-amber-400 font-bold text-sm mb-3 block flex items-center gap-2">
+                            ✨ SUA EXPERIÊNCIA
+                        </h7>
+                        <p class="text-gray-200 leading-relaxed">${sugestao.experiencia || 'Experiência incrível te aguarda!'}</p>
+                    </div>
+                    
+                    <!-- Informações em Grid -->
+                    <div class="grid md:grid-cols-2 gap-4 mb-6">
+                        <!-- Custos -->
+                        <div class="bg-blue-900/20 rounded-lg p-4 border border-blue-700/30">
+                            <h8 class="text-blue-400 font-bold text-sm mb-3 block flex items-center gap-2">
+                                💰 INVESTIMENTO
+                            </h8>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-300">⛽ Combustível:</span>
+                                    <span class="text-blue-300 font-semibold">R$ ${custos.gasolina || '40'}</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-300">🛣️ Pedágios:</span>
+                                    <span class="text-blue-300 font-semibold">R$ ${custos.pedagio || '20'}</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-300">🍽️ No local:</span>
+                                    <span class="text-blue-300 font-semibold">R$ ${custos.local || '80'}</span>
+                                </div>
+                                <div class="border-t border-blue-700/30 pt-2 mt-2">
+                                    <div class="flex justify-between items-center font-bold">
+                                        <span class="text-blue-200">Total:</span>
+                                        <span class="text-blue-300 text-lg">R$ ${custos.total || '150'}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Por que é perfeito -->
+                        <div class="bg-purple-900/20 rounded-lg p-4 border border-purple-700/30">
+                            <h8 class="text-purple-400 font-bold text-sm mb-3 block flex items-center gap-2">
+                                🎯 POR QUE É IDEAL
+                            </h8>
+                            <p class="text-gray-300 text-sm leading-relaxed">${sugestao.porquePerfeito || 'Perfeito para sua experiência desejada!'}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Logística -->
+                    <div class="bg-green-900/20 rounded-lg p-4 mb-6 border border-green-700/30">
+                        <h8 class="text-green-400 font-bold text-sm mb-3 block flex items-center gap-2">
+                            🗺️ COMO CHEGAR E O QUE FAZER
+                        </h8>
+                        <p class="text-gray-300 text-sm leading-relaxed">${sugestao.logistica || 'Rota otimizada e dicas serão fornecidas após seleção.'}</p>
+                    </div>
+                    
+                    <!-- Botões de Ação -->
+                    <div class="flex gap-3">
+                        <button class="escolher-experiencia flex-1 px-6 py-4 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-gray-900 font-bold rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg">
+                            🚀 Escolher Esta Experiência
+                        </button>
+                        <button class="compartilhar-experiencia px-4 py-4 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg transition-colors" title="Compartilhar">
+                            📤
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        // Adicionar eventos de clique para escolher experiência
+        experienciasList.querySelectorAll('.escolher-experiencia').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const card = btn.closest('.experiencia-card');
+                const experienciaData = JSON.parse(card.dataset.experiencia);
+                
+                // Salvar experiência escolhida
+                window.experienciaSelecionada = experienciaData;
+                console.log('Experiência selecionada:', experienciaData);
+                
+                // Preencher campos ocultos para compatibilidade
+                if ($('role-destino')) $('role-destino').value = experienciaData.nome;
+                if ($('role-saida-final')) $('role-saida-final').value = $('role-saida-desejada')?.value || '08:00';
+                
+                // Mostrar etapa 3 - Confirmação
+                const confirmacaoContainer = $('confirmacao-container');
+                const destinoSelecionado = $('destino-selecionado');
+                const horarioSelecionado = $('horario-selecionado');
+                
+                if (confirmacaoContainer) {
+                    confirmacaoContainer.classList.remove('hidden');
+                    console.log('Container de confirmação mostrado');
+                }
+                if (destinoSelecionado) destinoSelecionado.textContent = experienciaData.nome;
+                if (horarioSelecionado) {
+                    const saidaDesejada = $('role-saida-desejada')?.value || '08:00';
+                    const voltaDesejada = $('role-chegada-desejada')?.value || '19:00';
+                    horarioSelecionado.textContent = `Saída ${saidaDesejada} • Volta ${voltaDesejada} • ${experienciaData.distancia || '200'}km`;
+                }
+                
+                // Feedback visual
+                btn.innerHTML = '✅ Experiência Selecionada!';
+                btn.disabled = true;
+                btn.classList.add('bg-green-600', 'hover:bg-green-600');
+                
+                // Scroll para confirmação após um delay
+                setTimeout(() => {
+                    confirmacaoContainer?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 300);
+            });
+        });
+        
+        // Adicionar eventos de compartilhamento
+        experienciasList.querySelectorAll('.compartilhar-experiencia').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const card = btn.closest('.experiencia-card');
+                const experienciaData = JSON.parse(card.dataset.experiencia);
+                
+                // Criar texto para compartilhamento
+                const textoCompartilhamento = `🏍️ Sons of Peaky - Experiência Recomendada!\n\n` +
+                    `✨ ${experienciaData.nome}\n` +
+                    `📍 ${experienciaData.distancia || '200'}km de distância\n` +
+                    `💰 Investimento: R$ ${experienciaData.custos?.total || '150'}\n\n` +
+                    `${experienciaData.experiencia || 'Experiência incrível!'}\n\n` +
+                    `Planeje seu rolê em: https://sonsofpeaky.com`;
+                
+                // Tentar usar API nativa de compartilhamento
+                if (navigator.share) {
+                    navigator.share({
+                        title: `Sons of Peaky - ${experienciaData.nome}`,
+                        text: textoCompartilhamento,
+                        url: window.location.href
+                    });
+                } else {
+                    // Fallback: copiar para clipboard
+                    navigator.clipboard.writeText(textoCompartilhamento).then(() => {
+                        btn.innerHTML = '✅ Copiado!';
+                        setTimeout(() => {
+                            btn.innerHTML = '📤';
+                        }, 2000);
+                    });
+                }
+            });
+        });
+    }
+    
+    // Função para processar resposta em texto da IA
+    function processarRespostaTextoIA(texto) {
+        const linhas = texto.split('\n').filter(l => l.trim());
+        const sugestoes = [];
+        let sugestaoAtual = {};
+        
+        linhas.forEach(linha => {
+            if (linha.includes('1.') || linha.includes('2.') || linha.includes('3.')) {
+                if (sugestaoAtual.nome) sugestoes.push(sugestaoAtual);
+                sugestaoAtual = {
+                    nome: linha.replace(/^\d+\.\s*/, '').trim(),
+                    razao: 'Destino recomendado pela IA',
+                    horarioSaida: '08:00',
+                    atrativos: ['Destino sugerido'],
+                    dicas: ['Leve equipamentos adequados']
+                };
+            }
+        });
+        
+        if (sugestaoAtual.nome) sugestoes.push(sugestaoAtual);
+        return { sugestoes };
+    }
+    
+    // Renderizar sugestões na interface
+    function renderizarSugestoes(sugestoes, destinosLocais) {
+        const sugestoesList = $('sugestoes-list');
+        if (!sugestoesList) return;
+        
+        sugestoesList.innerHTML = sugestoes.map((sugestao, index) => {
+            const destinoLocal = destinosLocais.find(d => d.nome.includes(sugestao.nome) || sugestao.nome.includes(d.nome));
+            const distancia = destinoLocal ? destinoLocal.distancia : '~200';
+            const custoTotal = destinoLocal ? calcularCustoTotal(destinoLocal) : 150;
+            const infoTempo = destinoLocal?.infoTempo;
+            
+            return `
+                <div class="bg-gray-800 rounded-lg p-4 cursor-pointer hover:bg-gray-700 transition-colors sugestao-card" 
+                     data-nome="${sugestao.nome}" 
+                     data-tipo="${destinoLocal?.categoria || 'turístico'}"
+                     data-horario="${sugestao.horarioSaida}"
+                     data-destino='${JSON.stringify(destinoLocal)}'>
+                    <div class="flex justify-between items-start mb-2">
+                        <h6 class="text-amber-300 font-bold text-lg">${sugestao.nome}</h6>
+                        <span class="text-gray-400 text-sm">${distancia}km</span>
+                    </div>
+                    <p class="text-gray-300 text-sm mb-2">${sugestao.razao}</p>
+                    
+                    ${infoTempo ? `
+                        <div class="bg-gray-900 rounded-lg p-3 mb-2">
+                            <div class="text-xs text-gray-400 mb-1">⏱️ Análise de Tempo:</div>
+                            <div class="grid grid-cols-2 gap-2 text-xs">
+                                <div class="text-blue-300">📍 Ida: ${infoTempo.detalhes.ida}h</div>
+                                <div class="text-green-300">🏖️ Local: ${infoTempo.detalhes.permanencia}h</div>
+                                <div class="text-blue-300">🏠 Volta: ${infoTempo.detalhes.volta}h</div>
+                                <div class="text-amber-300">⏰ Sobra: ${infoTempo.sobra}h</div>
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="flex flex-wrap gap-2 mb-2">
+                        <span class="bg-blue-600 text-white px-2 py-1 rounded-full text-xs">⏰ Saída: ${sugestao.horarioSaida}</span>
+                        <span class="bg-green-600 text-white px-2 py-1 rounded-full text-xs">💰 ~R$${custoTotal}</span>
+                        ${infoTempo ? `<span class="bg-amber-600 text-white px-2 py-1 rounded-full text-xs">✅ Tempo OK</span>` : ''}
+                    </div>
+                    <div class="text-xs text-gray-400">
+                        <strong>Atrativos:</strong> ${sugestao.atrativos.slice(0, 3).join(', ')}
+                    </div>
+                    <div class="mt-2 text-center">
+                        <button class="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-gray-900 font-bold rounded-lg text-sm transition-colors escolher-destino">
+                            🎯 Escolher Este Destino
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        // Adicionar eventos de clique
+        sugestoesList.querySelectorAll('.escolher-destino').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const card = btn.closest('.sugestao-card');
+                const nome = card.dataset.nome;
+                const tipo = card.dataset.tipo;
+                const horario = card.dataset.horario;
+                const destinoData = JSON.parse(card.dataset.destino || '{}');
+                
+                // Salvar destino globalmente para uso no prompt da IA
+                window.destinoSelecionado = destinoData;
+                
+                // Preencher campos ocultos para compatibilidade
+                if ($('role-destino')) $('role-destino').value = nome;
+                if ($('role-saida-final')) $('role-saida-final').value = $('role-saida-desejada')?.value || horario;
+                
+                // Mostrar etapa 3 - Confirmação
+                const confirmacaoContainer = $('confirmacao-container');
+                const destinoSelecionado = $('destino-selecionado');
+                const horarioSelecionado = $('horario-selecionado');
+                
+                if (confirmacaoContainer) confirmacaoContainer.classList.remove('hidden');
+                if (destinoSelecionado) destinoSelecionado.textContent = nome;
+                if (horarioSelecionado) {
+                    const saidaDesejada = $('role-saida-desejada')?.value || horario;
+                    const voltaDesejada = $('role-chegada-desejada')?.value || '19:00';
+                    horarioSelecionado.textContent = `Saída ${saidaDesejada} • Volta ${voltaDesejada}`;
+                }
+                
+                // Scroll para confirmação
+                confirmacaoContainer?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
+        });
+    }
+    
+    // Event listener para botão de sugerir destinos
+    const gerarRoleBtn = $('gerar-role-btn');
+    if (gerarRoleBtn) {
+        gerarRoleBtn.addEventListener('click', gerarRoleDeMoto);
+    }
+    
+    // Limpar avisos quando usuário modificar campos
+    ['experiencia-desejada', 'role-saida-desejada', 'role-chegada-desejada'].forEach(fieldId => {
+        const field = $(fieldId);
+        if (field) {
+            field.addEventListener('input', function() {
+                const avisosDiv = $('avisos-viabilidade');
+                if (avisosDiv) avisosDiv.innerHTML = '';
+            });
+        }
+    });
+    
+    // Função auxiliar para calcular custos de combustível baseado na cilindrada
+    function calcularCombustivel(distanciaKm, cilindrada) {
+        const consumoPorCilindrada = {
+            125: 35, // km/l
+            250: 25,
+            600: 18,
+            1000: 15
+        };
+        
+        const consumo = consumoPorCilindrada[cilindrada] || 20;
+        const precoLitro = 6.50; // Preço médio da gasolina
+        const litrosNecessarios = distanciaKm / consumo;
+        
+        return Math.round(litrosNecessarios * precoLitro);
+    }
+    
+    // Função para estimar pedágios por região
+    function estimarPedagios(destino, distanciaKm) {
+        const regionsPedagio = {
+            'santos': 25,
+            'campos do jordão': 45,
+            'ubatuba': 35,
+            'serra': 30,
+            'litoral': 25,
+            'sul': 20,
+            'norte': 15
+        };
+        
+        for (const [regiao, valor] of Object.entries(regionsPedagio)) {
+            if (destino.toLowerCase().includes(regiao)) {
+                return valor;
+            }
+        }
+        
+        // Estimativa baseada na distância se não encontrar região específica
+        if (distanciaKm > 250) return 35;
+        if (distanciaKm > 150) return 20;
+        if (distanciaKm > 80) return 10;
+        return 0;
+    }
+    
+    // Função para compartilhar no WhatsApp
+    window.compartilharWhatsApp = function(destino, data, horaSaida, pontos) {
+        const texto = `🏍️ *ROLÊ SONS OF PEAKY* 🏍️\n\n` +
+            `📍 *Destino:* ${destino}\n` +
+            `📅 *Data:* ${data}\n` +
+            `⏰ *Saída:* ${horaSaida}\n` +
+            `🚩 *Ponto de Encontro:* ${pontos[0]?.local || 'Galpão SOP'}\n\n` +
+            `Bora colar, irmãos! 🔥\n\n` +
+            `_Por Ordem dos Sons of Peaky_ 💀`;
+        
+        const url = `https://wa.me/?text=${encodeURIComponent(texto)}`;
+        window.open(url, '_blank');
+    };
+    
+    // Função para copiar roteiro
+    window.copiarRoteiro = function() {
+        const roteiroDiv = document.querySelector('#role-avancado-output .bg-gray-900');
+        if (roteiroDiv) {
+            const texto = roteiroDiv.innerText;
+            navigator.clipboard.writeText(texto).then(() => {
+                showModal('✅ Roteiro copiado para a área de transferência!');
+            }).catch(() => {
+                showModal('❌ Erro ao copiar. Selecione e copie manualmente.');
+            });
+        }
+    };
+    
+    // Função para salvar em PDF (placeholder - requer biblioteca adicional)
+    window.salvarPDF = function(destino) {
+        showModal(`📄 Funcionalidade de PDF em desenvolvimento!\n\nPor enquanto, use "Copiar Roteiro" ou "Compartilhar WhatsApp" para salvar as informações.\n\nDestino: ${destino}`);
+    };
+    
+    // Inicialização automática de campos
+    function inicializarCamposAutomaticos() {
+        // Definir data padrão para o próximo sábado
+        const hoje = new Date();
+        const proximoSabado = new Date(hoje);
+        proximoSabado.setDate(hoje.getDate() + (6 - hoje.getDay()));
+        
+        const roleData = $('role-data');
+        if (roleData && !roleData.value) {
+            roleData.value = proximoSabado.toISOString().split('T')[0];
+        }
+        
+        // Sistema de experiências não precisa de contador de destinos
+        // O botão mantém seu texto original do HTML
+    }
+    
+    // Executar inicialização
+    inicializarCamposAutomaticos();
+    
+    /* === SEÇÃO DESABILITADA - PONTOS DE ENCONTRO ===
     // Gerenciar pontos de encontro dinâmicos
     const addPontoBtn = $('add-ponto-btn');
     if (addPontoBtn) {
@@ -518,15 +1091,15 @@ Que as estradas nos levem e nos tragam em segurança!
             }
         });
     }
+    === FIM DA SEÇÃO DESABILITADA === */
 
+    /* === SEÇÃO DESABILITADA - GERADOR AVANÇADO ===
     // Gerador de Rolê Avançado
     const gerarRoleAvancadoBtn = $('gerar-role-avancado-btn');
     if (gerarRoleAvancadoBtn) gerarRoleAvancadoBtn.addEventListener('click', async function () {
         const destino = $('role-destino')?.value.trim();
-        const tipo = $('role-tipo')?.value.trim();
         const data = $('role-data')?.value;
-        const horaSaida = $('role-saida')?.value;
-        const horaVolta = $('role-volta')?.value;
+        const horaSaida = $('role-saida-final')?.value;
         const perfil = $('role-perfil')?.value;
         const estrada = $('role-estrada')?.value;
         const grupo = $('role-grupo')?.value;
@@ -537,9 +1110,9 @@ Que as estradas nos levem e nos tragam em segurança!
         const outputDiv = $('role-avancado-output');
         const loadingIndicator = $('loading-indicator-role-avancado');
 
-        if (!destino || !data || !horaSaida) {
+        if (!destino || !data) {
             if (outputDiv) {
-                outputDiv.innerHTML = '<div class="text-red-400 p-4 bg-red-900 rounded-lg">❌ Por favor, preencha pelo menos o destino, data e horário de saída.</div>';
+                outputDiv.innerHTML = '<div class="text-red-400 p-4 bg-red-900 rounded-lg">❌ Por favor, primeiro escolha um destino sugerido na Etapa 2 e defina a data do rolê.</div>';
                 outputDiv.classList.remove('hidden');
             }
             return;
@@ -569,7 +1142,10 @@ Que as estradas nos levem e nos tragam em segurança!
 
             let roteiro = null;
             if (API_URL_GENERATE_TEXT) {
-                const prompt = `Atue como um especialista em planejamento de viagens de moto e crie um roteiro COMPLETO e DETALHADO com base nas seguintes informações:
+                // Verificar se temos dados do destino selecionado
+                const destinoInfo = window.destinoSelecionado || null;
+                
+                const prompt = `Atue como um especialista em planejamento de viagens de moto para o grupo Sons of Peaky e crie um roteiro COMPLETO e DETALHADO.
 
 🎯 INFORMAÇÕES DA VIAGEM:
 - Destino: ${destino}
@@ -589,52 +1165,63 @@ Que as estradas nos levem e nos tragam em segurança!
 📍 PONTOS DE ENCONTRO:
 ${pontos.map(p => `- ${p.local} às ${p.hora} (${p.tipo})`).join('\n')}
 
-CRIE UM ROTEIRO DETALHADO QUE INCLUA:
+${destinoInfo ? `
+🎯 DADOS ESPECÍFICOS DO DESTINO (use para cálculos precisos):
+- Distância real: ${destinoInfo.distancia}km (ida e volta)
+- Tempo estimado de viagem: ${destinoInfo.tempoEstimado}
+- Nível de dificuldade: ${destinoInfo.dificuldade}
+- Pontos imperdíveis: ${destinoInfo.pontos?.join(', ') || 'A definir'}
+- Custos conhecidos: Pedágio R$${destinoInfo.custos?.pedagio || 0}, Combustível R$${destinoInfo.custos?.combustivel || 0}
+- Avisos importantes: ${destinoInfo.avisos?.join(' | ') || 'Nenhum'}
+- Características: ${destinoInfo.tags?.join(', ') || ''}
+` : ''}
+
+CRIE UM ROTEIRO ÉPICO QUE INCLUA:
 
 1. 📋 RESUMO EXECUTIVO:
-   - Distância total estimada
-   - Tempo de viagem (considerando paradas)
-   - Custo estimado por pessoa (combustível + pedágios + alimentação)
-   - Nível de dificuldade da rota
+   - Distância total ${destinoInfo ? `(${destinoInfo.distancia}km confirmados)` : 'estimada'}
+   - Tempo de viagem considerando paradas
+   - Custo total por pessoa detalhado
+   - Nível de dificuldade e preparação necessária
 
-2. ⏰ CRONOGRAMA DETALHADO:
-   - Horários de encontro em cada ponto
-   - Tempo estimado entre pontos
-   - Horários de paradas obrigatórias
-   - Chegada no destino
-   - Tempo de permanência
-   - Retorno planejado
+2. ⏰ CRONOGRAMA MILITAR:
+   - Timeline completa do dia
+   - Margem de segurança em cada etapa
+   - Pontos de reagrupamento
+   - Horário crítico de retorno
 
-3. 🛣️ ROTA OTIMIZADA:
-   - Melhor trajeto considerando o tipo de estrada
-   - Rotas alternativas se disponíveis
-   - Pontos de referência importantes
-   - Radares e fiscalizações conhecidas
+3. 🛣️ ROTA DOS CAMPEÕES:
+   - Melhor trajeto para motos
+   - Trechos mais bonitos
+   - Pontos perigosos a evitar
+   - Rotas alternativas de emergência
 
 4. ⛽ PARADAS ESTRATÉGICAS:
-   - Postos de combustível recomendados
-   - Pontos para lanche/almoço
+   - Postos confiáveis no trajeto
+   - Restaurantes recomendados
+   - Pontos turísticos pelo caminho
    - Banheiros e descanso
    - Pontos turísticos pelo caminho
 
-5. 💰 CUSTOS DETALHADOS:
-   - Combustível por moto (baseado no consumo da cilindrada)
-   - Pedágios (ida e volta)
-   - Alimentação estimada
-   - Estacionamento se aplicável
+5. 💰 ORÇAMENTO REAL:
+   - Combustível baseado na cilindrada real (${cilindrada}cc)
+   - Todos os pedágios do trajeto
+   - Sugestões de alimentação com preços
+   - Custos extras (estacionamento, ingressos)
 
-6. 🌤️ CONSIDERAÇÕES CLIMÁTICAS E SEGURANÇA:
-   - Melhor horário para evitar chuvas
-   - Trechos que exigem mais atenção
-   - Equipamentos recomendados
+6. 🛡️ SEGURANÇA DOS IRMÃOS:
+   - Equipamentos obrigatórios
+   - Condições da estrada
+   - Pontos de apoio médico
    - Contatos de emergência locais
 
-7. 📱 COMUNICAÇÃO:
-   - Grupos de WhatsApp sugeridos
-   - Frequências de rádio se aplicável
-   - Pontos sem sinal de celular
+7. 🎯 EXPERIÊNCIA ÉPICA SONS OF PEAKY:
+   - Melhores pontos para fotos do grupo
+   - Experiências únicas do local
+   - História e cultura local
+   - O que não pode ser perdido
 
-Seja EXTREMAMENTE detalhado e prático. Use informações reais sobre estradas brasileiras, custos atuais e tempos realistas. Formate de maneira clara e profissional.`;
+FORMATO: Seja detalhado, realista e mantenha o espírito aventureiro dos Sons of Peaky. Use dados reais de distâncias e custos atuais do Brasil.`;
 
                 const payload = { contents: [{ parts: [{ text: prompt }] }] };
                 const response = await fetchWithExponentialBackoff(API_URL_GENERATE_TEXT, {
@@ -731,173 +1318,7 @@ Um roteiro completo será gerado quando a conexão for estabelecida.`;
             }
         }
     });
-
-    // Gerador de Rolê Simples (mantendo compatibilidade)
-    const gerarRoleBtn = $('gerar-role-btn');
-    if (gerarRoleBtn) gerarRoleBtn.addEventListener('click', async function () {
-        const input = $('role-input')?.value.trim();
-        const km = $('role-km-input')?.value.trim();
-        const date = $('role-date-input')?.value.trim();
-        const outputDiv = $('role-output');
-        const loadingIndicator = $('loading-indicator-role');
-
-        if (!input || !km || !date) {
-            if (outputDiv) {
-                outputDiv.textContent = 'Por favor, preencha todos os campos para gerar o rolê.';
-                outputDiv.classList.remove('hidden');
-            }
-            return;
-        }
-        if (outputDiv) {
-            outputDiv.innerHTML = '';
-            outputDiv.classList.remove('hidden');
-        }
-        if (loadingIndicator) {
-            loadingIndicator.style.display = 'flex';
-            loadingIndicator.classList.remove('hidden');
-        }
-
-        try {
-            let generatedText = null;
-
-            if (API_URL_GENERATE_TEXT) {
-                const promptText = `Atue como um especialista em roteiros de viagem de moto para o grupo Sons of Peaky. 
-
-Crie um roteiro detalhado para um rolê de moto com as seguintes informações:
-- Destino/Tipo: ${input}
-- Distância total: ${km}km (ida e volta)
-- Data: ${date}
-
-O roteiro deve incluir:
-1. Ponto de encontro: Galpão - Rua José Flavio, 420, Travessa 1A
-2. Horário sugerido de saída e chegada
-3. Rota sugerida com pontos de interesse
-4. Paradas recomendadas (combustível, alimentação, descanso)
-5. Estimativa de tempo de viagem
-6. Dicas de segurança específicas para o trajeto
-7. O que levar (equipamentos, documentos)
-8. Contatos de emergência locais se aplicável
-
-Escreva de forma clara e objetiva, mantendo o tom fraternal do grupo Sons of Peaky. Use linguagem motociclística apropriada.`;
-
-                const payloadText = { contents: [{ parts: [{ text: promptText }] }] };
-                const responseText = await fetchWithExponentialBackoff(API_URL_GENERATE_TEXT, {
-                    method: 'POST', 
-                    headers: { 'Content-Type': 'application/json' }, 
-                    body: JSON.stringify(payloadText)
-                });
-                
-                // Debug logging
-                console.log('Gemini API Response:', responseText);
-                
-                if (responseText?.candidates?.[0]?.content?.parts?.[0]?.text) {
-                    generatedText = responseText.candidates[0].content.parts[0].text;
-                } else if (responseText?.error) {
-                    console.error('Gemini API Error:', responseText.error);
-                    throw new Error(`API Error: ${responseText.error.message || 'Unknown error'}`);
-                } else {
-                    console.warn('Resposta inesperada da API:', responseText);
-                    throw new Error('Resposta inválida da API');
-                }
-            }
-
-            if (!generatedText) {
-                generatedText = localGenerateRide({ input, km: Number(km), date });
-            }
-
-            // Gerar um convite visual elegante sem API de imagem
-            const conviteHtml = `
-                <div class="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 border-2 border-amber-500 rounded-xl p-8 max-w-2xl mx-auto shadow-2xl">
-                    <div class="text-center space-y-4">
-                        <div class="flex justify-center mb-4">
-                            <img src="assets/img/SONSOFPEAKY_TRANSPARENTE_BRANCO.png" alt="Sons of Peaky" class="h-16 w-auto">
-                        </div>
-                        <h2 class="text-3xl font-bold text-amber-400 mb-2">🏍️ CONVITE OFICIAL 🏍️</h2>
-                        <h3 class="text-xl font-semibold text-white">${input}</h3>
-                        <div class="bg-amber-500 text-gray-900 py-2 px-4 rounded-lg font-bold inline-block">
-                            📅 ${date} | 🛣️ ${km}km
-                        </div>
-                        <p class="text-gray-300 text-lg mt-4">Ponto de Encontro:</p>
-                        <p class="text-amber-300 font-semibold">Galpão SOP - Rua José Flavio, 420</p>
-                        <div class="border-t border-amber-500 pt-4 mt-4">
-                            <p class="text-sm text-gray-400 italic">"Por Ordem dos Peaky Blinders"</p>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            if (outputDiv) outputDiv.innerHTML = `
-                    <div class="space-y-6">
-                        <h4 class="text-lg font-bold text-white">Detalhes do Rolê:</h4>
-                        <div class="p-4 rounded-md bg-gray-900 border border-gray-700 whitespace-pre-wrap">${generatedText}</div>
-                        <h4 class="text-lg font-bold text-white">Convite Visual:</h4>
-                        ${conviteHtml}
-                    </div>
-                `;
-
-            // Adicionar o rolê à agenda
-            const agendaContainer = document.querySelector('#agenda-container');
-            if (agendaContainer) {
-                const eventId = `role-${Date.now()}`;
-                const newEventHTML = `
-                        <div id="${eventId}" class="p-4 rounded-md bg-gray-900 border border-gray-700">
-                            <h3 class="text-lg font-bold text-amber-500">${new Date(date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' })} - ${input}</h3>
-                            <p class="text-gray-400">Ponto de encontro: Galpão. Distância: ${km}km.</p>
-                            <button class="mt-2 px-4 py-2 bg-amber-600 text-gray-900 font-bold rounded-full transition-transform duration-300 hover:scale-105 confirmar-btn">Confirmar Presença</button>
-                        </div>
-                    `;
-                agendaContainer.insertAdjacentHTML('afterbegin', newEventHTML);
-                addConfirmButtonListeners();
-                renderAttendees(eventId);
-            }
-
-        } catch (error) {
-            console.error('Erro ao gerar rolê:', error);
-            console.log('Usando geração local como fallback...');
-            
-            // Fallback para geração local
-            try {
-                generatedText = localGenerateRide({ input, km: Number(km), date });
-                
-                if (outputDiv) {
-                    outputDiv.innerHTML = `
-                        <div class="space-y-4">
-                            <h4 class="text-lg font-bold text-white">Roteiro Gerado (Offline):</h4>
-                            <div class="p-4 rounded-md bg-gray-900 border border-gray-700 whitespace-pre-wrap">${generatedText}</div>
-                        </div>
-                    `;
-                }
-                
-                // Adicionar à agenda mesmo com fallback
-                const agendaContainer = document.querySelector('#agenda-container');
-                if (agendaContainer) {
-                    const eventId = `role-${Date.now()}`;
-                    const newEventHTML = `
-                            <div id="${eventId}" class="p-4 rounded-md bg-gray-900 border border-gray-700">
-                                <h3 class="text-lg font-bold text-amber-500">${new Date(date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' })} - ${input}</h3>
-                                <p class="text-gray-400">Ponto de encontro: Galpão. Distância: ${km}km.</p>
-                                <button class="mt-2 px-4 py-2 bg-amber-600 text-gray-900 font-bold rounded-full transition-transform duration-300 hover:scale-105 confirmar-btn">Confirmar Presença</button>
-                            </div>
-                        `;
-                    agendaContainer.insertAdjacentHTML('afterbegin', newEventHTML);
-                    addConfirmButtonListeners();
-                    renderAttendees(eventId);
-                }
-                
-            } catch (fallbackError) {
-                console.error('Erro no fallback local:', fallbackError);
-                if ($('role-output')) {
-                    $('role-output').textContent = 'Ocorreu um erro ao gerar o roteiro. Tente novamente mais tarde.';
-                    $('role-output').classList.remove('hidden');
-                }
-            }
-        } finally {
-            if ($('loading-indicator-role')) {
-                $('loading-indicator-role').style.display = 'none';
-                $('loading-indicator-role').classList.add('hidden');
-            }
-        }
-    });
+    === FIM DA SEÇÃO DESABILITADA === */
 
     // Gerador de Ideias de Eventos
     const gerarEventoBtn = $('gerar-evento-btn');
@@ -1213,16 +1634,40 @@ function toggleSection(contentId, iconId) {
         content.style.maxHeight = '0px';
         icon.style.transform = 'rotate(0deg)';
     } else {
-        // Abrir seção - usar 'none' em vez de altura fixa para permitir expansão dinâmica
+        // Abrir seção - calcular altura total real incluindo conteúdo dinâmico
         content.style.maxHeight = 'none';
         icon.style.transform = 'rotate(180deg)';
         
-        // Após um pequeno delay, definir altura real para manter animação de fechamento
-        setTimeout(() => {
+        // Força recálculo de altura para conteúdo dinâmico
+        const recalculateHeight = () => {
             if (content.style.maxHeight === 'none') {
-                const height = content.scrollHeight;
+                // Usar altura mínima maior para acomodar conteúdo dinâmico
+                const height = Math.max(content.scrollHeight, 2000); // Mínimo 2000px
                 content.style.maxHeight = height + 'px';
             }
-        }, 10);
+        };
+        
+        // Recalcular altura imediatamente e após possíveis mudanças
+        setTimeout(recalculateHeight, 10);
+        setTimeout(recalculateHeight, 500); // Para conteúdo que demora a carregar
+        
+        // Adicionar observer para mudanças de conteúdo
+        if (!content.heightObserver) {
+            const observer = new MutationObserver(() => {
+                if (content.style.maxHeight !== '0px') {
+                    const newHeight = Math.max(content.scrollHeight, 2000);
+                    content.style.maxHeight = newHeight + 'px';
+                }
+            });
+            
+            observer.observe(content, {
+                childList: true,
+                subtree: true,
+                attributes: true,
+                characterData: true
+            });
+            
+            content.heightObserver = observer;
+        }
     }
 }
