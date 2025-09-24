@@ -602,19 +602,29 @@ function parseAIResponse(response, formData) {
                             'Levar equipamentos de proteção'
                         ]
                     })) : generateFallbackDestinos(formData, tipos[index]),
-                custos_detalhados: sugestao.custos_detalhados || {
-                    combustivel: calculateCostByType(formData, tipos[index], 'combustivel'),
-                    alimentacao: calculateCostByType(formData, tipos[index], 'alimentacao'),
-                    entradas: calculateCostByType(formData, tipos[index], 'entradas'),
-                    outros: calculateCostByType(formData, tipos[index], 'outros'),
-                    total: sugestao.custo_total_estimado || calculateFallbackCost(formData, tipos[index])
-                },
-                observacoes: Array.isArray(sugestao.observacoes) ? sugestao.observacoes : [
-                    'Verificar combustível antes da saída',
-                    'Levar equipamentos de segurança',
-                    'Conferir previsão do tempo',
-                    `Roteiro otimizado para ${tipos[index].toLowerCase()}`
-                ],
+                custos_detalhados: sugestao.custos_detalhados || (() => {
+                    const combustivel = calculateCostByType(formData, tipos[index], 'combustivel');
+                    const alimentacao = calculateCostByType(formData, tipos[index], 'alimentacao');
+                    const entradas = calculateCostByType(formData, tipos[index], 'entradas');
+                    const outros = calculateCostByType(formData, tipos[index], 'outros');
+                    
+                    // Calcular total somando todos os custos
+                    const totalValue = 
+                        parseInt(combustivel.replace('R$ ', '')) +
+                        parseInt(alimentacao.replace('R$ ', '')) +
+                        parseInt(entradas.replace('R$ ', '')) +
+                        parseInt(outros.replace('R$ ', ''));
+                    
+                    return {
+                        combustivel,
+                        alimentacao,
+                        entradas,
+                        outros,
+                        total: `R$ ${totalValue}`
+                    };
+                })(),
+                observacoes: Array.isArray(sugestao.observacoes) ? sugestao.observacoes : 
+                    generateObservacoesPercurso(formData, tipos[index], sugestao.destinos),
                 dicas_importantes: Array.isArray(sugestao.dicas_importantes) ? sugestao.dicas_importantes : [
                     'Verificar combustível',
                     'Levar equipamentos de segurança',
@@ -850,6 +860,64 @@ function calcularDistanciaEntre(destinoA, destinoB) {
     };
     
     return distancias[destinoA.nome]?.[destinoB.nome] || 30; // Fallback 30km
+}
+
+/**
+ * Gera observações específicas do percurso baseadas nos destinos reais
+ */
+function generateObservacoesPercurso(formData, tipo, destinos) {
+    const tempoDisponivel = calcularTempoDisponivel(formData);
+    const observacoes = [];
+    
+    // Observações baseadas no tipo de roteiro
+    if (tipo === 'ECONÔMICA') {
+        observacoes.push('Roteiro otimizado para menor gasto - priorizando locais gratuitos');
+        observacoes.push('Abastecimento em postos mais baratos do percurso');
+    } else if (tipo === 'EQUILIBRADA') {
+        observacoes.push('Roteiro balanceado entre custo e experiência');
+        observacoes.push('Mix de atrações gratuitas e pagas para melhor custo-benefício');
+    } else if (tipo === 'PREMIUM') {
+        observacoes.push('Roteiro premium com foco na experiência completa');
+        observacoes.push('Inclui paradas em estabelecimentos renomados');
+    }
+    
+    // Observações baseadas nos destinos específicos
+    if (destinos && Array.isArray(destinos)) {
+        const temSerra = destinos.some(d => 
+            d.nome?.toLowerCase().includes('serra') || 
+            d.nome?.toLowerCase().includes('campos') ||
+            d.nome?.toLowerCase().includes('cantareira')
+        );
+        
+        const temLitoral = destinos.some(d => 
+            d.endereco?.toLowerCase().includes('ubatuba') ||
+            d.endereco?.toLowerCase().includes('bertioga') ||
+            d.endereco?.toLowerCase().includes('ilhabela')
+        );
+        
+        if (temSerra) {
+            observacoes.push('Percurso serrano: levar agasalho (temperatura até 10°C menor)');
+            observacoes.push('Estradas sinuosas - reduzir velocidade em curvas fechadas');
+        }
+        
+        if (temLitoral) {
+            observacoes.push('Percurso litorâneo: atenção à maresia e protetor solar');
+        }
+        
+        // Observação sobre primeira parada
+        if (destinos[0]?.nome) {
+            observacoes.push(`Primeira parada: ${destinos[0].nome} - confirmar horário de funcionamento`);
+        }
+    }
+    
+    // Observação sobre tempo disponível
+    if (tempoDisponivel <= 6) {
+        observacoes.push('Roteiro compacto para aproveitar janela de 6h disponíveis');
+    } else if (tempoDisponivel >= 10) {
+        observacoes.push('Tempo amplo permite paradas extras para fotos e descanso');
+    }
+    
+    return observacoes.slice(0, 4); // Máximo 4 observações
 }
 
 /**
