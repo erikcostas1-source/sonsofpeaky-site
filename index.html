@@ -1042,7 +1042,7 @@
 
                                             <!-- Experiência Desejada -->
                                             <div>
-                                                <label for="experiencia-desejada" class="block text-sm font-medium text-gray-300 mb-2">✨ Que rolê você quer fazer?</label>
+                                                <label for="experiencia-desejada" class="block text-sm font-medium text-gray-300 mb-2">✨ Que rolê você quer fazer? *</label>
                                                 <textarea id="experiencia-desejada" 
                                                         class="w-full px-4 py-4 rounded-lg bg-gray-800 border border-gray-600 text-gray-100 focus:border-amber-500 outline-none transition-colors h-28 resize-none" 
                                                         placeholder="Descreva detalhadamente o rolê que você quer fazer...
@@ -1051,27 +1051,95 @@ Exemplos:
 • 'Quero tomar café da manhã em uma fazenda com vista para montanhas'
 • 'Procuro um restaurante de comida italiana autêntica no interior'
 • 'Busco uma cachoeira com trilha fácil onde posso fazer piquenique'
-• 'Quero conhecer uma vinícola com degustação e vista panorâmica'"></textarea>
+• 'Quero conhecer uma vinícola com degustação e vista panorâmica'"
+                                                        required></textarea>
                                             </div>
-                                            
+
+                                            <!-- Grid de Campos Adicionais -->
+                                            <div class="grid md:grid-cols-2 gap-4">
+                                                <!-- Data do Rolê -->
+                                                <div>
+                                                    <label for="data-role" class="block text-sm font-medium text-gray-300 mb-2">📅 Data do Rolê</label>
+                                                    <input id="data-role" 
+                                                           type="date" 
+                                                           class="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-600 text-gray-100 focus:border-amber-500 outline-none transition-colors">
+                                                </div>
+
+                                                <!-- Orçamento -->
+                                                <div>
+                                                    <label for="orcamento-role" class="block text-sm font-medium text-gray-300 mb-2">💰 Orçamento (R$)</label>
+                                                    <input id="orcamento-role" 
+                                                           type="number" 
+                                                           class="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-600 text-gray-100 focus:border-amber-500 outline-none transition-colors" 
+                                                           placeholder="Ex: 200"
+                                                           min="50">
+                                                </div>
+
+                                                <!-- Horário de Saída -->
+                                                <div>
+                                                    <label for="horario-saida" class="block text-sm font-medium text-gray-300 mb-2">⏰ Horário de Saída</label>
+                                                    <input id="horario-saida" 
+                                                           type="time" 
+                                                           class="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-600 text-gray-100 focus:border-amber-500 outline-none transition-colors" 
+                                                           value="08:00">
+                                                </div>
+
+                                                <!-- Horário de Volta -->
+                                                <div>
+                                                    <label for="horario-volta" class="block text-sm font-medium text-gray-300 mb-2">🔚 Horário de Volta</label>
+                                                    <input id="horario-volta" 
+                                                           type="time" 
+                                                           class="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-600 text-gray-100 focus:border-amber-500 outline-none transition-colors" 
+                                                           value="19:00">
+                                                </div>
+
+                                                <!-- Tipo de Moto -->
+                                                <div>
+                                                    <label for="tipo-moto" class="block text-sm font-medium text-gray-300 mb-2">🏍️ Tipo da sua Moto *</label>
+                                                    <select id="tipo-moto" 
+                                                            class="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-600 text-gray-100 focus:border-amber-500 outline-none transition-colors"
+                                                            required>
+                                                        <option value="125cc">125-150cc (Econômica - 35km/l)</option>
+                                                        <option value="250cc">250-400cc (Média - 25km/l)</option>
+                                                        <option value="600cc" selected>600-800cc (Esportiva - 18km/l)</option>
+                                                        <option value="1000cc">1000cc+ (Big Trail - 15km/l)</option>
+                                                    </select>
+                                                </div>
+
+                                                <!-- Perfil de Pilotagem -->
+                                                <div>
+                                                    <label for="perfil-pilotagem" class="block text-sm font-medium text-gray-300 mb-2">🎯 Perfil de Pilotagem</label>
+                                                    <select id="perfil-pilotagem" 
+                                                            class="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-600 text-gray-100 focus:border-amber-500 outline-none transition-colors">
+                                                        <option value="conservador">Conservador (Estradas tranquilas)</option>
+                                                        <option value="moderado" selected>Moderado (Equilibrado)</option>
+                                                        <option value="esportivo">Esportivo (Curvas e aventura)</option>
+                                                    </select>
+                                                </div>
+                                            </div>
 
                                         </div>
 
-                                        <div class="mt-4 flex justify-center">
-                                            <button id="sugerir-destinos-btn" class="px-8 py-4 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-gray-900 font-bold rounded-lg transition-colors duration-200 text-lg">
-                                                🌟 Gerar Rolê Perfeito
+                                        <div class="mt-6 flex justify-center">
+                                            <button id="gerar-role-btn" class="px-8 py-4 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-gray-900 font-bold rounded-lg transition-colors duration-200 text-lg shadow-lg transform hover:scale-105">
+                                                🚀 Gerar Rolê Personalizado
                                             </button>
                                         </div>
                                     </div>
 
-                                    <!-- ETAPA 2: Sugestões e Viabilidade -->
-                                    <div id="sugestoes-container" class="hidden bg-gray-900 rounded-lg p-4">
-                                        <h4 class="text-lg font-bold text-amber-400 mb-4">🎯 Sugestões de Rolês</h4>
-                                        <div id="loading-indicator" class="hidden flex items-center justify-center gap-2 text-blue-400 py-8">
-                                            <div class="animate-spin w-8 h-8 border-2 border-blue-400 border-t-transparent rounded-full"></div>
-                                            <span class="text-lg">Consultando IA para encontrar experiências perfeitas...</span>
+                                    <!-- ETAPA 2: Resultados do Gerador -->
+                                    <div id="resultados-container" class="hidden mt-8">
+                                        <div id="loading-role" class="hidden bg-gradient-to-r from-blue-900/20 to-purple-900/20 rounded-lg p-8 text-center border border-blue-700/30">
+                                            <div class="flex items-center justify-center gap-3 text-blue-400 mb-4">
+                                                <div class="animate-spin w-8 h-8 border-2 border-blue-400 border-t-transparent rounded-full"></div>
+                                                <span class="text-xl font-bold">Consultando IA Gemini...</span>
+                                            </div>
+                                            <p class="text-blue-300">Analisando suas preferências e encontrando os rolês perfeitos!</p>
                                         </div>
-                                        <div id="experiencias-list" class="space-y-4"></div>
+                                        
+                                        <div id="sugestoes-role" class="space-y-6">
+                                            <!-- Sugestões serão inseridas aqui dinamicamente -->
+                                        </div>
                                     </div>
                                 </div>
 

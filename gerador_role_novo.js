@@ -289,45 +289,186 @@ function escolherRole(index) {
     // Salvar escolha
     window.roleEscolhido = sugestao;
     
-    // Feedback visual
-    alert(`Rolê escolhido: ${sugestao.nome}\n\nRoteiro salvo! Você pode compartilhar com o grupo.`);
-    
-    // Scroll para o topo
-    document.querySelector('#ferramentas').scrollIntoView({ behavior: 'smooth' });
+    // Mostrar modal de ações
+    mostrarModalAcoesRole(sugestao, index);
 }
 
-// Compartilhar rolê
+// Modal com ações após escolher rolê
+function mostrarModalAcoesRole(sugestao, index) {
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4';
+    modal.innerHTML = `
+        <div class="bg-gray-900 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-gray-700">
+            <!-- Header -->
+            <div class="sticky top-0 bg-gray-900 p-6 border-b border-gray-700 rounded-t-xl">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-2xl font-bold text-transparent bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text">
+                            🎉 Rolê Escolhido!
+                        </h3>
+                        <p class="text-gray-300 text-sm mt-1">${sugestao.nome}</p>
+                    </div>
+                    <button onclick="fecharModalAcoes()" class="text-gray-400 hover:text-white text-2xl">×</button>
+                </div>
+            </div>
+            
+            <!-- Conteúdo -->
+            <div class="p-6 space-y-6">
+                <!-- Resumo do Rolê -->
+                <div class="bg-gradient-to-r from-amber-900/20 to-orange-900/20 rounded-lg p-4 border border-amber-700/30">
+                    <h4 class="text-amber-400 font-bold mb-2 flex items-center gap-2">
+                        📍 DESTINO CONFIRMADO
+                    </h4>
+                    <p class="text-gray-200 text-sm mb-2">${sugestao.endereco}</p>
+                    <div class="flex items-center gap-4 text-sm text-gray-300">
+                        <span>📏 ${sugestao.distanciaKm}km</span>
+                        <span>⏱️ ${sugestao.tempoViagem}</span>
+                        <span>💰 R$ ${sugestao.custos.total}</span>
+                    </div>
+                </div>
+                
+                <!-- Ações Principais -->
+                <div class="grid md:grid-cols-2 gap-4">
+                    <!-- Compartilhar -->
+                    <button onclick="compartilharRoleEscolhido(${index})" 
+                            class="flex items-center gap-3 p-4 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors">
+                        <span class="text-2xl">📤</span>
+                        <div class="text-left">
+                            <div class="font-bold">Compartilhar</div>
+                            <div class="text-xs opacity-90">Enviar para o grupo</div>
+                        </div>
+                    </button>
+                    
+                    <!-- Gerar Checklist -->
+                    <button onclick="gerarChecklistRole()" 
+                            class="flex items-center gap-3 p-4 bg-green-600 hover:bg-green-500 text-white rounded-lg transition-colors">
+                        <span class="text-2xl">📋</span>
+                        <div class="text-left">
+                            <div class="font-bold">Checklist</div>
+                            <div class="text-xs opacity-90">O que levar/verificar</div>
+                        </div>
+                    </button>
+                    
+                    <!-- Salvar no Calendário -->
+                    <button onclick="salvarNoCalendario()" 
+                            class="flex items-center gap-3 p-4 bg-purple-600 hover:bg-purple-500 text-white rounded-lg transition-colors">
+                        <span class="text-2xl">📅</span>
+                        <div class="text-left">
+                            <div class="font-bold">Calendário</div>
+                            <div class="text-xs opacity-90">Adicionar evento</div>
+                        </div>
+                    </button>
+                    
+                    <!-- Abrir no Maps -->
+                    <button onclick="abrirNoMaps('${sugestao.endereco.replace(/'/g, "\\'")}')" 
+                            class="flex items-center gap-3 p-4 bg-red-600 hover:bg-red-500 text-white rounded-lg transition-colors">
+                        <span class="text-2xl">🗺️</span>
+                        <div class="text-left">
+                            <div class="font-bold">Ver Rota</div>
+                            <div class="text-xs opacity-90">Abrir no Google Maps</div>
+                        </div>
+                    </button>
+                </div>
+                
+                <!-- Ações Secundárias -->
+                <div class="pt-4 border-t border-gray-700">
+                    <h4 class="text-gray-300 font-bold mb-3 text-sm">PRÓXIMOS PASSOS:</h4>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex items-center gap-3 text-gray-300">
+                            <span class="text-green-400">✓</span>
+                            <span>Rolê salvo e pronto para execução</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-gray-300">
+                            <span class="text-yellow-400">⏳</span>
+                            <span>Verifique previsão do tempo no dia</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-gray-300">
+                            <span class="text-blue-400">ℹ️</span>
+                            <span>Confirme funcionamento do local</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Botão de Fechar -->
+                <div class="pt-4">
+                    <button onclick="fecharModalAcoes()" 
+                            class="w-full px-4 py-3 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg transition-colors">
+                        Fechar
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Fechar com ESC
+    const handleEsc = (e) => {
+        if (e.key === 'Escape') {
+            fecharModalAcoes();
+            document.removeEventListener('keydown', handleEsc);
+        }
+    };
+    document.addEventListener('keydown', handleEsc);
+}
+
+// Fechar modal de ações
+function fecharModalAcoes() {
+    const modal = document.querySelector('.fixed.inset-0.bg-black\\/70');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+// Compartilhar rolê escolhido (do modal)
+async function compartilharRoleEscolhido(index) {
+    await compartilharRole(index);
+    fecharModalAcoes();
+}
+
+// Compartilhar rolê (função original melhorada)
 async function compartilharRole(index) {
     const sugestao = window.sugestoesRole?.[index];
     if (!sugestao) return;
+    
+    // Obter dados do formulário para incluir no compartilhamento
+    const dataRole = document.getElementById('data-role')?.value || 'A definir';
+    const horarioSaida = document.getElementById('horario-saida')?.value || '08:00';
+    const enderecoPartida = document.getElementById('endereco-partida')?.value || 'A definir';
     
     const textoCompartilhamento = `🏍️ ROLÊ SONS OF PEAKY 🏍️
 
 📍 DESTINO: ${sugestao.nome}
 🎯 EXPERIÊNCIA: ${sugestao.experiencia}
 
+📅 QUANDO: ${dataRole === 'A definir' ? 'Data a definir' : new Date(dataRole + 'T00:00').toLocaleDateString('pt-BR')}
+⏰ SAÍDA: ${horarioSaida} - ${enderecoPartida}
+
 📋 DETALHES:
 • 📏 Distância: ${sugestao.distanciaKm}km
 • ⏱️ Tempo: ${sugestao.tempoViagem}
-• 💰 Custo total: R$ ${sugestao.custos.total}
+• 💰 Custo estimado: R$ ${sugestao.custos.total}
 
-🗺️ ENDEREÇO:
+🗺️ ENDEREÇO COMPLETO:
 ${sugestao.endereco}
 
-🛣️ ROTEIRO:
+🛣️ ROTEIRO SUGERIDO:
 ${sugestao.roteiro}
 
-💡 DICAS:
+💡 DICAS IMPORTANTES:
 ${sugestao.dicasEspeciais}
 
-#SonsOfPeaky #Motociclismo #Brotherhood`;
+🏍️ CONFIRMEM PRESENÇA! Brotherhood em ação! 
+
+#SonsOfPeaky #Motociclismo #Brotherhood #Role`;
     
     // Tentar Web Share API
     if (navigator.share) {
         try {
             await navigator.share({
                 title: `Rolê SOP: ${sugestao.nome}`,
-                text: textoCompartilhamento
+                text: textoCompartilhamento,
+                url: window.location.href
             });
             return;
         } catch (error) {
@@ -338,10 +479,148 @@ ${sugestao.dicasEspeciais}
     // Fallback: copiar para clipboard
     try {
         await navigator.clipboard.writeText(textoCompartilhamento);
-        alert('Rolê copiado para área de transferência! 📋');
+        
+        // Feedback visual melhorado
+        const toast = document.createElement('div');
+        toast.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+        toast.textContent = '📋 Rolê copiado! Cole no WhatsApp do grupo';
+        document.body.appendChild(toast);
+        
+        setTimeout(() => toast.remove(), 3000);
+        
     } catch (error) {
         alert('Não foi possível compartilhar automaticamente. Copie manualmente o texto abaixo:\n\n' + textoCompartilhamento);
     }
+}
+
+// Gerar checklist para o rolê
+function gerarChecklistRole() {
+    const sugestao = window.roleEscolhido;
+    if (!sugestao) return;
+    
+    const tipoMoto = document.getElementById('tipo-moto')?.value || '600cc';
+    const distancia = sugestao.distanciaKm;
+    
+    const checklist = `📋 CHECKLIST ROLÊ: ${sugestao.nome}
+
+🏍️ VERIFICAÇÕES NA MOTO:
+${distancia > 200 ? '✓ Revisão completa (óleo, freios, pneus)' : '✓ Verificação básica (óleo, freios)'}
+✓ Calibragem dos pneus
+✓ Combustível completo
+✓ Kit de primeiros socorros
+${tipoMoto === '1000cc' ? '✓ Verificar bagageiros/alforjes' : '✓ Espaço para bagagem'}
+
+🎒 ITENS PESSOAIS:
+✓ Documentos (CNH, documento da moto)
+✓ Capacete e equipamentos de segurança
+✓ Protetor solar e óculos
+✓ Carregador portátil para celular
+✓ Dinheiro em espécie (pedágios/emergências)
+
+🍽️ ALIMENTAÇÃO:
+✓ Água (pelo menos 1L)
+${sugestao.custos.local > 50 ? '✓ Reserva no restaurante (se necessário)' : '✓ Lanche para o caminho'}
+✓ Balas/energético para a viagem
+
+🌤️ CLIMA & SITUAÇÃO:
+✓ Conferir previsão do tempo
+✓ Confirmar funcionamento do destino
+✓ Avisar família sobre o rolê
+✓ Definir ponto de encontro com o grupo
+
+⚠️ EMERGÊNCIAS:
+✓ Contato de mecânico da região
+✓ Número de emergência dos membros
+✓ Seguro da moto em dia
+
+Bom rolê, irmão! 🏍️🔥`;
+
+    // Mostrar checklist
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4';
+    modal.innerHTML = `
+        <div class="bg-gray-900 rounded-xl max-w-lg w-full max-h-[90vh] overflow-y-auto border border-gray-700">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold text-green-400">📋 Checklist do Rolê</h3>
+                    <button onclick="this.closest('.fixed').remove()" class="text-gray-400 hover:text-white text-2xl">×</button>
+                </div>
+                <pre class="text-gray-300 text-sm whitespace-pre-wrap bg-gray-800 p-4 rounded-lg">${checklist}</pre>
+                <div class="flex gap-3 mt-4">
+                    <button onclick="copiarChecklist(\`${checklist.replace(/`/g, '\\`')}\`)" 
+                            class="flex-1 px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg transition-colors">
+                        📋 Copiar Checklist
+                    </button>
+                    <button onclick="this.closest('.fixed').remove()" 
+                            class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg transition-colors">
+                        Fechar
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+}
+
+// Copiar checklist
+async function copiarChecklist(texto) {
+    try {
+        await navigator.clipboard.writeText(texto);
+        
+        const toast = document.createElement('div');
+        toast.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+        toast.textContent = '✓ Checklist copiado!';
+        document.body.appendChild(toast);
+        
+        setTimeout(() => toast.remove(), 2000);
+    } catch (error) {
+        alert('Checklist:\n\n' + texto);
+    }
+}
+
+// Salvar no calendário
+function salvarNoCalendario() {
+    const sugestao = window.roleEscolhido;
+    if (!sugestao) return;
+    
+    const dataRole = document.getElementById('data-role')?.value;
+    const horarioSaida = document.getElementById('horario-saida')?.value || '08:00';
+    const horarioVolta = document.getElementById('horario-volta')?.value || '19:00';
+    
+    if (!dataRole) {
+        alert('⚠️ Defina uma data no formulário antes de salvar no calendário!');
+        return;
+    }
+    
+    // Criar evento do calendário
+    const evento = {
+        title: `🏍️ Rolê SOP: ${sugestao.nome}`,
+        start: `${dataRole}T${horarioSaida}:00`,
+        end: `${dataRole}T${horarioVolta}:00`,
+        description: `${sugestao.experiencia}\n\nEndereço: ${sugestao.endereco}\nDistância: ${sugestao.distanciaKm}km\nCusto: R$ ${sugestao.custos.total}\n\nDicas: ${sugestao.dicasEspeciais}`,
+        location: sugestao.endereco
+    };
+    
+    // Gerar URL do Google Calendar
+    const startDate = new Date(`${dataRole}T${horarioSaida}:00`).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+    const endDate = new Date(`${dataRole}T${horarioVolta}:00`).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+    
+    const calendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(evento.title)}&dates=${startDate}/${endDate}&details=${encodeURIComponent(evento.description)}&location=${encodeURIComponent(evento.location)}`;
+    
+    window.open(calendarUrl, '_blank');
+    
+    fecharModalAcoes();
+}
+
+// Abrir no Google Maps
+function abrirNoMaps(endereco) {
+    const enderecoPartida = document.getElementById('endereco-partida')?.value || 'Penha, São Paulo, SP';
+    const mapsUrl = `https://www.google.com/maps/dir/${encodeURIComponent(enderecoPartida)}/${encodeURIComponent(endereco)}`;
+    
+    window.open(mapsUrl, '_blank');
+    
+    fecharModalAcoes();
 }
 
 // Funções auxiliares
