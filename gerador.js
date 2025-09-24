@@ -349,7 +349,53 @@ async function generateRole(formData) {
         const aiResponse = data.candidates[0].content.parts[0].text;
         console.log('🤖 Resposta da IA:', aiResponse.substring(0, 300) + '...');
         
-        const results = parseAIResponse(aiResponse, formData);
+        // Verificar se resposta foi truncada por MAX_TOKENS
+        const finishReason = data.candidates[0].finishReason;
+        let finalResponse = aiResponse;
+        
+        if (finishReason === 'MAX_TOKENS') {
+            console.warn('⚠️ Resposta truncada por MAX_TOKENS - tentando com prompt reduzido');
+            
+            try {
+                // Retry com prompt ultra-simplificado
+                const simplePrompt = `Crie 3 roteiros de moto brasileiros em JSON:
+{"sugestoes": [
+  {"tipo": "ECONÔMICA", "titulo": "Roteiro Econômico", "resumo": "Baixo custo", "distancia_total": "100km", "tempo_total": "4h", "custo_total_estimado": "R$150", "destinos": [{"nome": "Local1", "endereco": "End1", "descricao": "Desc1"}]},
+  {"tipo": "EQUILIBRADA", "titulo": "Roteiro Equilibrado", "resumo": "Balanceado", "distancia_total": "150km", "tempo_total": "6h", "custo_total_estimado": "R$300", "destinos": [{"nome": "Local2", "endereco": "End2", "descricao": "Desc2"}]},
+  {"tipo": "PREMIUM", "titulo": "Roteiro Premium", "resumo": "Completo", "distancia_total": "200km", "tempo_total": "8h", "custo_total_estimado": "R$500", "destinos": [{"nome": "Local3", "endereco": "End3", "descricao": "Desc3"}]}
+]}`;
+                
+                const retryRequestBody = {
+                    contents: [{
+                        parts: [{
+                            text: simplePrompt
+                        }]
+                    }]
+                };
+                
+                const retryResponse = await fetch(apiConfig.apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(retryRequestBody)
+                });
+                
+                if (retryResponse.ok) {
+                    const retryData = await retryResponse.json();
+                    const retryText = retryData.candidates?.[0]?.content?.parts?.[0]?.text;
+                    
+                    if (retryText && retryData.candidates?.[0]?.finishReason !== 'MAX_TOKENS') {
+                        console.log('✅ Retry bem-sucedido - resposta completa obtida');
+                        finalResponse = retryText;
+                    }
+                }
+            } catch (retryError) {
+                console.warn('⚠️ Retry falhou, usando resposta original truncada:', retryError);
+            }
+        }
+        
+        const results = parseAIResponse(finalResponse, formData);
         
         // Salva no cache
         cache.set(cacheKey, {
@@ -446,133 +492,58 @@ function buildPrompt(formData) {
     const orcamentoInfo = orcamento ? `R$ ${orcamento}` : 'Não especificado (sem limite definido)';
     
     return `
-Você é um especialista em turismo rodoviário e motociclismo no Brasil. Crie um roteiro detalhado para um rolê de moto baseado nestas informações:
+Especialista em turismo rodoviário brasileiro. Crie 3 roteiros de moto baseado em:
 
-DADOS OBRIGATÓRIOS DO ROLÊ:
-- Ponto de partida: ${enderecoPartida}
-- Data: ${dataRole}
-- Horário de saída: ${horarioSaida}
-- Horário de volta: ${horarioVolta}
-- Tipo de moto: ${tipoMoto} (consumo: ${consumoMoto}km/l)
-- Perfil de pilotagem: ${perfilPilotagem} (velocidade média: ${velocidadeMedia}km/h)
-
-PREFERÊNCIAS OPCIONAIS (use como balizadores):
-- Quilometragem desejada: ${quilometragemInfo}
+DADOS:
+- Saída: ${enderecoPartida}
+- Data: ${dataRole} 
+- Horário: ${horarioSaida} às ${horarioVolta}
+- Moto: ${tipoMoto} (${consumoMoto}km/l)
+- Pilotagem: ${perfilPilotagem} (${velocidadeMedia}km/h)
+- Quilometragem: ${quilometragemInfo}
 - Orçamento: ${orcamentoInfo}
-- Nível de aventura: ${nivelAventura}
+- Aventura: ${nivelAventura}
 - Companhia: ${companhia}
-- Interesses específicos: ${preferencias.join(', ') || 'Nenhum específico'}
+- Interesses: ${preferencias.join(', ') || 'Variados'}
+- Experiência: ${experienciaDesejada}
 
-EXPERIÊNCIA DESEJADA:
-${experienciaDesejada}
+CRIAR 3 ROTEIROS:
+1. ECONÔMICA: Baixo custo, locais gratuitos
+2. EQUILIBRADA: Custo-benefício balanceado
+3. PREMIUM: Experiência completa
 
-INSTRUÇÕES PARA 3 SUGESTÕES DE ROTEIRO:
-1. PRIORIDADE MÁXIMA: Respeite rigorosamente os horários de saída e volta
-2. Crie EXATAMENTE 3 sugestões diferentes baseadas na experiência desejada:
-   - SUGESTÃO 1 (ECONÔMICA): Foco em menor custo, destinos gratuitos/baratos
-   - SUGESTÃO 2 (EQUILIBRADA): Balance entre custo, aventura e conforto  
-   - SUGESTÃO 3 (PREMIUM): Experiência completa, sem limite de orçamento
+CADA ROTEIRO COM:
+- 2-3 destinos reais e específicos
+- Horários respeitando saída/volta
+- Custos realistas (combustível R$5,50/l)
+- Dicas para motociclistas
 
-3. Se quilometragem foi especificada, mantenha-se dentro da faixa para todas as 3
-4. Cada sugestão deve ter 2-3 destinos/paradas principais diferentes
-
-Para cada destino em cada sugestão, forneça:
-   - Nome completo e endereço exato
-   - Distância e tempo de viagem desde o ponto anterior
-   - Descrição detalhada do que fazer/ver
-   - Custo estimado por pessoa
-   - Dicas específicas para motociclistas (condições da estrada, melhor horário, equipamentos, segurança)
-   - Horário sugerido de chegada e permanência
-
-Calcule custos realistas para cada sugestão:
-   - Combustível (preço atual ~R$ 5,50/litro)
-   - Alimentação (café da manhã, almoço, lanche)
-   - Eventuais taxas de entrada
-   - Estacionamento para moto
-
-Considere a logística:
-   - Condições das estradas (asfalto, terra, curvas, subidas)
-   - Locais para parar e descansar
-   - Postos de combustível no trajeto
-   - Segurança para motos (guarda-volumes, vigilância)
-   - TEMPO TOTAL compatível com horários de saída e volta
-   - Condições climáticas da região
-   - Equipamentos recomendados (capacete, proteção, capa de chuva)
-   - Documentação necessária
-   - Telefone de emergência local
-
-5. Formate a resposta em JSON válido com esta estrutura:
+FORMATO JSON:
 {
   "sugestoes": [
     {
-      "id": 1,
       "tipo": "ECONÔMICA",
-      "titulo": "Nome do Roteiro Econômico",
-      "resumo": "Descrição focada em baixo custo",
+      "titulo": "Nome Roteiro",
+      "resumo": "Descrição",
       "distancia_total": "XXX km",
-      "tempo_total": "X horas", 
+      "tempo_total": "X horas",
       "custo_total_estimado": "R$ XXX",
-      "nivel_dificuldade": "Fácil/Moderado/Difícil",
+      "nivel_dificuldade": "Fácil",
       "destinos": [
         {
-          "nome": "Nome do Local",
-          "endereco": "Endereço completo",
-          "distancia_anterior": "XX km",
-          "tempo_viagem": "XX min",
-          "horario_chegada": "HH:MM",
-          "tempo_permanencia": "XX min",
-          "descricao": "O que fazer/ver",
-          "custo_estimado": "R$ XX",
-          "dicas_motociclista": [
-            "Condições da estrada (ex: 'Asfalto em bom estado, mas cuidado com curvas acentuadas')",
-            "Segurança local (ex: 'Local com boa vigilância, estacionamento gratuito para motos')",
-            "Equipamentos (ex: 'Recomendado capacete extra para trilha, protetor de joelho')",
-            "Melhor horário (ex: 'Evite entre 12h-14h devido ao sol forte na subida')",
-            "Emergência (ex: 'Posto de saúde a 5km, sinal de celular instável na serra')"
-          ],
-          "coordenadas": "lat,lng (se souber)"
+          "nome": "Local",
+          "endereco": "Endereço",
+          "distancia": "XX km",
+          "tempo_parada": "XX min",
+          "descricao": "Atividade",
+          "custo_estimado": "R$ XX"
         }
-      ],
-      "custos_detalhados": {
-        "combustivel": "R$ XX",
-        "alimentacao": "R$ XX", 
-        "entradas": "R$ XX",
-        "outros": "R$ XX",
-        "total": "R$ XXX"
-      },
-      "observacoes": ["observação1", "observação2"]
-    },
-    {
-      "id": 2,
-      "tipo": "EQUILIBRADA",
-      "titulo": "Nome do Roteiro Equilibrado",
-      "resumo": "Descrição balanceada",
-      "distancia_total": "XXX km",
-      "tempo_total": "X horas",
-      "custo_total_estimado": "R$ XXX",
-      "nivel_dificuldade": "Fácil/Moderado/Difícil",
-      "destinos": [...],
-      "custos_detalhados": {...},
-      "observacoes": [...]
-    },
-    {
-      "id": 3,
-      "tipo": "PREMIUM", 
-      "titulo": "Nome do Roteiro Premium",
-      "resumo": "Descrição experiência completa",
-      "distancia_total": "XXX km",
-      "tempo_total": "X horas",
-      "custo_total_estimado": "R$ XXX",
-      "nivel_dificuldade": "Fácil/Moderado/Difícil", 
-      "destinos": [...],
-      "custos_detalhados": {...},
-      "observacoes": [...]
+      ]
     }
   ]
 }
 
-IMPORTANTE: Retorne APENAS o JSON válido, sem texto adicional antes ou depois. Use destinos reais e existentes no Brasil.
-`;
+IMPORTANTE: Responda APENAS com JSON válido. Use locais reais do Brasil.`;
 }
 
 /**
@@ -717,48 +688,36 @@ function generateFallbackDestinos(formData, tipo) {
 }
 
 /**
- * Parsing manual da resposta como fallback
+ * Parsing manual da resposta como fallback - SEMPRE 3 SUGESTÕES
  */
 function parseResponseManually(response, formData) {
-    // Implementação simplificada para casos de erro
-    return [{
-        titulo: "Roteiro Personalizado",
-        resumo: "Roteiro criado baseado em suas preferências",
-        distancia_total: "150 km",
-        tempo_total: "8 horas",
-        custo_total_estimado: `R$ ${formData.orcamento}`,
-        nivel_dificuldade: formData.nivelAventura === 'tranquilo' ? 'Fácil' : 
-                          formData.nivelAventura === 'moderado' ? 'Moderado' : 'Difícil',
-        destinos: [
-            {
-                nome: "Destino Sugerido",
-                endereco: "Consulte GPS para melhor rota",
-                distancia_anterior: "75 km",
-                tempo_viagem: "90 min",
-                horario_chegada: "10:30",
-                tempo_permanencia: "180 min",
-                descricao: formData.experienciaDesejada || "Experiência única aguarda você",
-                custo_estimado: `R$ ${Math.floor(formData.orcamento * 0.7)}`,
-                dicas_motociclista: [
-                    "Verifique as condições da estrada",
-                    "Leve equipamentos de segurança",
-                    "Confirme horários de funcionamento"
-                ]
-            }
+    console.log('🔄 Gerando 3 sugestões de fallback');
+    
+    const tipos = ['ECONÔMICA', 'EQUILIBRADA', 'PREMIUM'];
+    const nomes = ['Roteiro Econômico', 'Roteiro Equilibrado', 'Roteiro Premium'];
+    const resumos = [
+        'Roteiro focado em baixo custo com destinos gratuitos',
+        'Roteiro com balance entre custo e experiência', 
+        'Roteiro completo com experiências premium'
+    ];
+    
+    return tipos.map((tipo, index) => ({
+        tipo: tipo,
+        titulo: nomes[index],
+        resumo: resumos[index],
+        distancia_total: `${120 + (index * 40)} km`,
+        tempo_total: `${6 + index} horas`,
+        custo_total_estimado: calculateFallbackCost(formData, tipo),
+        nivel_dificuldade: ['Fácil', 'Moderado', 'Moderado'][index],
+        destinos: generateFallbackDestinos(formData, tipo),
+        dicas_importantes: [
+            'Verificar combustível antes da saída',
+            'Levar equipamentos de segurança',
+            'Conferir previsão do tempo'
         ],
-        custos_detalhados: {
-            combustivel: `R$ ${Math.floor(formData.orcamento * 0.3)}`,
-            alimentacao: `R$ ${Math.floor(formData.orcamento * 0.4)}`,
-            entradas: `R$ ${Math.floor(formData.orcamento * 0.2)}`,
-            outros: `R$ ${Math.floor(formData.orcamento * 0.1)}`,
-            total: `R$ ${formData.orcamento}`
-        },
-        observacoes: [
-            "Roteiro gerado automaticamente",
-            "Confirme informações antes da viagem",
-            "Respeite limites de velocidade"
-        ]
-    }];
+        horario_sugerido_saida: formData.horarioSaida || '08:00',
+        horario_estimado_volta: formData.horarioVolta || '18:00'
+    }));
 }
 
 /**
