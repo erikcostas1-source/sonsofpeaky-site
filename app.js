@@ -417,7 +417,7 @@ Que as estradas nos levem e nos tragam em segurança!
         });
     });
 
-    const AC_UNLOCK_KEY = 'sop_ac_unlocked';
+    // Proteção da seção Alta Cúpula - SEM persistência
     function showAcUnlocked() {
         const locked = document.getElementById('ac-locked');
         const content = document.getElementById('ac-content');
@@ -426,20 +426,46 @@ Que as estradas nos levem e nos tragam em segurança!
             content.classList.remove('hidden');
         }
     }
-    // Persist unlock state per browser
-    if (localStorage.getItem(AC_UNLOCK_KEY) === '1') showAcUnlocked();
+    
+    function hideAcContent() {
+        const locked = document.getElementById('ac-locked');
+        const content = document.getElementById('ac-content');
+        if (locked && content) {
+            locked.classList.remove('hidden');
+            content.classList.add('hidden');
+        }
+    }
+    
+    // Sempre inicia bloqueado
+    hideAcContent();
+    
     const acUnlockBtn = document.getElementById('ac-unlock-btn');
     if (acUnlockBtn) acUnlockBtn.addEventListener('click', () => {
         const pwd = (document.getElementById('ac-password')?.value || '').trim();
         const status = document.getElementById('ac-status');
-        if (pwd.toLowerCase() === 'cangaiba') {
-            localStorage.setItem(AC_UNLOCK_KEY, '1');
+        if (pwd.toLowerCase() === 'sonsofpeaky2021') {
             if (status) status.classList.add('hidden');
             showAcUnlocked();
+            // Limpar campo de senha
+            const passwordField = document.getElementById('ac-password');
+            if (passwordField) passwordField.value = '';
         } else {
-            if (status) status.classList.remove('hidden');
+            if (status) {
+                status.textContent = 'Senha incorreta. Acesso negado.';
+                status.classList.remove('hidden');
+            }
         }
     });
+    
+    // Enter key support
+    const passwordField = document.getElementById('ac-password');
+    if (passwordField) {
+        passwordField.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                acUnlockBtn?.click();
+            }
+        });
+    }
 
     // Adiciona evento recorrente: toda quinta às 19:30
     (function ensureWeeklyMeeting() {
@@ -895,3 +921,21 @@ Crie algo original e impactante para motivar os irmãos do grupo.`;
     }
 
 });
+
+// ===== FUNÇÃO PARA SEÇÕES COLAPSÁVEIS =====
+function toggleSection(contentId, iconId) {
+    const content = document.getElementById(contentId);
+    const icon = document.getElementById(iconId);
+    
+    if (!content || !icon) return;
+    
+    if (content.style.maxHeight && content.style.maxHeight !== '0px') {
+        // Fechar seção
+        content.style.maxHeight = '0px';
+        icon.style.transform = 'rotate(0deg)';
+    } else {
+        // Abrir seção
+        content.style.maxHeight = content.scrollHeight + 'px';
+        icon.style.transform = 'rotate(180deg)';
+    }
+}

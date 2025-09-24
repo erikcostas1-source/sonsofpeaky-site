@@ -7,12 +7,12 @@
     <meta name="theme-color" content="#0d0d0d" />
     <meta name="author" content="Sons of Peaky" />
     <title>Sons of Peaky - Irmandade de Motociclistas</title>
-    <link rel="icon" href="assets/img/SOP_LOGO_PRINCIPAL.svg" />
+    <link rel="icon" href="assets/img/SONSOFPEAKY_TRANSPARENTE_BRANCO.png" />
     
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="Sons of Peaky - Irmandade de Motociclistas" />
     <meta property="og:description" content="Conheça a irmandade Sons of Peaky. Missão, valores, estatutos e comunidade de motociclistas unidos pela paixão das estradas." />
-    <meta property="og:image" content="assets/img/SOP_LOGO_PRINCIPAL.svg" />
+    <meta property="og:image" content="assets/img/SONSOFPEAKY_TRANSPARENTE_BRANCO.png" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://erikcostas1-source.github.io/sonsofpeaky-site/" />
     
@@ -20,7 +20,7 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Sons of Peaky - Irmandade de Motociclistas" />
     <meta name="twitter:description" content="Conheça a irmandade Sons of Peaky. Missão, valores, estatutos e comunidade de motociclistas unidos pela paixão das estradas." />
-    <meta name="twitter:image" content="assets/img/SOP_LOGO_PRINCIPAL.svg" />
+    <meta name="twitter:image" content="assets/img/SONSOFPEAKY_TRANSPARENTE_BRANCO.png" />
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -57,7 +57,7 @@
             <!-- Logo e título - responsivos -->
             <div class="flex flex-col md:flex-row items-center justify-between py-4">
                 <div class="flex flex-col items-center md:items-start">
-                    <img src="assets/img/SOP_LOGO_HEADER.svg" alt="Logotipo Sons of Peaky" class="logo-header mb-2" />
+                    <img src="assets/img/SONSOFPEAKY_TRANSPARENTE_BRANCO.png" alt="Logotipo Sons of Peaky" class="h-12 md:h-16 w-auto mb-2 filter drop-shadow-lg" />
                     <h1 class="text-2xl md:text-4xl font-bold drop-shadow-lg" style="font-family:'Pirata One','Carnevalee Freakshow',serif;color:#fb923c;">Sons of Peaky</h1>
                     <p class="text-sm md:text-lg text-gray-300 hidden md:block">Rua José Flavio, 420, Travessa 1A</p>
                 </div>
@@ -113,8 +113,18 @@
     <main id="main-content" role="main" aria-label="Conteúdo principal do site">
         <!-- História -->
         <section id="historia" class="py-12 md:py-16 lg:py-20 bg-gradient-to-b from-black via-gray-900 to-black">
-            <div class="container mx-auto px-4 space-y-10">
-                <h2 class="section-title text-3xl md:text-4xl lg:text-5xl">Como Tudo Começou</h2>
+            <div class="container mx-auto px-4 space-y-6">
+                <div class="section-toggle bg-gray-800 border border-gray-700 rounded-xl p-6 cursor-pointer hover:border-amber-500 transition-all duration-300 shadow-lg" onclick="toggleSection('historia-content', 'historia-icon')">
+                    <div class="flex items-center justify-between">
+                        <h2 class="section-title text-3xl md:text-4xl lg:text-5xl">Como Tudo Começou</h2>
+                        <i id="historia-icon" class="fas fa-chevron-down text-amber-500 text-2xl transition-transform duration-300"></i>
+                    </div>
+                    <p class="text-gray-300 mt-3 text-lg">A origem da Irmandade SOP - de uma ideia simples ao movimento que é hoje</p>
+                </div>
+                
+                <div id="historia-content" class="section-content"
+                     style="max-height: 0; overflow: hidden; transition: max-height 0.5s ease-in-out;">
+                    <div class="space-y-10 pt-6">
                 
                 <div class="max-w-4xl mx-auto space-y-8">
                     <!-- Introdução -->
@@ -277,14 +287,25 @@
                             </p>
                         </div>
                     </div>
+                    </div>
                 </div>
             </div>
         </section>
 
         <!-- Irmandade -->
         <section id="irmandade" class="py-12 md:py-16 lg:py-20">
-            <div class="container mx-auto px-4 space-y-8">
-                <h2 class="section-title text-3xl md:text-4xl lg:text-5xl">O Caminho para a Irmandade</h2>
+            <div class="container mx-auto px-4 space-y-6">
+                <div class="section-toggle bg-gray-800 border border-gray-700 rounded-xl p-6 cursor-pointer hover:border-amber-500 transition-all duration-300 shadow-lg" onclick="toggleSection('irmandade-content', 'irmandade-icon')">
+                    <div class="flex items-center justify-between">
+                        <h2 class="section-title text-3xl md:text-4xl lg:text-5xl">O Caminho para a Irmandade</h2>
+                        <i id="irmandade-icon" class="fas fa-chevron-down text-amber-500 text-2xl transition-transform duration-300"></i>
+                    </div>
+                    <p class="text-gray-300 mt-3 text-lg">Como se tornar parte da família SOP - requisitos e processo</p>
+                </div>
+                
+                <div id="irmandade-content" class="section-content"
+                     style="max-height: 0; overflow: hidden; transition: max-height 0.5s ease-in-out;">
+                    <div class="space-y-8 pt-6">
                 <div class="grid lg:grid-cols-2 gap-8 lg:gap-12">
                     <div class="space-y-6">
                         <div class="prose prose-invert max-w-none">
@@ -370,14 +391,25 @@
                             </div>
                         </div>
                     </div>
+                    </div>
                 </div>
             </div>
         </section>
 
         <!-- Missão & Visão -->
         <section id="missao" class="py-12 md:py-16 lg:py-20 bg-gradient-to-b from-gray-900 to-black">
-            <div class="container mx-auto px-4 space-y-10">
-                <h2 class="section-title text-3xl md:text-4xl lg:text-5xl">Missão, Visão, Valores e Cultura</h2>
+            <div class="container mx-auto px-4 space-y-6">
+                <div class="section-toggle bg-gray-800 border border-gray-700 rounded-xl p-6 cursor-pointer hover:border-amber-500 transition-all duration-300 shadow-lg" onclick="toggleSection('missao-content', 'missao-icon')">
+                    <div class="flex items-center justify-between">
+                        <h2 class="section-title text-3xl md:text-4xl lg:text-5xl">Missão, Visão, Valores e Cultura</h2>
+                        <i id="missao-icon" class="fas fa-chevron-down text-amber-500 text-2xl transition-transform duration-300"></i>
+                    </div>
+                    <p class="text-gray-300 mt-3 text-lg">Os pilares fundamentais que guiam a Irmandade SOP</p>
+                </div>
+                
+                <div id="missao-content" class="section-content"
+                     style="max-height: 0; overflow: hidden; transition: max-height 0.5s ease-in-out;">
+                    <div class="space-y-10 pt-6">
                 <div class="grid md:grid-cols-2 lg:grid-cols-2 gap-6 lg:gap-8">
                     <!-- Missão -->
                     <div class="card group hover:border-amber-500 transition-all duration-300">
@@ -466,7 +498,17 @@
         <!-- Estatutos -->
             <section id="estatutos" class="py-16 md:py-24">
                 <div class="container space-y-6">
-                    <h2 class="section-title">Estatutos</h2>
+                    <div class="section-toggle bg-gray-800 border border-gray-700 rounded-xl p-6 cursor-pointer hover:border-amber-500 transition-all duration-300 shadow-lg" onclick="toggleSection('estatutos-content', 'estatutos-icon')">
+                        <div class="flex items-center justify-between">
+                            <h2 class="section-title">Estatutos</h2>
+                            <i id="estatutos-icon" class="fas fa-chevron-down text-amber-500 text-2xl transition-transform duration-300"></i>
+                        </div>
+                        <p class="text-gray-300 mt-3 text-lg">Regras, direitos e deveres dos membros e frequentadores</p>
+                    </div>
+                    
+                    <div id="estatutos-content" class="section-content"
+                         style="max-height: 0; overflow: hidden; transition: max-height 0.5s ease-in-out;">
+                        <div class="space-y-6 pt-6">
 
                     <!-- Alta Cúpula (protegido) -->
                     <div class="p-4 rounded-md bg-gray-900 border border-gray-700">
@@ -559,14 +601,25 @@
                                             <p class="text-gray-300">Ao entrar no galpão, o frequentador concorda automaticamente com este estatuto. Agradecemos a colaboração e a compreensão.</p>
                                         </div>
                                     </div>
+                        </div>
                     </div>
                 </div>
             </section>
 
         <!-- Agenda -->
         <section id="agenda" class="py-12 md:py-16 lg:py-20 bg-gradient-to-b from-gray-900 to-black">
-            <div class="container mx-auto px-4 space-y-10">
-                <h2 class="section-title text-3xl md:text-4xl lg:text-5xl">Agenda de Eventos</h2>
+            <div class="container mx-auto px-4 space-y-6">
+                <div class="section-toggle bg-gray-800 border border-gray-700 rounded-xl p-6 cursor-pointer hover:border-amber-500 transition-all duration-300 shadow-lg" onclick="toggleSection('agenda-content', 'agenda-icon')">
+                    <div class="flex items-center justify-between">
+                        <h2 class="section-title text-3xl md:text-4xl lg:text-5xl">Agenda de Eventos</h2>
+                        <i id="agenda-icon" class="fas fa-chevron-down text-amber-500 text-2xl transition-transform duration-300"></i>
+                    </div>
+                    <p class="text-gray-300 mt-3 text-lg">Próximos eventos e encontros da Irmandade</p>
+                </div>
+                
+                <div id="agenda-content" class="section-content"
+                     style="max-height: 0; overflow: hidden; transition: max-height 0.5s ease-in-out;">
+                    <div class="space-y-10 pt-6">
                 
                 <!-- Próximos Eventos -->
                 <div id="agenda-container" class="space-y-6">
@@ -679,12 +732,21 @@
 
         <!-- Ferramentas -->
         <section id="ferramentas" class="py-12 md:py-16 lg:py-20 bg-gradient-to-b from-black to-gray-900">
-            <div class="container mx-auto px-4 space-y-10">
-                <h2 class="section-title text-3xl md:text-4xl lg:text-5xl">Ferramentas da Irmandade</h2>
+            <div class="container mx-auto px-4 space-y-6">
+                <div class="section-toggle bg-gray-800 border border-gray-700 rounded-xl p-6 cursor-pointer hover:border-amber-500 transition-all duration-300 shadow-lg" onclick="toggleSection('ferramentas-content', 'ferramentas-icon')">
+                    <div class="flex items-center justify-between">
+                        <h2 class="section-title text-3xl md:text-4xl lg:text-5xl">Ferramentas da Irmandade</h2>
+                        <i id="ferramentas-icon" class="fas fa-chevron-down text-amber-500 text-2xl transition-transform duration-300"></i>
+                    </div>
+                    <p class="text-gray-300 mt-3 text-lg">Ferramentas exclusivas para planejamento e criação de conteúdo</p>
+                </div>
                 
-                <p class="text-center text-gray-300 text-lg md:text-xl max-w-3xl mx-auto mb-12">
-                    Ferramentas exclusivas para membros da irmandade Sons of Peaky planejarem rolês, eventos e criarem conteúdo para as redes sociais.
-                </p>
+                <div id="ferramentas-content" class="section-content"
+                     style="max-height: 0; overflow: hidden; transition: max-height 0.5s ease-in-out;">
+                    <div class="space-y-10 pt-6">
+                        <p class="text-center text-gray-300 text-lg md:text-xl max-w-3xl mx-auto mb-12">
+                            Ferramentas exclusivas para membros da irmandade Sons of Peaky planejarem rolês, eventos e criarem conteúdo para as redes sociais.
+                        </p>
 
                 <div class="grid md:grid-cols-2 gap-8">
                     <!-- Gerador de Rolê -->
