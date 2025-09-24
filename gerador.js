@@ -681,6 +681,131 @@ function calculateCostByType(formData, tipo, categoria) {
 }
 
 /**
+ * Calcula custos de forma inteligente baseado no tipo de roteiro
+ */
+function calculateSmartCosts(formData, tipoRoteiro, index) {
+    const tempoDisponivel = calcularTempoDisponivel(formData);
+    const distanciaEstimada = index === 0 ? 120 : index === 1 ? 200 : 300;
+    
+    // Combustível - sempre presente, calculado pelo consumo real
+    const consumoMedio = 22; // km/l médio
+    const precoCombustivel = 6.60; // R$ por litro (valor atual)
+    const combustivelCusto = Math.round((distanciaEstimada / consumoMedio) * precoCombustivel);
+    
+    // Alimentação - sempre presente, varia por tempo e tipo
+    const alimentacaoMultipliers = [0.7, 1.0, 1.8]; // Econômico, Equilibrado, Premium
+    const alimentacaoBase = tempoDisponivel >= 8 ? 80 : 40; // Almoço completo vs lanche
+    const alimentacaoCusto = Math.round(alimentacaoBase * alimentacaoMultipliers[index]);
+    
+    // Entradas - apenas se experiência inclui turismo/aventura
+    const experiencia = formData.experienciaDesejada || '';
+    const temTurismo = experiencia.includes('turismo') || experiencia.includes('paisagem') || experiencia.includes('aventura');
+    const entradasCusto = temTurismo ? [0, 25, 80][index] : 0;
+    
+    // Outros - baseado na distância e experiência
+    let outrosCusto = 0;
+    const isLongDistance = distanciaEstimada > 150;
+    if (isLongDistance) outrosCusto += 15; // Pedágio
+    if (index === 2) outrosCusto += 30; // Serviços premium
+    if (experiencia.includes('aventura')) outrosCusto += 20; // Equipamentos
+    
+    // Total
+    const total = combustivelCusto + alimentacaoCusto + entradasCusto + outrosCusto;
+    
+    return {
+        combustivel: `R$ ${combustivelCusto}`,
+        alimentacao: `R$ ${alimentacaoCusto}`,
+        entradas: entradasCusto > 0 ? `R$ ${entradasCusto}` : null,
+        outros: outrosCusto > 0 ? `R$ ${outrosCusto}` : null,
+        total: total
+    };
+}
+
+/**
+ * Gera cronograma horário inteligente para o roteiro
+ */
+function generateSmartTimeline(formData, destinos) {
+    const horarioSaida = formData.horarioSaida || '08:00';
+    const horarioVolta = formData.horarioVolta || '17:00';
+    
+    // Converter horários para minutos
+    const [saidaHoras, saidaMinutos] = horarioSaida.split(':').map(n => parseInt(n));
+    const [voltaHoras, voltaMinutos] = horarioVolta.split(':').map(n => parseInt(n));
+    
+    const saidaTotal = saidaHoras * 60 + saidaMinutos;
+    const voltaTotal = voltaHoras * 60 + voltaMinutos;
+    const tempoDisponivel = voltaTotal - saidaTotal; // em minutos
+    
+    if (!destinos || destinos.length === 0) return [];
+    
+    // Calcular tempo por destino (incluindo tempo de viagem e permanência)
+    const tempoViagem = Math.floor(tempoDisponivel * 0.4); // 40% do tempo viajando
+    const tempoPermanencia = tempoDisponivel - tempoViagem; // 60% permanecendo
+    const tempoPorDestino = Math.floor(tempoPermanencia / destinos.length);
+    
+    let cronograma = [];
+    let horarioAtual = saidaTotal;
+    
+    // Ponto de partida
+    cronograma.push({
+        horario: formatMinutesToTime(horarioAtual),
+        evento: `🏠 Saída do ponto de partida`,
+        endereco: formData.enderecoPartida || 'Ponto de partida',
+        tipo: 'saida'
+    });
+    
+    // Para cada destino
+    destinos.forEach((destino, index) => {
+        // Tempo de viagem até o destino
+        const tempoViagem = Math.floor(30 + (index * 15)); // 30-60 min entre destinos
+        horarioAtual += tempoViagem;
+        
+        cronograma.push({
+            horario: formatMinutesToTime(horarioAtual),
+            evento: `🏍️ Chegada - ${destino.nome}`,
+            endereco: destino.endereco_completo || destino.nome,
+            descricao: destino.descricao,
+            tempo_permanencia: `${Math.floor(tempoPorDestino / 60)}h ${tempoPorDestino % 60}min`,
+            tipo: 'chegada'
+        });
+        
+        // Tempo de permanência no destino
+        horarioAtual += tempoPorDestino;
+        
+        if (index < destinos.length - 1) {
+            cronograma.push({
+                horario: formatMinutesToTime(horarioAtual),
+                evento: `🚀 Saída - ${destino.nome}`,
+                endereco: `Próximo destino: ${destinos[index + 1].nome}`,
+                tipo: 'saida_destino'
+            });
+        }
+    });
+    
+    // Viagem de volta
+    const tempoVoltaCasa = Math.floor(60 + Math.random() * 30); // 60-90 min
+    horarioAtual += tempoVoltaCasa;
+    
+    cronograma.push({
+        horario: formatMinutesToTime(Math.min(horarioAtual, voltaTotal)),
+        evento: `🏠 Chegada em casa`,
+        endereco: 'De volta ao lar, doce lar',
+        tipo: 'chegada_final'
+    });
+    
+    return cronograma;
+}
+
+/**
+ * Converte minutos para formato HH:MM
+ */
+function formatMinutesToTime(minutes) {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+}
+
+/**
  * Calcula custo estimado quando IA não fornece
  */
 function calculateFallbackCost(formData, tipo) {
@@ -1017,17 +1142,9 @@ function parseResponseManually(response, formData) {
     ];
     
     return tipos.map((tipo, index) => {
-        // Calcular custos detalhados
-        const combustivel = calculateCostByType(formData, tipo, 'combustivel');
-        const alimentacao = calculateCostByType(formData, tipo, 'alimentacao');
-        const entradas = calculateCostByType(formData, tipo, 'entradas');
-        const outros = calculateCostByType(formData, tipo, 'outros');
-        
-        const totalValue = 
-            parseInt(combustivel.replace('R$ ', '')) +
-            parseInt(alimentacao.replace('R$ ', '')) +
-            parseInt(entradas.replace('R$ ', '')) +
-            parseInt(outros.replace('R$ ', ''));
+        // Calcular custos detalhados inteligentemente
+        const custosCalculados = calculateSmartCosts(formData, tipo, index);
+        const { combustivel, alimentacao, entradas, outros, total: totalValue } = custosCalculados;
 
         return {
             tipo: tipo,
@@ -1041,11 +1158,12 @@ function parseResponseManually(response, formData) {
             custos_detalhados: {
                 combustivel,
                 alimentacao,
-                entradas,
-                outros,
+                entradas: entradas || null,
+                outros: outros || null,
                 total: `R$ ${totalValue}`
             },
             observacoes: generateObservacoesPercurso(formData, tipo, generateFallbackDestinos(formData, tipo)),
+            cronograma: generateSmartTimeline(formData, generateFallbackDestinos(formData, tipo)),
             dicas_importantes: [
                 'Verificar combustível antes da saída',
                 'Levar equipamentos de segurança',
@@ -1481,26 +1599,66 @@ function createResultCard(roteiro, index) {
             <div class="cost-display mb-6">
                 <h4 class="text-lg font-bold text-green-400 mb-3">💰 Custos Detalhados</h4>
                 <div class="space-y-2">
+                    ${roteiro.custos_detalhados.combustivel ? `
                     <div class="cost-item">
                         <span>⛽ Combustível</span>
                         <span class="font-bold">${roteiro.custos_detalhados.combustivel}</span>
-                    </div>
+                    </div>` : ''}
+                    ${roteiro.custos_detalhados.alimentacao ? `
                     <div class="cost-item">
                         <span>🍽️ Alimentação</span>
                         <span class="font-bold">${roteiro.custos_detalhados.alimentacao}</span>
-                    </div>
+                    </div>` : ''}
+                    ${roteiro.custos_detalhados.entradas ? `
                     <div class="cost-item">
-                        <span>🎫 Entradas</span>
+                        <span>🎫 Entradas (Atrações Turísticas)</span>
                         <span class="font-bold">${roteiro.custos_detalhados.entradas}</span>
-                    </div>
+                    </div>` : ''}
+                    ${roteiro.custos_detalhados.outros ? `
                     <div class="cost-item">
-                        <span>🔧 Outros</span>
+                        <span>🔧 Outros (Pedágio, Estacionamento)</span>
                         <span class="font-bold">${roteiro.custos_detalhados.outros}</span>
-                    </div>
-                    <div class="cost-item">
+                    </div>` : ''}
+                    <div class="cost-item border-t border-gray-600 pt-2 mt-3">
                         <span class="text-lg">💎 TOTAL</span>
                         <span class="font-bold text-lg text-gold-primary">${roteiro.custos_detalhados.total}</span>
                     </div>
+                </div>
+            </div>
+        ` : ''}
+        
+        ${roteiro.cronograma && roteiro.cronograma.length > 0 ? `
+            <div class="bg-blue-900 bg-opacity-30 p-4 rounded-lg mb-4">
+                <h4 class="text-lg font-bold text-blue-400 mb-3">⏰ Cronograma do Rolê</h4>
+                <div class="space-y-3">
+                    ${roteiro.cronograma.map(item => {
+                        const iconMap = {
+                            'saida': '🏠',
+                            'chegada': '🏍️',
+                            'saida_destino': '🚀',
+                            'chegada_final': '🏡'
+                        };
+                        const bgColorMap = {
+                            'saida': 'bg-green-600',
+                            'chegada': 'bg-blue-600',
+                            'saida_destino': 'bg-orange-600',
+                            'chegada_final': 'bg-purple-600'
+                        };
+                        return `
+                        <div class="flex items-start space-x-3 p-3 bg-gray-700 rounded-lg">
+                            <div class="flex-shrink-0">
+                                <div class="w-12 h-12 ${bgColorMap[item.tipo]} rounded-full flex items-center justify-center text-white font-bold">
+                                    ${item.horario}
+                                </div>
+                            </div>
+                            <div class="flex-grow">
+                                <div class="font-semibold text-white mb-1">${item.evento}</div>
+                                <div class="text-sm text-gray-300">${item.endereco}</div>
+                                ${item.descricao ? `<div class="text-xs text-gray-400 mt-1">${item.descricao}</div>` : ''}
+                                ${item.tempo_permanencia ? `<div class="text-xs text-blue-300 mt-1">⏱️ Tempo no local: ${item.tempo_permanencia}</div>` : ''}
+                            </div>
+                        </div>`;
+                    }).join('')}
                 </div>
             </div>
         ` : ''}

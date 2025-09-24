@@ -9,13 +9,19 @@
   --bg-tertiary: #252525;
   --bg-elevated: #2d2d2d;
   
-  /* Brand Colors */
-  --gold-primary: #c9a14a;
-  --gold-light: #d4af37;
-  --gold-dark: #b8941f;
-  --accent-primary: #fb923c;
-  --accent-hover: #f59e0b;
-  --accent-light: #fbbf24;
+  /* Brand Colors - Esquema Profissional */
+  --gold-primary: #D4AF37;    /* Ouro mais elegante */
+  --gold-light: #F4D03F;      /* Ouro claro sofisticado */
+  --gold-dark: #B7950B;       /* Ouro escuro premium */
+  --accent-primary: #E67E22;  /* Laranja premium */
+  --accent-hover: #D35400;    /* Laranja hover refinado */
+  --accent-light: #F39C12;    /* Laranja claro elegante */
+  
+  /* Cores Secundárias Profissionais */
+  --blue-primary: #2C3E50;    /* Azul corporativo */
+  --blue-accent: #3498DB;     /* Azul destaque */
+  --gray-premium: #2F3640;    /* Cinza premium */
+  --gray-soft: #57606F;       /* Cinza suave */
   
   /* Text Colors */
   --text-primary: #ffffff;
@@ -1403,20 +1409,41 @@ button[onclick*="generateQRCode"]:hover {
 }
 
 /* === PADRONIZAÇÃO VISUAL COMPLETA === */
-/* Garantir consistência de fontes em todo o sistema */
-.suggestion-card h3, 
-.text-xl.font-bold, 
-.text-2xl.font-bold,
-.text-3xl.font-bold {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
-    line-height: 1.2 !important;
+/* === TIPOGRAFIA PROFISSIONAL === */
+/* Aplicar Poppins como fonte principal em todo o sistema */
+* {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif !important;
 }
 
-.suggestion-card p,
-.text-gray-300,
-.text-gray-400 {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+/* Hierarquia tipográfica profissional */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', sans-serif !important;
+    font-weight: 600 !important;
+    line-height: 1.2 !important;
+    letter-spacing: -0.025em !important;
+}
+
+h1 { font-size: 2.5rem !important; }
+h2 { font-size: 2rem !important; }
+h3 { font-size: 1.5rem !important; }
+h4 { font-size: 1.25rem !important; }
+h5 { font-size: 1.125rem !important; }
+
+p, span, div {
+    font-family: 'Poppins', sans-serif !important;
+    line-height: 1.6 !important;
+}
+
+/* Textos específicos com melhor legibilidade */
+.text-gray-300, .text-gray-400 {
+    font-weight: 400 !important;
     line-height: 1.5 !important;
+}
+
+/* Botões e interfaces com fonte mais robusta */
+button, input, select, textarea {
+    font-family: 'Poppins', sans-serif !important;
+    font-weight: 500 !important;
 }
 
 /* Padronização de ícones */
