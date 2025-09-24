@@ -1,10 +1,14 @@
 /**
  * Gerador de Rolês de Moto - JavaScript Principal
  * Sistema completo de geração de roteiros personalizados
+ * Version: 2.0.1 - Fixed GitHub Pages
  */
+
+console.log('🔧 Gerador.js carregado - Version 2.0.1');
 
 // Configuração da API - usando função serverless para segurança
 function getAPIConfig() {
+    console.log('🔍 getAPIConfig chamado - hostname:', window.location.hostname);
     // Força modo desenvolvimento se configurado
     const forceDevelopment = window.FORCE_DEVELOPMENT_MODE === true;
     
