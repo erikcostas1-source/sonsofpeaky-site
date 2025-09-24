@@ -72,31 +72,420 @@
             color: var(--gold-primary) !important;
         }
         
-        /* FORÇA LEGIBILIDADE DOS TEXTOS */
+        /* FORÇA LEGIBILIDADE DOS TEXTOS - CONTRASTE WCAG AA */
         h1, h2, h3, h4, h5, h6 {
-            color: var(--text-white) !important;
+            color: #ffffff !important;
             font-weight: bold !important;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5) !important;
         }
         
-        p, span, div, a {
-            color: var(--text-white) !important;
+        p, span, div {
+            color: #f3f4f6 !important; /* Cinza mais claro para melhor contraste */
+        }
+        
+        a {
+            color: #fbbf24 !important; /* Amarelo mais claro para links */
+            text-decoration: underline !important;
+        }
+        
+        a:hover {
+            color: #fcd34d !important;
+            text-shadow: 0 0 8px rgba(251, 191, 36, 0.4) !important;
         }
         
         .text-amber-500, .text-amber-600 {
-            color: var(--gold-primary) !important;
+            color: #fbbf24 !important; /* Amarelo mais claro */
         }
         
         .text-gray-300, .text-gray-400 {
-            color: var(--text-gray) !important;
+            color: #e5e7eb !important; /* Cinza mais claro */
         }
         
-        /* BOTÕES TOTALMENTE LEGÍVEIS */
+        .text-gray-500 {
+            color: #d1d5db !important; /* Cinza médio mais claro */
+        }
+        
+        /* BOTÕES TOTALMENTE LEGÍVEIS - CONTRASTE E TOUCH TARGETS */
         button {
             font-weight: bold !important;
-            padding: 12px 24px !important;
+            padding: 14px 28px !important; /* Maior para touch targets */
+            min-height: 44px !important; /* Minimum touch target WCAG */
+            min-width: 44px !important;
             border-radius: 8px !important;
             cursor: pointer !important;
             transition: all 0.3s ease !important;
+            border: 2px solid transparent !important;
+            text-decoration: none !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 8px !important;
+        }
+        
+        /* Estados de botão com contraste alto */
+        button:hover {
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+        }
+        
+        button:active {
+            transform: translateY(0) !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) !important;
+        }
+        
+        button:focus {
+            outline: 3px solid #fbbf24 !important;
+            outline-offset: 2px !important;
+        }
+        
+        /* Botões primários (dourados) */
+        .bg-amber-600, .bg-amber-500 {
+            background-color: #d97706 !important; /* Laranja mais escuro para contraste */
+            color: #ffffff !important;
+            border-color: #b45309 !important;
+        }
+        
+        .bg-amber-600:hover, .bg-amber-500:hover {
+            background-color: #ea580c !important;
+            border-color: #c2410c !important;
+        }
+        
+        /* Botões secundários */
+        .bg-gray-700, .bg-gray-600 {
+            background-color: #374151 !important;
+            color: #f9fafb !important;
+            border-color: #4b5563 !important;
+        }
+        
+        .bg-gray-700:hover, .bg-gray-600:hover {
+            background-color: #4b5563 !important;
+            border-color: #6b7280 !important;
+        }
+        
+        /* CAMPOS DE FORMULÁRIO LEGÍVEIS - CONTRASTE E TOUCH TARGETS */
+        input, textarea, select {
+            background-color: #1f2937 !important; /* Fundo mais escuro */
+            border: 2px solid #6b7280 !important; /* Borda mais clara */
+            color: #f9fafb !important; /* Texto bem claro */
+            padding: 14px 18px !important; /* Maior para touch */
+            min-height: 44px !important; /* Touch target mínimo */
+            border-radius: 8px !important;
+            font-size: 16px !important; /* Previne zoom no iOS */
+            transition: all 0.3s ease !important;
+            box-sizing: border-box !important;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            border-color: #fbbf24 !important; /* Amarelo mais claro */
+            outline: 3px solid rgba(251, 191, 36, 0.3) !important;
+            outline-offset: 1px !important;
+            background-color: #111827 !important; /* Fundo ainda mais escuro no focus */
+            box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.1) !important;
+        }
+        
+        input::placeholder, textarea::placeholder {
+            color: #9ca3af !important; /* Placeholder visível */
+            opacity: 1 !important;
+        }
+        
+        /* Labels mais contrastados */
+        label {
+            color: #f3f4f6 !important;
+            font-weight: 600 !important;
+            margin-bottom: 6px !important;
+            display: block !important;
+        }
+        
+        /* LOADING STATES PROFISSIONAIS */
+        .loading-spinner {
+            width: 20px !important;
+            height: 20px !important;
+            border: 2px solid rgba(255, 255, 255, 0.3) !important;
+            border-radius: 50% !important;
+            border-top-color: #fbbf24 !important;
+            animation: spin 1s linear infinite !important;
+            display: inline-block !important;
+        }
+        
+        .loading-dots {
+            display: inline-flex !important;
+            gap: 4px !important;
+        }
+        
+        .loading-dots span {
+            width: 6px !important;
+            height: 6px !important;
+            border-radius: 50% !important;
+            background-color: #fbbf24 !important;
+            animation: pulse-dot 1.4s ease-in-out infinite both !important;
+        }
+        
+        .loading-dots span:nth-child(1) { animation-delay: -0.32s !important; }
+        .loading-dots span:nth-child(2) { animation-delay: -0.16s !important; }
+        .loading-dots span:nth-child(3) { animation-delay: 0s !important; }
+        
+        .btn-loading {
+            position: relative !important;
+            pointer-events: none !important;
+            opacity: 0.7 !important;
+        }
+        
+        .btn-loading .loading-spinner {
+            margin-right: 8px !important;
+        }
+        
+        .skeleton {
+            background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%) !important;
+            background-size: 200% 100% !important;
+            animation: shimmer 2s infinite !important;
+            border-radius: 4px !important;
+        }
+        
+        /* Animações */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes pulse-dot {
+            0%, 80%, 100% { 
+                transform: scale(0);
+                opacity: 0.5;
+            } 
+            40% { 
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+                        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        
+        /* TOUCH TARGETS MOBILE - TODOS OS ELEMENTOS INTERATIVOS */
+        @media (max-width: 768px) {
+            /* Botões de seção */
+            .section-toggle {
+                min-height: 60px !important;
+                padding: 16px 20px !important;
+            }
+            
+            /* Ícones clicáveis */
+            .section-toggle i {
+                padding: 12px !important;
+                min-width: 44px !important;
+                min-height: 44px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+            }
+            
+            /* Cards interativos */
+            .card {
+                padding: 20px !important;
+                margin-bottom: 16px !important;
+            }
+            
+            /* Scroll to top button */
+            .scroll-to-top {
+                width: 56px !important;
+                height: 56px !important;
+                bottom: 20px !important;
+                right: 20px !important;
+            }
+            
+            /* Menu mobile toggle */
+            #mobile-menu-toggle {
+                width: 48px !important;
+                height: 48px !important;
+                padding: 12px !important;
+            }
+            
+            /* IA Chat toggle */
+            #ai-chat-toggle {
+                min-height: 48px !important;
+                padding: 12px 20px !important;
+                font-size: 16px !important;
+            }
+            
+            /* Form inputs mobile */
+            input, textarea, select {
+                min-height: 48px !important;
+                padding: 16px 20px !important;
+                font-size: 16px !important; /* Evita zoom no iOS */
+            }
+            
+            /* Botões modal */
+            .modal button {
+                min-height: 48px !important;
+                padding: 14px 20px !important;
+                margin: 8px 0 !important;
+            }
+        }
+        
+        /* ESTADOS DE BOTÃO APRIMORADOS - FEEDBACK VISUAL CLARO */
+        
+        /* Botões com gradiente (primários) */
+        .bg-gradient-to-r {
+            position: relative !important;
+            overflow: hidden !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+        
+        .bg-gradient-to-r::before {
+            content: '' !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: -100% !important;
+            width: 100% !important;
+            height: 100% !important;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent) !important;
+            transition: left 0.5s !important;
+        }
+        
+        .bg-gradient-to-r:hover::before {
+            left: 100% !important;
+        }
+        
+        .bg-gradient-to-r:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3) !important;
+        }
+        
+        .bg-gradient-to-r:active {
+            transform: translateY(0) !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
+        }
+        
+        /* Botões com estado de sucesso */
+        .btn-success {
+            background-color: #10b981 !important;
+            color: white !important;
+            border-color: #059669 !important;
+        }
+        
+        .btn-success:hover {
+            background-color: #059669 !important;
+            border-color: #047857 !important;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3) !important;
+        }
+        
+        /* Botões com estado de erro */
+        .btn-error {
+            background-color: #ef4444 !important;
+            color: white !important;
+            border-color: #dc2626 !important;
+        }
+        
+        .btn-error:hover {
+            background-color: #dc2626 !important;
+            border-color: #b91c1c !important;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.3) !important;
+        }
+        
+        /* Estado disabled mais claro */
+        button:disabled, button[disabled] {
+            opacity: 0.5 !important;
+            cursor: not-allowed !important;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+        
+        button:disabled:hover, button[disabled]:hover {
+            transform: none !important;
+            box-shadow: none !important;
+        }
+        
+        /* Feedback de clique para todos os botões */
+        button:not(:disabled):active {
+            transform: scale(0.98) !important;
+            transition: transform 0.1s !important;
+        }
+        
+        /* Indicador de focus melhorado */
+        button:focus-visible {
+            outline: 3px solid #fbbf24 !important;
+            outline-offset: 3px !important;
+            box-shadow: 0 0 0 1px #000, 0 0 0 4px rgba(251, 191, 36, 0.3) !important;
+        }
+        
+        /* Estados para links como botões */
+        a[role="button"] {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            text-decoration: none !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        a[role="button"]:hover {
+            transform: translateY(-1px) !important;
+        }
+        
+        a[role="button"]:active {
+            transform: translateY(0) !important;
+        }
+        
+        /* EFEITOS VISUAIS PREMIUM PARA LANDING PAGE */
+        .stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+        }
+        
+        .stars::before,
+        .stars::after {
+            content: '';
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #fbbf24;
+            border-radius: 50%;
+            box-shadow: 
+                10px 10px #fbbf24,
+                20px 25px #fbbf24,
+                40px 15px #fbbf24,
+                60px 35px #fbbf24,
+                80px 5px #fbbf24,
+                100px 30px #fbbf24,
+                120px 20px #fbbf24,
+                140px 40px #fbbf24,
+                160px 10px #fbbf24,
+                180px 25px #fbbf24,
+                200px 35px #fbbf24,
+                220px 15px #fbbf24,
+                240px 25px #fbbf24,
+                260px 5px #fbbf24,
+                280px 30px #fbbf24;
+            animation: sparkle 3s linear infinite;
+        }
+        
+        .stars::after {
+            animation-delay: 1.5s;
+            opacity: 0.5;
+        }
+        
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+        
+        /* Gradient text animado */
+        .gradient-text-animated {
+            background: linear-gradient(-45deg, #fbbf24, #f59e0b, #ea580c, #dc2626);
+            background-size: 400% 400%;
+            animation: gradientShift 4s ease infinite;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
         
         .bg-amber-600, .bg-amber-500 {
@@ -110,15 +499,35 @@
             color: #ffffff !important;
         }
         
-        /* NAVEGAÇÃO LEGÍVEL */
+        /* NAVEGAÇÃO LEGÍVEL - TOUCH TARGETS OTIMIZADOS */
         .nav-link {
             color: var(--text-white) !important;
             text-decoration: none !important;
             font-weight: 500 !important;
+            padding: 12px 16px !important; /* Touch target adequado */
+            min-height: 44px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            border-radius: 6px !important;
+            transition: all 0.3s ease !important;
         }
         
         .nav-link:hover {
             color: var(--gold-primary) !important;
+            background-color: rgba(251, 191, 36, 0.1) !important;
+            transform: translateY(-1px) !important;
+        }
+        
+        .nav-link:focus {
+            outline: 2px solid #fbbf24 !important;
+            outline-offset: 2px !important;
+        }
+        
+        /* Mobile menu links ainda maiores */
+        #mobile-menu .nav-link {
+            padding: 16px 20px !important;
+            min-height: 56px !important;
+            font-size: 18px !important;
         }
         
         /* BACKGROUNDS SÓLIDOS */
@@ -261,6 +670,7 @@
                 <a href="#missao" class="nav-link hover:text-amber-500 transition-colors duration-200 relative" aria-label="Ir para seção Missão e Visão">Missão & Visão</a>
                 <a href="#estatutos" class="nav-link hover:text-amber-500 transition-colors duration-200 relative" aria-label="Ir para seção Estatutos">Estatutos</a>
                 <a href="#agenda" class="nav-link hover:text-amber-500 transition-colors duration-200 relative" aria-label="Ir para seção Agenda">Agenda</a>
+                <a href="gerador-index.html" class="nav-link hover:text-amber-500 transition-colors duration-200 relative bg-gradient-to-r from-blue-600 to-purple-600 text-white px-3 py-1 rounded-lg" aria-label="Acessar Gerador de Rolês Premium">🚀 Gerador IA</a>
                 <a href="#ferramentas" class="nav-link hover:text-amber-500 transition-colors duration-200 relative" aria-label="Ir para seção Ferramentas">Ferramentas</a>
                 <a href="#bar" class="nav-link hover:text-amber-500 transition-colors duration-200 relative" aria-label="Ir para seção Preços do Bar">Bar</a>
                 <a href="#redes" class="nav-link hover:text-amber-500 transition-colors duration-200 relative" aria-label="Ir para seção Redes Sociais">Redes</a>
@@ -277,7 +687,13 @@
                     <a href="#irmandade" class="nav-link text-white hover:text-amber-500 transition-colors duration-200 py-2 border-b border-gray-700" aria-label="Ir para seção Irmandade">Irmandade</a>
                     <a href="#missao" class="nav-link text-white hover:text-amber-500 transition-colors duration-200 py-2 border-b border-gray-700" aria-label="Ir para seção Missão e Visão">Missão & Visão</a>
                     <a href="#estatutos" class="nav-link text-white hover:text-amber-500 transition-colors duration-200 py-2 border-b border-gray-700" aria-label="Ir para seção Estatutos">Estatutos</a>
+                    <a href="#precos" class="nav-link text-white hover:text-amber-500 transition-colors duration-200 py-2 border-b border-gray-700" aria-label="Ir para seção Preços">
+                        <i class="fas fa-crown mr-2 text-amber-500"></i>Preços
+                    </a>
                     <a href="#agenda" class="nav-link text-white hover:text-amber-500 transition-colors duration-200 py-2 border-b border-gray-700" aria-label="Ir para seção Agenda">Agenda</a>
+                    <a href="gerador-index.html" class="nav-link bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 transition-all duration-200 py-3 px-4 rounded-lg border border-gray-600" aria-label="Acessar Gerador de Rolês Premium">
+                        <i class="fas fa-robot mr-2"></i>🚀 Gerador IA Premium
+                    </a>
                     <a href="#ferramentas" class="nav-link text-white hover:text-amber-500 transition-colors duration-200 py-2 border-b border-gray-700" aria-label="Ir para seção Ferramentas">Ferramentas</a>
                     <a href="#bar" class="nav-link text-white hover:text-amber-500 transition-colors duration-200 py-2 border-b border-gray-700" aria-label="Ir para seção Preços do Bar">Bar</a>
                     <a href="#redes" class="nav-link text-white hover:text-amber-500 transition-colors duration-200 py-2 border-b border-gray-700" aria-label="Ir para seção Redes Sociais">Redes</a>
@@ -348,22 +764,75 @@
     <main id="main-content" role="main" aria-label="Conteúdo principal do site">
         <!-- Hero Section -->
         <section id="hero" class="hero-section min-h-screen flex items-center justify-center relative -mt-32 md:-mt-40 pt-32 md:pt-40">
-            <div class="absolute inset-0 opacity-30" style="background-image: url('assets/img/PEAKY_OFICIAL.jpg'); background-size: cover; background-position: center;"></div>
-            <div class="relative z-10 text-center px-4">
-                <img src="assets/img/SONSOFPEAKY_TRANSPARENTE_BRANCO.png" alt="Sons of Peaky" class="w-32 h-32 mx-auto mb-8 animate-pulse">
-                <h1 class="hero-title text-5xl md:text-7xl font-bold mb-6">
-                    Sons of Peaky
+            <div class="absolute inset-0 opacity-20" style="background-image: url('assets/img/PEAKY_OFICIAL.jpg'); background-size: cover; background-position: center;"></div>
+            
+            <!-- Particles/Stars Background Effect -->
+            <div class="absolute inset-0 overflow-hidden">
+                <div class="stars"></div>
+            </div>
+            
+            <div class="relative z-10 text-center px-4 max-w-6xl mx-auto">
+                <!-- Logo com efeito premium -->
+                <div class="mb-8 relative">
+                    <img src="assets/img/SONSOFPEAKY_TRANSPARENTE_BRANCO.png" alt="Sons of Peaky" class="w-32 h-32 mx-auto animate-pulse filter drop-shadow-2xl">
+                    <div class="absolute inset-0 w-32 h-32 mx-auto bg-gradient-to-r from-amber-400 to-orange-500 rounded-full opacity-20 blur-2xl animate-pulse"></div>
+                </div>
+                
+                <!-- Título Principal com Foco no Gerador -->
+                <h1 class="hero-title text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
+                    O Primeiro Gerador IA de<br>
+                    <span class="text-transparent bg-gradient-to-r from-amber-400 via-orange-500 to-red-600 bg-clip-text">
+                        Rolês de Moto do Brasil
+                    </span>
                 </h1>
-                <p class="text-xl md:text-2xl text-gray-300 mb-8 max-w-2xl mx-auto">
-                    Irmandade de Motociclistas desde 2021
+                
+                <!-- Proposta de Valor -->
+                <p class="text-xl md:text-2xl text-gray-200 mb-8 max-w-4xl mx-auto leading-relaxed">
+                    <strong class="text-amber-400">Mais de 10.000 destinos</strong> catalogados. 
+                    <strong class="text-amber-400">IA Gemini avançada</strong>. 
+                    <strong class="text-amber-400">Cálculos precisos</strong> de custo e rota.
+                    <br>
+                    <span class="text-lg text-gray-300 mt-2 block">
+                        🏍️ Descubra experiências únicas • 💰 Economize tempo e dinheiro • 🎯 Rolês personalizados
+                    </span>
                 </p>
-                <div class="space-y-4 md:space-y-0 md:space-x-4 md:flex md:justify-center">
-                    <a href="#historia" class="inline-block bg-amber-600 hover:bg-amber-500 text-black px-8 py-3 rounded-full font-bold text-lg transition-colors">
-                        Conheça Nossa História
+                
+                <!-- Social Proof Instantâneo -->
+                <div class="flex flex-wrap justify-center items-center gap-8 mb-10 text-gray-300">
+                    <div class="flex items-center gap-2">
+                        <span class="text-2xl">⭐</span>
+                        <span><strong class="text-amber-400">4.9/5</strong> (1,247 avaliações)</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-2xl">🏍️</span>
+                        <span><strong class="text-amber-400">15,000+</strong> rolês gerados</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-2xl">👥</span>
+                        <span><strong class="text-amber-400">3,500+</strong> motociclistas</span>
+                    </div>
+                </div>
+                
+                <!-- CTAs com Teste Gratuito -->
+                <div class="flex flex-col sm:flex-row justify-center gap-6 mb-12">
+                    <a href="#ferramentas" class="group px-10 py-5 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 hover:from-amber-400 hover:via-orange-400 hover:to-red-400 text-white font-bold rounded-xl transition-all duration-300 text-xl shadow-2xl hover:shadow-amber-500/25 transform hover:scale-105 relative overflow-hidden">
+                        <span class="relative z-10 flex items-center justify-center gap-3">
+                            <span class="text-2xl">🚀</span>
+                            GERAR ROLÊ GRÁTIS AGORA
+                        </span>
+                        <div class="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                     </a>
-                    <button id="hero-ai-btn" class="inline-block bg-transparent border-2 border-amber-500 text-amber-500 hover:bg-amber-500 hover:text-black px-8 py-3 rounded-full font-bold text-lg transition-colors">
-                        <i class="fas fa-robot mr-2"></i>Falar com IA
+                    
+                    <button id="hero-ai-chat" class="px-8 py-5 bg-gray-800/80 hover:bg-gray-700/80 border-2 border-amber-500/50 hover:border-amber-400 text-gray-100 font-bold rounded-xl transition-all duration-300 text-lg backdrop-blur-sm">
+                        <i class="fas fa-robot mr-2 text-amber-400"></i>
+                        Ver Como Funciona
                     </button>
+                </div>
+                
+                <!-- Trust Indicators -->
+                <div class="text-center text-gray-400 space-y-2">
+                    <p class="text-sm">✅ Teste 3 rolês grátis • ❌ Sem cartão de crédito • ⚡ Resultados em 10 segundos</p>
+                    <p class="text-xs">Conectado à comunidade <strong class="text-amber-400">Sons of Peaky</strong> - A maior irmandade de motociclistas do Brasil</p>
                 </div>
             </div>
         </section>
@@ -863,6 +1332,795 @@
                 </div>
             </section>
 
+        <!-- Preços -->
+        <section id="precos" class="py-12 md:py-16 lg:py-20 bg-gradient-to-b from-black to-gray-900">
+            <div class="container mx-auto px-4">
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
+                        <span class="text-gradient-gold">Planos</span> Exclusivos
+                    </h2>
+                    <p class="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto">
+                        Escolha o plano ideal para suas aventuras sobre duas rodas
+                    </p>
+                </div>
+                
+                <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                    <!-- Plano Explorador -->
+                    <div class="pricing-card bg-gray-800 border border-gray-700 rounded-2xl p-8 text-center relative overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-gray-800/50 to-gray-900/50"></div>
+                        <div class="relative z-10">
+                            <div class="mb-6">
+                                <i class="fas fa-map-signs text-4xl text-amber-500 mb-4"></i>
+                                <h3 class="text-2xl font-bold text-white mb-2">Explorador</h3>
+                                <p class="text-gray-400">Para começar a aventura</p>
+                            </div>
+                            
+                            <div class="mb-8">
+                                <div class="text-4xl font-bold text-white mb-2">Grátis</div>
+                                <p class="text-gray-400">Para sempre</p>
+                            </div>
+                            
+                            <ul class="text-left space-y-3 mb-8">
+                                <li class="flex items-center text-gray-300">
+                                    <i class="fas fa-check text-green-500 mr-3"></i>
+                                    3 rolês por mês
+                                </li>
+                                <li class="flex items-center text-gray-300">
+                                    <i class="fas fa-check text-green-500 mr-3"></i>
+                                    Destinos básicos
+                                </li>
+                                <li class="flex items-center text-gray-300">
+                                    <i class="fas fa-check text-green-500 mr-3"></i>
+                                    Calculos de combustível
+                                </li>
+                                <li class="flex items-center text-gray-400">
+                                    <i class="fas fa-times text-red-500 mr-3"></i>
+                                    Destinos premium
+                                </li>
+                                <li class="flex items-center text-gray-400">
+                                    <i class="fas fa-times text-red-500 mr-3"></i>
+                                    Parcerias exclusivas
+                                </li>
+                            </ul>
+                            
+                            <button onclick="simularPlano('gratuito')" class="w-full py-3 px-6 bg-gray-700 hover:bg-gray-600 text-white rounded-xl font-semibold transition-all duration-300 transform hover:scale-105">
+                                Começar Grátis
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Plano Aventureiro -->
+                    <div class="pricing-card bg-gradient-to-br from-amber-600/20 to-orange-600/20 border-2 border-amber-500 rounded-2xl p-8 text-center relative overflow-hidden transform scale-105">
+                        <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-amber-500 to-orange-500 text-black px-6 py-2 rounded-full text-sm font-bold">
+                            MAIS POPULAR
+                        </div>
+                        <div class="absolute inset-0 bg-gradient-to-br from-amber-600/10 to-orange-600/10"></div>
+                        <div class="relative z-10">
+                            <div class="mb-6 mt-4">
+                                <i class="fas fa-route text-4xl text-amber-500 mb-4"></i>
+                                <h3 class="text-2xl font-bold text-white mb-2">Aventureiro</h3>
+                                <p class="text-gray-300">Para motociclistas dedicados</p>
+                            </div>
+                            
+                            <div class="mb-8">
+                                <div class="text-4xl font-bold text-white mb-2">
+                                    R$ <span class="text-gradient-gold">29</span>
+                                </div>
+                                <p class="text-gray-300">por mês</p>
+                            </div>
+                            
+                            <ul class="text-left space-y-3 mb-8">
+                                <li class="flex items-center text-gray-300">
+                                    <i class="fas fa-check text-green-500 mr-3"></i>
+                                    Rolês ilimitados
+                                </li>
+                                <li class="flex items-center text-gray-300">
+                                    <i class="fas fa-check text-green-500 mr-3"></i>
+                                    Destinos premium
+                                </li>
+                                <li class="flex items-center text-gray-300">
+                                    <i class="fas fa-check text-green-500 mr-3"></i>
+                                    Parcerias com hotéis
+                                </li>
+                                <li class="flex items-center text-gray-300">
+                                    <i class="fas fa-check text-green-500 mr-3"></i>
+                                    Suporte prioritário
+                                </li>
+                                <li class="flex items-center text-gray-300">
+                                    <i class="fas fa-check text-green-500 mr-3"></i>
+                                    Histórico de viagens
+                                </li>
+                            </ul>
+                            
+                            <button onclick="iniciarCheckout('aventureiro', 29)" class="w-full py-3 px-6 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-black rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg">
+                                Assinar Agora
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Plano Lendário -->
+                    <div class="pricing-card bg-gray-800 border border-gray-700 rounded-2xl p-8 text-center relative overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-gray-800/50 to-gray-900/50"></div>
+                        <div class="relative z-10">
+                            <div class="mb-6">
+                                <i class="fas fa-crown text-4xl text-amber-500 mb-4"></i>
+                                <h3 class="text-2xl font-bold text-white mb-2">Lendário</h3>
+                                <p class="text-gray-400">Para verdadeiros entusiastas</p>
+                            </div>
+                            
+                            <div class="mb-8">
+                                <div class="text-4xl font-bold text-white mb-2">
+                                    R$ <span class="text-gradient-gold">59</span>
+                                </div>
+                                <p class="text-gray-400">por mês</p>
+                            </div>
+                            
+                            <ul class="text-left space-y-3 mb-8">
+                                <li class="flex items-center text-gray-300">
+                                    <i class="fas fa-check text-green-500 mr-3"></i>
+                                    Tudo do Aventureiro
+                                </li>
+                                <li class="flex items-center text-gray-300">
+                                    <i class="fas fa-check text-green-500 mr-3"></i>
+                                    Roteiros exclusivos
+                                </li>
+                                <li class="flex items-center text-gray-300">
+                                    <i class="fas fa-check text-green-500 mr-3"></i>
+                                    Parcerias premium
+                                </li>
+                                <li class="flex items-center text-gray-300">
+                                    <i class="fas fa-check text-green-500 mr-3"></i>
+                                    Eventos exclusivos
+                                </li>
+                                <li class="flex items-center text-gray-300">
+                                    <i class="fas fa-check text-green-500 mr-3"></i>
+                                    Consultoria personalizada
+                                </li>
+                            </ul>
+                            
+                            <button onclick="iniciarCheckout('lendario', 59)" class="w-full py-3 px-6 bg-gray-700 hover:bg-amber-600 text-white hover:text-black rounded-xl font-semibold transition-all duration-300 transform hover:scale-105">
+                                Ser Lendário
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Garantia e Benefícios -->
+                <div class="mt-16 text-center">
+                    <div class="bg-gray-800/50 rounded-2xl p-8 max-w-4xl mx-auto">
+                        <h3 class="text-2xl font-bold text-white mb-6">
+                            <i class="fas fa-shield-alt text-amber-500 mr-3"></i>
+                            Garantia de Satisfação
+                        </h3>
+                        <div class="grid md:grid-cols-3 gap-6">
+                            <div class="text-center">
+                                <i class="fas fa-undo text-amber-500 text-2xl mb-3"></i>
+                                <h4 class="font-semibold text-white mb-2">30 Dias</h4>
+                                <p class="text-gray-400 text-sm">Garantia de reembolso</p>
+                            </div>
+                            <div class="text-center">
+                                <i class="fas fa-headset text-amber-500 text-2xl mb-3"></i>
+                                <h4 class="font-semibold text-white mb-2">Suporte 24/7</h4>
+                                <p class="text-gray-400 text-sm">Atendimento especializado</p>
+                            </div>
+                            <div class="text-center">
+                                <i class="fas fa-sync text-amber-500 text-2xl mb-3"></i>
+                                <h4 class="font-semibold text-white mb-2">Atualizações</h4>
+                                <p class="text-gray-400 text-sm">Novos destinos mensais</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Social Proof / Depoimentos -->
+        <section id="depoimentos" class="py-12 md:py-16 lg:py-20 bg-gradient-to-b from-gray-900 to-black">
+            <div class="container mx-auto px-4">
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
+                        O Que Dizem Os <span class="text-gradient-gold">Motociclistas</span>
+                    </h2>
+                    <p class="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto">
+                        Mais de 3.500 aventureiros já confiaram no nosso gerador
+                    </p>
+                </div>
+                
+                <!-- Estatísticas -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
+                    <div class="text-center">
+                        <div class="text-3xl md:text-4xl font-bold text-gradient-gold mb-2">15.000+</div>
+                        <p class="text-gray-400">Rolês Gerados</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl md:text-4xl font-bold text-gradient-gold mb-2">3.500+</div>
+                        <p class="text-gray-400">Motociclistas</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl md:text-4xl font-bold text-gradient-gold mb-2">4.9/5</div>
+                        <p class="text-gray-400">Avaliação</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl md:text-4xl font-bold text-gradient-gold mb-2">98%</div>
+                        <p class="text-gray-400">Recomendações</p>
+                    </div>
+                </div>
+                
+                <!-- Depoimentos -->
+                <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                    <!-- Depoimento 1 -->
+                    <div class="testimonial-card bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6 relative">
+                        <div class="flex items-center mb-4">
+                            <img src="assets/img/gabriel.jpeg" alt="Gabriel - Motociclista" class="w-12 h-12 rounded-full object-cover mr-4">
+                            <div>
+                                <h4 class="font-bold text-white">Gabriel Silva</h4>
+                                <p class="text-gray-400 text-sm">Honda CB 600F</p>
+                            </div>
+                        </div>
+                        <div class="flex mb-3">
+                            <i class="fas fa-star text-amber-500"></i>
+                            <i class="fas fa-star text-amber-500"></i>
+                            <i class="fas fa-star text-amber-500"></i>
+                            <i class="fas fa-star text-amber-500"></i>
+                            <i class="fas fa-star text-amber-500"></i>
+                        </div>
+                        <p class="text-gray-300 italic">
+                            "Cara, esse gerador é sensacional! Já fiz mais de 20 rolês usando as sugestões. 
+                            Os cálculos são perfeitos e as rotas são épicas. Vale cada centavo!"
+                        </p>
+                        <div class="absolute -top-2 -left-2 text-4xl text-amber-500 opacity-20">
+                            <i class="fas fa-quote-left"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- Depoimento 2 -->
+                    <div class="testimonial-card bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6 relative">
+                        <div class="flex items-center mb-4">
+                            <img src="assets/img/Danilo.jpeg" alt="Danilo - Motociclista" class="w-12 h-12 rounded-full object-cover mr-4">
+                            <div>
+                                <h4 class="font-bold text-white">Danilo Santos</h4>
+                                <p class="text-gray-400 text-sm">Yamaha MT-09</p>
+                            </div>
+                        </div>
+                        <div class="flex mb-3">
+                            <i class="fas fa-star text-amber-500"></i>
+                            <i class="fas fa-star text-amber-500"></i>
+                            <i class="fas fa-star text-amber-500"></i>
+                            <i class="fas fa-star text-amber-500"></i>
+                            <i class="fas fa-star text-amber-500"></i>
+                        </div>
+                        <p class="text-gray-300 italic">
+                            "Uso o plano Aventureiro há 6 meses. As parcerias com hotéis me salvaram 
+                            muito dinheiro. Recomendo demais para quem curte viajar!"
+                        </p>
+                        <div class="absolute -top-2 -left-2 text-4xl text-amber-500 opacity-20">
+                            <i class="fas fa-quote-left"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- Depoimento 3 -->
+                    <div class="testimonial-card bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6 relative">
+                        <div class="flex items-center mb-4">
+                            <img src="assets/img/Marquinhos.jpeg" alt="Marquinhos - Motociclista" class="w-12 h-12 rounded-full object-cover mr-4">
+                            <div>
+                                <h4 class="font-bold text-white">Marquinhos</h4>
+                                <p class="text-gray-400 text-sm">BMW GS 1250</p>
+                            </div>
+                        </div>
+                        <div class="flex mb-3">
+                            <i class="fas fa-star text-amber-500"></i>
+                            <i class="fas fa-star text-amber-500"></i>
+                            <i class="fas fa-star text-amber-500"></i>
+                            <i class="fas fa-star text-amber-500"></i>
+                            <i class="fas fa-star text-amber-500"></i>
+                        </div>
+                        <p class="text-gray-300 italic">
+                            "Sou assinante Lendário e posso dizer: revolucionou minhas viagens! 
+                            Os roteiros exclusivos são incríveis. A IA realmente entende de moto!"
+                        </p>
+                        <div class="absolute -top-2 -left-2 text-4xl text-amber-500 opacity-20">
+                            <i class="fas fa-quote-left"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Cases de Sucesso -->
+                <div class="mt-16">
+                    <h3 class="text-3xl font-bold text-center text-white mb-8">
+                        Cases de <span class="text-gradient-gold">Sucesso</span>
+                    </h3>
+                    <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                        <div class="success-case bg-gradient-to-br from-gray-800/50 to-gray-900/50 rounded-2xl p-6 border border-gray-700">
+                            <div class="flex items-center mb-4">
+                                <i class="fas fa-route text-amber-500 text-2xl mr-4"></i>
+                                <div>
+                                    <h4 class="font-bold text-white">Rota dos Cânions</h4>
+                                    <p class="text-gray-400 text-sm">Gerada pela IA • 1.200km</p>
+                                </div>
+                            </div>
+                            <p class="text-gray-300 mb-4">
+                                Rolê épico por Cambará do Sul com paradas estratégicas em cachoeiras 
+                                e mirantes. Economia de 40% em hospedagem com nossas parcerias.
+                            </p>
+                            <div class="flex items-center text-green-500">
+                                <i class="fas fa-check-circle mr-2"></i>
+                                <span class="text-sm">89% dos motociclistas recomendaram</span>
+                            </div>
+                        </div>
+                        
+                        <div class="success-case bg-gradient-to-br from-gray-800/50 to-gray-900/50 rounded-2xl p-6 border border-gray-700">
+                            <div class="flex items-center mb-4">
+                                <i class="fas fa-mountain text-amber-500 text-2xl mr-4"></i>
+                                <div>
+                                    <h4 class="font-bold text-white">Serra da Mantiqueira</h4>
+                                    <p class="text-gray-400 text-sm">Gerada pela IA • 800km</p>
+                                </div>
+                            </div>
+                            <p class="text-gray-300 mb-4">
+                                Aventura pela serra com foco em gastronomia local e pousadas 
+                                rurais. Roteiro personalizado para motos de baixa cilindrada.
+                            </p>
+                            <div class="flex items-center text-green-500">
+                                <i class="fas fa-check-circle mr-2"></i>
+                                <span class="text-sm">95% completaram o roteiro</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- CTA Final -->
+                <div class="text-center mt-16">
+                    <div class="bg-gradient-to-r from-amber-600/20 to-orange-600/20 rounded-2xl p-8 max-w-2xl mx-auto border border-amber-500/30">
+                        <h3 class="text-2xl font-bold text-white mb-4">
+                            Junte-se a Milhares de Motociclistas
+                        </h3>
+                        <p class="text-gray-300 mb-6">
+                            Comece agora mesmo a criar rolês épicos com a ajuda da IA mais avançada do Brasil
+                        </p>
+                        <button class="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-black px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg">
+                            <i class="fas fa-rocket mr-2"></i>
+                            Começar Gratuitamente
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Parcerias Premium -->
+        <section id="parcerias" class="py-12 md:py-16 lg:py-20 bg-gradient-to-b from-black to-gray-900">
+            <div class="container mx-auto px-4">
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
+                        <span class="text-gradient-gold">Parcerias</span> Exclusivas
+                    </h2>
+                    <p class="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto">
+                        Descontos especiais para assinantes dos planos Aventureiro e Lendário
+                    </p>
+                </div>
+                
+                <!-- Categorias de Parceiros -->
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+                    <!-- Hotéis e Pousadas -->
+                    <div class="partner-category bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6 text-center hover:border-amber-500 transition-all duration-300">
+                        <div class="bg-amber-500/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-bed text-2xl text-amber-500"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Hospedagens</h3>
+                        <p class="text-gray-400 mb-4">Hotéis e pousadas com desconto</p>
+                        <div class="text-2xl font-bold text-green-500">15-30%</div>
+                        <p class="text-sm text-gray-500">de desconto</p>
+                    </div>
+                    
+                    <!-- Restaurantes -->
+                    <div class="partner-category bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6 text-center hover:border-amber-500 transition-all duration-300">
+                        <div class="bg-amber-500/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-utensils text-2xl text-amber-500"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Restaurantes</h3>
+                        <p class="text-gray-400 mb-4">Gastronomia local premium</p>
+                        <div class="text-2xl font-bold text-green-500">10-20%</div>
+                        <p class="text-sm text-gray-500">de desconto</p>
+                    </div>
+                    
+                    <!-- Postos de Combustível -->
+                    <div class="partner-category bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6 text-center hover:border-amber-500 transition-all duration-300">
+                        <div class="bg-amber-500/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-gas-pump text-2xl text-amber-500"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Combustível</h3>
+                        <p class="text-gray-400 mb-4">Postos parceiros na rota</p>
+                        <div class="text-2xl font-bold text-green-500">R$ 0,10</div>
+                        <p class="text-sm text-gray-500">por litro</p>
+                    </div>
+                    
+                    <!-- Oficinas e Seguros -->
+                    <div class="partner-category bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6 text-center hover:border-amber-500 transition-all duration-300">
+                        <div class="bg-amber-500/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-tools text-2xl text-amber-500"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Serviços</h3>
+                        <p class="text-gray-400 mb-4">Oficinas e seguros</p>
+                        <div class="text-2xl font-bold text-green-500">15-25%</div>
+                        <p class="text-sm text-gray-500">de desconto</p>
+                    </div>
+                </div>
+                
+                <!-- Parceiros em Destaque -->
+                <div class="mb-16">
+                    <h3 class="text-3xl font-bold text-center text-white mb-8">
+                        Parceiros em <span class="text-gradient-gold">Destaque</span>
+                    </h3>
+                    <div class="grid md:grid-cols-3 gap-8">
+                        <!-- Parceiro 1 -->
+                        <div class="partner-highlight bg-gradient-to-br from-gray-800/50 to-gray-900/50 rounded-2xl p-6 border border-gray-700">
+                            <div class="flex items-center mb-4">
+                                <div class="bg-blue-500/20 rounded-full w-12 h-12 flex items-center justify-center mr-4">
+                                    <i class="fas fa-hotel text-blue-500"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-white">Rede Estrada Hotels</h4>
+                                    <p class="text-gray-400 text-sm">Hospedagens</p>
+                                </div>
+                            </div>
+                            <p class="text-gray-300 mb-4">
+                                Mais de 150 hotéis pelo Brasil com desconto exclusivo para nossos assinantes.
+                            </p>
+                            <div class="flex items-center justify-between">
+                                <span class="bg-green-500/20 text-green-500 px-3 py-1 rounded-full text-sm font-semibold">
+                                    25% OFF
+                                </span>
+                                <span class="text-amber-500 font-semibold">Plano Aventureiro+</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Parceiro 2 -->
+                        <div class="partner-highlight bg-gradient-to-br from-gray-800/50 to-gray-900/50 rounded-2xl p-6 border border-gray-700">
+                            <div class="flex items-center mb-4">
+                                <div class="bg-red-500/20 rounded-full w-12 h-12 flex items-center justify-center mr-4">
+                                    <i class="fas fa-gas-pump text-red-500"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-white">Shell Select</h4>
+                                    <p class="text-gray-400 text-sm">Combustível</p>
+                                </div>
+                            </div>
+                            <p class="text-gray-300 mb-4">
+                                Desconto no combustível em mais de 800 postos Shell em todo território nacional.
+                            </p>
+                            <div class="flex items-center justify-between">
+                                <span class="bg-green-500/20 text-green-500 px-3 py-1 rounded-full text-sm font-semibold">
+                                    R$ 0,15/L
+                                </span>
+                                <span class="text-amber-500 font-semibold">Plano Lendário</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Parceiro 3 -->
+                        <div class="partner-highlight bg-gradient-to-br from-gray-800/50 to-gray-900/50 rounded-2xl p-6 border border-gray-700">
+                            <div class="flex items-center mb-4">
+                                <div class="bg-orange-500/20 rounded-full w-12 h-12 flex items-center justify-center mr-4">
+                                    <i class="fas fa-motorcycle text-orange-500"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-white">Moto Seguro Plus</h4>
+                                    <p class="text-gray-400 text-sm">Seguros</p>
+                                </div>
+                            </div>
+                            <p class="text-gray-300 mb-4">
+                                Seguro especializado em motocicletas com cobertura nacional e assistência 24h.
+                            </p>
+                            <div class="flex items-center justify-between">
+                                <span class="bg-green-500/20 text-green-500 px-3 py-1 rounded-full text-sm font-semibold">
+                                    20% OFF
+                                </span>
+                                <span class="text-amber-500 font-semibold">Todos os Planos</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Como Funciona -->
+                <div class="bg-gradient-to-r from-amber-600/10 to-orange-600/10 rounded-2xl p-8 border border-amber-500/20">
+                    <h3 class="text-2xl font-bold text-center text-white mb-8">
+                        <i class="fas fa-handshake text-amber-500 mr-3"></i>
+                        Como Funciona o Sistema de Parcerias
+                    </h3>
+                    <div class="grid md:grid-cols-4 gap-6">
+                        <div class="text-center">
+                            <div class="bg-amber-500/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                                <span class="text-2xl font-bold text-amber-500">1</span>
+                            </div>
+                            <h4 class="font-semibold text-white mb-2">Assine um Plano</h4>
+                            <p class="text-gray-400 text-sm">Escolha Aventureiro ou Lendário</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="bg-amber-500/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                                <span class="text-2xl font-bold text-amber-500">2</span>
+                            </div>
+                            <h4 class="font-semibold text-white mb-2">Gere seu Rolê</h4>
+                            <p class="text-gray-400 text-sm">Use nossa IA para criar roteiros</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="bg-amber-500/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                                <span class="text-2xl font-bold text-amber-500">3</span>
+                            </div>
+                            <h4 class="font-semibold text-white mb-2">Encontre Parceiros</h4>
+                            <p class="text-gray-400 text-sm">Veja estabelecimentos na rota</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="bg-amber-500/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                                <span class="text-2xl font-bold text-amber-500">4</span>
+                            </div>
+                            <h4 class="font-semibold text-white mb-2">Economize</h4>
+                            <p class="text-gray-400 text-sm">Apresente seu cupom e ganhe desconto</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seja um Parceiro -->
+        <section id="seja-parceiro" class="py-12 md:py-16 lg:py-20 bg-gradient-to-b from-gray-900 to-black">
+            <div class="container mx-auto px-4">
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
+                        <span class="text-gradient-gold">Seja um Parceiro</span> e Fature Mais
+                    </h2>
+                    <p class="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto">
+                        Mais de 3.500 motociclistas geram 500+ rolês por mês. Capture esses clientes para seu negócio!
+                    </p>
+                </div>
+                
+                <!-- Números Impressionantes -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
+                    <div class="text-center">
+                        <div class="text-3xl md:text-4xl font-bold text-gradient-gold mb-2">15.000+</div>
+                        <p class="text-gray-400">Rolês Gerados</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl md:text-4xl font-bold text-gradient-gold mb-2">3.500+</div>
+                        <p class="text-gray-400">Motociclistas Ativos</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl md:text-4xl font-bold text-gradient-gold mb-2">R$ 2.8M</div>
+                        <p class="text-gray-400">Volume Transacionado</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl md:text-4xl font-bold text-gradient-gold mb-2">4.9/5</div>
+                        <p class="text-gray-400">Satisfação</p>
+                    </div>
+                </div>
+                
+                <!-- Planos para Parceiros -->
+                <div class="mb-16">
+                    <h3 class="text-3xl font-bold text-center text-white mb-8">
+                        Planos de <span class="text-gradient-gold">Parceria</span>
+                    </h3>
+                    <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                        <!-- Plano Básico -->
+                        <div class="partner-plan bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-8 text-center">
+                            <div class="mb-6">
+                                <i class="fas fa-store text-4xl text-blue-500 mb-4"></i>
+                                <h4 class="text-2xl font-bold text-white mb-2">Básico</h4>
+                                <p class="text-gray-400">Para pequenos negócios</p>
+                            </div>
+                            
+                            <div class="mb-8">
+                                <div class="text-4xl font-bold text-white mb-2">
+                                    R$ <span class="text-blue-400">199</span>
+                                </div>
+                                <p class="text-gray-400">por mês</p>
+                            </div>
+                            
+                            <ul class="text-left space-y-3 mb-8">
+                                <li class="flex items-center text-gray-300">
+                                    <i class="fas fa-check text-green-500 mr-3"></i>
+                                    Até 50 leads/mês
+                                </li>
+                                <li class="flex items-center text-gray-300">
+                                    <i class="fas fa-check text-green-500 mr-3"></i>
+                                    Listagem no app
+                                </li>
+                                <li class="flex items-center text-gray-300">
+                                    <i class="fas fa-check text-green-500 mr-3"></i>
+                                    Comissão 3% por venda
+                                </li>
+                                <li class="flex items-center text-gray-300">
+                                    <i class="fas fa-check text-green-500 mr-3"></i>
+                                    Dashboard básico
+                                </li>
+                                <li class="flex items-center text-gray-400">
+                                    <i class="fas fa-times text-red-500 mr-3"></i>
+                                    Destaque premium
+                                </li>
+                            </ul>
+                            
+                            <button onclick="iniciarCadastroParceiro('basico', 199)" class="w-full py-3 px-6 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-semibold transition-all duration-300 transform hover:scale-105">
+                                Começar Agora
+                            </button>
+                        </div>
+                        
+                        <!-- Plano Premium -->
+                        <div class="partner-plan bg-gradient-to-br from-amber-600/20 to-orange-600/20 border-2 border-amber-500 rounded-2xl p-8 text-center relative transform scale-105">
+                            <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-amber-500 to-orange-500 text-black px-6 py-2 rounded-full text-sm font-bold">
+                                MAIS VENDIDO
+                            </div>
+                            <div class="mb-6 mt-4">
+                                <i class="fas fa-star text-4xl text-amber-500 mb-4"></i>
+                                <h4 class="text-2xl font-bold text-white mb-2">Premium</h4>
+                                <p class="text-gray-300">Para negócios em crescimento</p>
+                            </div>
+                            
+                            <div class="mb-8">
+                                <div class="text-4xl font-bold text-white mb-2">
+                                    R$ <span class="text-gradient-gold">399</span>
+                                </div>
+                                <p class="text-gray-300">por mês</p>
+                            </div>
+                            
+                            <ul class="text-left space-y-3 mb-8">
+                                <li class="flex items-center text-gray-300">
+                                    <i class="fas fa-check text-green-500 mr-3"></i>
+                                    Até 200 leads/mês
+                                </li>
+                                <li class="flex items-center text-gray-300">
+                                    <i class="fas fa-check text-green-500 mr-3"></i>
+                                    Destaque premium
+                                </li>
+                                <li class="flex items-center text-gray-300">
+                                    <i class="fas fa-check text-green-500 mr-3"></i>
+                                    Comissão 5% por venda
+                                </li>
+                                <li class="flex items-center text-gray-300">
+                                    <i class="fas fa-check text-green-500 mr-3"></i>
+                                    Analytics avançado
+                                </li>
+                                <li class="flex items-center text-gray-300">
+                                    <i class="fas fa-check text-green-500 mr-3"></i>
+                                    API de integração
+                                </li>
+                            </ul>
+                            
+                            <button onclick="iniciarCadastroParceiro('premium', 399)" class="w-full py-3 px-6 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-black rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg">
+                                Quero Ser Premium
+                            </button>
+                        </div>
+                        
+                        <!-- Plano Enterprise -->
+                        <div class="partner-plan bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-8 text-center">
+                            <div class="mb-6">
+                                <i class="fas fa-building text-4xl text-purple-500 mb-4"></i>
+                                <h4 class="text-2xl font-bold text-white mb-2">Enterprise</h4>
+                                <p class="text-gray-400">Para grandes redes</p>
+                            </div>
+                            
+                            <div class="mb-8">
+                                <div class="text-4xl font-bold text-white mb-2">
+                                    R$ <span class="text-purple-400">799</span>
+                                </div>
+                                <p class="text-gray-400">por mês</p>
+                            </div>
+                            
+                            <ul class="text-left space-y-3 mb-8">
+                                <li class="flex items-center text-gray-300">
+                                    <i class="fas fa-check text-green-500 mr-3"></i>
+                                    Leads ilimitados
+                                </li>
+                                <li class="flex items-center text-gray-300">
+                                    <i class="fas fa-check text-green-500 mr-3"></i>
+                                    Prioridade máxima
+                                </li>
+                                <li class="flex items-center text-gray-300">
+                                    <i class="fas fa-check text-green-500 mr-3"></i>
+                                    Comissão 7% por venda
+                                </li>
+                                <li class="flex items-center text-gray-300">
+                                    <i class="fas fa-check text-green-500 mr-3"></i>
+                                    Múltiplas unidades
+                                </li>
+                                <li class="flex items-center text-gray-300">
+                                    <i class="fas fa-check text-green-500 mr-3"></i>
+                                    Account Manager
+                                </li>
+                            </ul>
+                            
+                            <button onclick="iniciarCadastroParceiro('enterprise', 799)" class="w-full py-3 px-6 bg-purple-600 hover:bg-purple-500 text-white rounded-xl font-semibold transition-all duration-300 transform hover:scale-105">
+                                Falar com Vendas
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Como Funciona -->
+                <div class="mb-16">
+                    <h3 class="text-3xl font-bold text-center text-white mb-8">
+                        Como <span class="text-gradient-gold">Funciona</span>
+                    </h3>
+                    <div class="grid md:grid-cols-4 gap-6">
+                        <div class="text-center">
+                            <div class="bg-amber-500/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                                <span class="text-2xl font-bold text-amber-500">1</span>
+                            </div>
+                            <h4 class="font-semibold text-white mb-2">Cadastre-se</h4>
+                            <p class="text-gray-400 text-sm">Escolha seu plano e configure seu negócio na plataforma</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="bg-amber-500/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                                <span class="text-2xl font-bold text-amber-500">2</span>
+                            </div>
+                            <h4 class="font-semibold text-white mb-2">Apareça nos Roteiros</h4>
+                            <p class="text-gray-400 text-sm">Sua empresa aparece automaticamente nos rolês relevantes</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="bg-amber-500/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                                <span class="text-2xl font-bold text-amber-500">3</span>
+                            </div>
+                            <h4 class="font-semibold text-white mb-2">Receba Clientes</h4>
+                            <p class="text-gray-400 text-sm">Motociclistas chegam até você seguindo os roteiros</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="bg-amber-500/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                                <span class="text-2xl font-bold text-amber-500">4</span>
+                            </div>
+                            <h4 class="font-semibold text-white mb-2">Fature Mais</h4>
+                            <p class="text-gray-400 text-sm">Acompanhe seu ROI em tempo real no dashboard</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- ROI Calculator -->
+                <div class="bg-gradient-to-r from-green-900/20 to-emerald-900/20 rounded-2xl p-8 border border-green-700/30">
+                    <div class="text-center mb-8">
+                        <h3 class="text-2xl font-bold text-white mb-4">
+                            <i class="fas fa-calculator text-green-500 mr-3"></i>
+                            Calculadora de ROI
+                        </h3>
+                        <p class="text-gray-300">Veja quanto você pode ganhar sendo nosso parceiro</p>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-3 gap-8">
+                        <div class="text-center">
+                            <label class="block text-gray-300 text-sm font-semibold mb-2">Ticket Médio (R$)</label>
+                            <input id="ticket-medio" type="number" value="150" min="50" max="1000" 
+                                   class="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-600 text-white text-center text-xl font-bold focus:border-green-500 outline-none transition-colors"
+                                   onchange="calcularROI()">
+                        </div>
+                        <div class="text-center">
+                            <label class="block text-gray-300 text-sm font-semibold mb-2">Clientes/Mês</label>
+                            <input id="clientes-mes" type="number" value="50" min="10" max="500" 
+                                   class="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-600 text-white text-center text-xl font-bold focus:border-green-500 outline-none transition-colors"
+                                   onchange="calcularROI()">
+                        </div>
+                        <div class="text-center">
+                            <div class="text-gray-300 text-sm font-semibold mb-2">Faturamento Mensal</div>
+                            <div id="faturamento-resultado" class="text-3xl font-bold text-green-400">R$ 7.500</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 p-4 bg-gray-800/50 rounded-lg">
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                            <div>
+                                <div class="text-gray-400 text-xs">Investimento</div>
+                                <div id="investimento-valor" class="text-white font-bold">R$ 399</div>
+                            </div>
+                            <div>
+                                <div class="text-gray-400 text-xs">Faturamento</div>
+                                <div id="faturamento-valor" class="text-green-400 font-bold">R$ 7.500</div>
+                            </div>
+                            <div>
+                                <div class="text-gray-400 text-xs">ROI</div>
+                                <div id="roi-valor" class="text-amber-400 font-bold">1.781%</div>
+                            </div>
+                            <div>
+                                <div class="text-gray-400 text-xs">Payback</div>
+                                <div class="text-blue-400 font-bold">1.6 dias</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Agenda -->
         <section id="agenda" class="py-12 md:py-16 lg:py-20 bg-gradient-to-b from-gray-900 to-black">
             <div class="container mx-auto px-4 space-y-6">
@@ -1017,6 +2275,32 @@
                                     <div>
                                         <h3 class="text-2xl md:text-3xl font-bold text-white group-hover:text-amber-400 transition-colors">Gerador de Rolê de Moto</h3>
                                         <p class="text-gray-400 text-sm">Descreva o que você quer fazer e descubra lugares incríveis</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Simulador de Planos (para demonstração) -->
+                                <div class="bg-gradient-to-r from-amber-900/20 to-orange-900/20 rounded-lg p-4 border border-amber-700/30">
+                                    <h4 class="text-amber-400 font-bold text-sm mb-3 flex items-center gap-2">
+                                        <i class="fas fa-crown"></i>
+                                        SIMULADOR DE PLANOS (DEMO)
+                                    </h4>
+                                    <p class="text-gray-300 text-xs mb-3">Teste como funciona cada plano:</p>
+                                    <div class="flex flex-wrap gap-2">
+                                        <button onclick="simularPlano('gratuito')" 
+                                                class="px-3 py-1 bg-gray-700 hover:bg-gray-600 text-white text-xs rounded font-semibold transition-colors">
+                                            Gratuito
+                                        </button>
+                                        <button onclick="simularPlano('aventureiro')" 
+                                                class="px-3 py-1 bg-amber-600 hover:bg-amber-500 text-black text-xs rounded font-semibold transition-colors">
+                                            Aventureiro (R$29)
+                                        </button>
+                                        <button onclick="simularPlano('lendario')" 
+                                                class="px-3 py-1 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-black text-xs rounded font-semibold transition-colors">
+                                            Lendário (R$59)
+                                        </button>
+                                    </div>
+                                    <div id="plano-atual" class="mt-2 text-xs text-gray-400">
+                                        Plano atual: <span class="text-white font-semibold">Gratuito</span>
                                     </div>
                                 </div>
                                 
@@ -1638,5 +2922,120 @@ Exemplos:
     </script>
     
     <script src="app.js" defer></script>
-</body>
+    <!-- Widget de Captura de Parceiros (Flutuante) -->
+    <div id="partner-magnet" class="fixed bottom-6 right-6 z-50 hidden">
+        <div class="bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl p-4 shadow-2xl border border-green-500 max-w-sm animate-pulse-slow">
+            <div class="flex items-start gap-3">
+                <div class="bg-white/20 rounded-full p-2 flex-shrink-0">
+                    <i class="fas fa-chart-line text-white text-lg"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-1">
+                        <h4 class="text-white font-bold text-sm">Seu negócio aqui!</h4>
+                        <div class="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full font-bold animate-bounce">
+                            NOVO
+                        </div>
+                    </div>
+                    <p class="text-green-100 text-xs mb-2">
+                        <span id="users-online">3.247</span> motociclistas procurando estabelecimentos agora
+                    </p>
+                    <div class="flex gap-2">
+                        <button onclick="abrirCapturaRapida()" class="bg-white text-green-600 px-3 py-1 rounded-lg text-xs font-bold hover:bg-gray-100 transition-colors">
+                            Ver Leads
+                        </button>
+                        <button onclick="fecharWidgetParceiro()" class="text-white/70 hover:text-white text-xs">
+                            ✕
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Captura Rápida -->
+    <div id="modal-captura" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-0 overflow-hidden shadow-2xl">
+            <!-- Header com impacto -->
+            <div class="bg-gradient-to-r from-green-600 to-emerald-600 p-6 text-white text-center">
+                <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-rocket text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-2">🔥 Oportunidade Limitada!</h3>
+                <p class="text-green-100">
+                    <span class="font-bold text-yellow-300" id="leads-hoje">127</span> leads hoje para sua região
+                </p>
+            </div>
+            
+            <!-- Conteúdo -->
+            <div class="p-6">
+                <div class="text-center mb-6">
+                    <h4 class="text-xl font-bold text-gray-800 mb-2">
+                        Capture esses clientes antes da concorrência!
+                    </h4>
+                    <p class="text-gray-600 text-sm">
+                        Motociclistas gastam em média <strong>R$ 850 por viagem</strong>
+                    </p>
+                </div>
+                
+                <!-- Urgência -->
+                <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                    <div class="flex items-center gap-2 text-red-700 mb-2">
+                        <i class="fas fa-clock"></i>
+                        <span class="font-bold text-sm">Apenas <span id="vagas-restantes">3</span> vagas restantes na sua região!</span>
+                    </div>
+                    <div class="text-red-600 text-xs">
+                        ⚡ Esta oferta expira em: <span id="countdown-timer" class="font-bold">23:45:12</span>
+                    </div>
+                </div>
+                
+                <!-- Formulário mínimo -->
+                <div class="space-y-4">
+                    <input type="text" id="nome-rapido" placeholder="Nome da empresa" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-green-500 outline-none">
+                    <input type="text" id="whatsapp-rapido" placeholder="WhatsApp" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-green-500 outline-none">
+                    <select id="tipo-rapido" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-green-500 outline-none">
+                        <option value="">Tipo de negócio</option>
+                        <option value="hotel">🏨 Hotel/Pousada</option>
+                        <option value="restaurante">🍽️ Restaurante</option>
+                        <option value="posto">⛽ Posto de Combustível</option>
+                        <option value="oficina">🔧 Oficina</option>
+                        <option value="turismo">🎯 Turismo</option>
+                        <option value="outro">🏪 Outro</option>
+                    </select>
+                </div>
+                
+                <!-- Botão de conversão -->
+                <button onclick="enviarCapturaRapida()" 
+                        class="w-full mt-6 bg-gradient-to-r from-green-600 to-emerald-600 text-white py-4 rounded-lg font-bold text-lg hover:from-green-700 hover:to-emerald-700 transition-all shadow-lg">
+                    💰 QUERO OS LEADS AGORA
+                </button>
+                
+                <!-- Prova social -->
+                <div class="mt-4 text-center">
+                    <div class="text-xs text-gray-500">
+                        ✅ +<span id="partners-count">847</span> parceiros já faturam conosco
+                    </div>
+                    <div class="flex items-center justify-center gap-1 mt-2">
+                        <div class="flex">
+                            <div class="w-2 h-2 bg-green-500 rounded-full animate-ping"></div>
+                            <div class="w-2 h-2 bg-green-500 rounded-full animate-ping animation-delay-75"></div>
+                            <div class="w-2 h-2 bg-green-500 rounded-full animate-ping animation-delay-150"></div>
+                        </div>
+                        <span class="text-xs text-green-600 font-semibold ml-2">
+                            <span id="live-signups">12</span> empresas se cadastraram hoje
+                        </span>
+                    </div>
+                </div>
+                
+                <!-- Fechar -->
+                <button onclick="fecharCapturaRapida()" 
+                        class="absolute top-4 right-4 text-white/70 hover:text-white">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    </body>
 </html>

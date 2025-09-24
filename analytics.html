@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics - Gerador de Rolês</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        .analytics-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+        }
+
+        .analytics-card:hover {
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 16px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            transform: translate(30px, -30px);
+        }
+
+        .metric-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .metric-trend {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .trend-up {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .trend-down {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .trend-neutral {
+            background: rgba(100, 116, 139, 0.2);
+            color: #64748b;
+        }
+
+        .filter-button {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            color: #64748b;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .filter-button.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .filter-button:hover:not(.active) {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        .data-table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .data-table th,
+        .data-table td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .data-table th {
+            background: #f8fafc;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .data-table tr:hover {
+            background: #f9fafb;
+        }
+
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+
+        .progress-ring-circle {
+            stroke-dasharray: 251.2;
+            stroke-dashoffset: 251.2;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.35s;
+        }
+
+        .heatmap-cell {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            margin: 1px;
+            background: #eee;
+            transition: all 0.2s ease;
+        }
+
+        .heatmap-cell:hover {
+            transform: scale(1.2);
+        }
+
+        .heatmap-1 { background: #c6f6d5; }
+        .heatmap-2 { background: #9ae6b4; }
+        .heatmap-3 { background: #68d391; }
+        .heatmap-4 { background: #48bb78; }
+        .heatmap-5 { background: #38a169; }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .metric-number {
+                font-size: 2rem;
+            }
+            
+            .chart-container {
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white border-b border-gray-200 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <button id="backBtn" class="p-2 hover:bg-gray-100 rounded-lg">
+                    <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                </button>
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">Analytics</h1>
+                    <p class="text-gray-600">Métricas e insights da plataforma</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <!-- Date Range Picker -->
+                <div class="flex items-center space-x-2">
+                    <input type="date" id="startDate" class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                    <span class="text-gray-500">até</span>
+                    <input type="date" id="endDate" class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                </div>
+                
+                <!-- Export Button -->
+                <button id="exportBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                    <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Exportar
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-6 py-8">
+        <!-- Filter Tabs -->
+        <div class="flex space-x-2 mb-8">
+            <button class="filter-button active" data-period="7d">7 dias</button>
+            <button class="filter-button" data-period="30d">30 dias</button>
+            <button class="filter-button" data-period="90d">3 meses</button>
+            <button class="filter-button" data-period="1y">1 ano</button>
+            <button class="filter-button" data-period="custom">Custom</button>
+        </div>
+
+        <!-- Key Metrics -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Total Users -->
+            <div class="metric-card p-6 text-white">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                        </svg>
+                    </div>
+                    <span class="metric-trend trend-up">
+                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17l9.2-9.2M17 17V7H7"></path>
+                        </svg>
+                        +12%
+                    </span>
+                </div>
+                <div class="metric-number" id="totalUsers">1,247</div>
+                <div class="text-blue-100 text-sm">Usuários Totais</div>
+            </div>
+
+            <!-- Active Users -->
+            <div class="metric-card p-6 text-white" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.636 18.364a9 9 0 010-12.728m12.728 0a9 9 0 010 12.728m-9.9-2.829a5 5 0 010-7.07m7.072 0a5 5 0 010 7.07M13 12a1 1 0 11-2 0 1 1 0 012 0z"></path>
+                        </svg>
+                    </div>
+                    <span class="metric-trend trend-up">
+                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17l9.2-9.2M17 17V7H7"></path>
+                        </svg>
+                        +8%
+                    </span>
+                </div>
+                <div class="metric-number" id="activeUsers">342</div>
+                <div class="text-green-100 text-sm">Usuários Ativos (30d)</div>
+            </div>
+
+            <!-- Total Generations -->
+            <div class="metric-card p-6 text-white" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <span class="metric-trend trend-up">
+                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17l9.2-9.2M17 17V7H7"></path>
+                        </svg>
+                        +25%
+                    </span>
+                </div>
+                <div class="metric-number" id="totalGenerations">3,891</div>
+                <div class="text-yellow-100 text-sm">Roteiros Gerados</div>
+            </div>
+
+            <!-- Revenue -->
+            <div class="metric-card p-6 text-white" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                        </svg>
+                    </div>
+                    <span class="metric-trend trend-up">
+                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17l9.2-9.2M17 17V7H7"></path>
+                        </svg>
+                        +18%
+                    </span>
+                </div>
+                <div class="metric-number" id="totalRevenue">R$ 8,4K</div>
+                <div class="text-purple-100 text-sm">Receita (30d)</div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <!-- User Growth Chart -->
+            <div class="analytics-card p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900">Crescimento de Usuários</h3>
+                    <div class="flex space-x-2">
+                        <button class="filter-button active" data-chart="users" data-metric="total">Total</button>
+                        <button class="filter-button" data-chart="users" data-metric="active">Ativos</button>
+                        <button class="filter-button" data-chart="users" data-metric="new">Novos</button>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="userGrowthChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Generation Analytics -->
+            <div class="analytics-card p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900">Gerações por Período</h3>
+                    <div class="flex space-x-2">
+                        <button class="filter-button active" data-chart="generations" data-metric="daily">Diário</button>
+                        <button class="filter-button" data-chart="generations" data-metric="hourly">Por Hora</button>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="generationsChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Analytics -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <!-- Plan Distribution -->
+            <div class="analytics-card p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-6">Distribuição de Planos</h3>
+                <div class="chart-container" style="height: 200px;">
+                    <canvas id="planDistributionChart"></canvas>
+                </div>
+                <div class="mt-4 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 bg-gray-400 rounded-full mr-2"></div>
+                            <span class="text-sm text-gray-600">FREE</span>
+                        </div>
+                        <span class="text-sm font-medium">68%</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+                            <span class="text-sm text-gray-600">PREMIUM</span>
+                        </div>
+                        <span class="text-sm font-medium">22%</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+                            <span class="text-sm text-gray-600">PRO</span>
+                        </div>
+                        <span class="text-sm font-medium">8%</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 bg-purple-500 rounded-full mr-2"></div>
+                            <span class="text-sm text-gray-600">ENTERPRISE</span>
+                        </div>
+                        <span class="text-sm font-medium">2%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance Metrics -->
+            <div class="analytics-card p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-6">Performance</h3>
+                
+                <!-- Average Generation Time -->
+                <div class="mb-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm text-gray-600">Tempo Médio de Geração</span>
+                        <span class="text-sm font-medium text-gray-900">2.3s</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-green-500 h-2 rounded-full" style="width: 85%"></div>
+                    </div>
+                    <div class="text-xs text-gray-500 mt-1">Meta: <3s</div>
+                </div>
+
+                <!-- Success Rate -->
+                <div class="mb-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm text-gray-600">Taxa de Sucesso</span>
+                        <span class="text-sm font-medium text-gray-900">98.7%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-green-500 h-2 rounded-full" style="width: 98.7%"></div>
+                    </div>
+                </div>
+
+                <!-- User Satisfaction -->
+                <div class="mb-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm text-gray-600">Satisfação dos Usuários</span>
+                        <span class="text-sm font-medium text-gray-900">4.6/5</span>
+                    </div>
+                    <div class="flex space-x-1">
+                        <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                        </svg>
+                        <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                        </svg>
+                        <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                        </svg>
+                        <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                        </svg>
+                        <svg class="w-4 h-4 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity Heatmap -->
+            <div class="analytics-card p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-6">Atividade por Hora</h3>
+                <div class="grid grid-cols-24 gap-1" id="activityHeatmap">
+                    <!-- Heatmap cells will be generated by JavaScript -->
+                </div>
+                <div class="flex items-center justify-between mt-4 text-xs text-gray-500">
+                    <span>00:00</span>
+                    <span>06:00</span>
+                    <span>12:00</span>
+                    <span>18:00</span>
+                    <span>23:59</span>
+                </div>
+                <div class="flex items-center justify-between mt-2">
+                    <span class="text-xs text-gray-500">Menos</span>
+                    <div class="flex space-x-1">
+                        <div class="heatmap-cell"></div>
+                        <div class="heatmap-cell heatmap-1"></div>
+                        <div class="heatmap-cell heatmap-2"></div>
+                        <div class="heatmap-cell heatmap-3"></div>
+                        <div class="heatmap-cell heatmap-4"></div>
+                        <div class="heatmap-cell heatmap-5"></div>
+                    </div>
+                    <span class="text-xs text-gray-500">Mais</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tables Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Top Destinations -->
+            <div class="analytics-card p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-6">Destinos Mais Populares</h3>
+                <div class="overflow-x-auto">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Destino</th>
+                                <th>Gerações</th>
+                                <th>Crescimento</th>
+                            </tr>
+                        </thead>
+                        <tbody id="topDestinationsTable">
+                            <tr>
+                                <td>
+                                    <div class="flex items-center">
+                                        <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                                            🏔️
+                                        </div>
+                                        <span>Campos do Jordão, SP</span>
+                                    </div>
+                                </td>
+                                <td class="font-medium">324</td>
+                                <td>
+                                    <span class="metric-trend trend-up text-xs">+15%</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="flex items-center">
+                                        <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                                            🏖️
+                                        </div>
+                                        <span>Ilhabela, SP</span>
+                                    </div>
+                                </td>
+                                <td class="font-medium">298</td>
+                                <td>
+                                    <span class="metric-trend trend-up text-xs">+8%</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="flex items-center">
+                                        <div class="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center mr-3">
+                                            🏛️
+                                        </div>
+                                        <span>Ouro Preto, MG</span>
+                                    </div>
+                                </td>
+                                <td class="font-medium">276</td>
+                                <td>
+                                    <span class="metric-trend trend-up text-xs">+12%</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="flex items-center">
+                                        <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
+                                            💧
+                                        </div>
+                                        <span>Brotas, SP</span>
+                                    </div>
+                                </td>
+                                <td class="font-medium">251</td>
+                                <td>
+                                    <span class="metric-trend trend-neutral text-xs">0%</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="flex items-center">
+                                        <div class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center mr-3">
+                                            🌊
+                                        </div>
+                                        <span>Ubatuba, SP</span>
+                                    </div>
+                                </td>
+                                <td class="font-medium">234</td>
+                                <td>
+                                    <span class="metric-trend trend-down text-xs">-3%</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- User Behavior -->
+            <div class="analytics-card p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-6">Comportamento dos Usuários</h3>
+                <div class="space-y-6">
+                    <!-- Average Session Duration -->
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm font-medium text-gray-700">Duração Média da Sessão</span>
+                            <span class="text-sm text-gray-900">8m 32s</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-blue-500 h-2 rounded-full" style="width: 85%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Pages per Session -->
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm font-medium text-gray-700">Páginas por Sessão</span>
+                            <span class="text-sm text-gray-900">3.4</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-green-500 h-2 rounded-full" style="width: 68%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Bounce Rate -->
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm font-medium text-gray-700">Taxa de Rejeição</span>
+                            <span class="text-sm text-gray-900">23%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-yellow-500 h-2 rounded-full" style="width: 23%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Return Users -->
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm font-medium text-gray-700">Usuários Recorrentes</span>
+                            <span class="text-sm text-gray-900">67%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-purple-500 h-2 rounded-full" style="width: 67%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Mobile Usage -->
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm font-medium text-gray-700">Uso Mobile</span>
+                            <span class="text-sm text-gray-900">74%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-orange-500 h-2 rounded-full" style="width: 74%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="database.js"></script>
+    <script src="auth.js"></script>
+    <script src="analytics.js"></script>
+</body>
+</html>

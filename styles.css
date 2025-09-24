@@ -820,3 +820,494 @@ a:hover, a:focus {
     --gold-primary: #ffff00;
   }
 }
+
+/* ====== SEÇÃO DE PREÇOS ====== */
+.pricing-card {
+    transition: all 0.3s ease;
+    position: relative;
+    backdrop-filter: blur(10px);
+}
+
+.pricing-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(201, 161, 74, 0.2);
+}
+
+.pricing-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    padding: 2px;
+    background: linear-gradient(45deg, transparent, rgba(201, 161, 74, 0.5), transparent);
+    border-radius: 16px;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: xor;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.pricing-card:hover::before {
+    opacity: 1;
+}
+
+.pricing-card .fa-check {
+    color: #10b981 !important;
+}
+
+.pricing-card .fa-times {
+    color: #ef4444 !important;
+}
+
+/* Efeito especial para o plano mais popular */
+.pricing-card.popular {
+    background: linear-gradient(135deg, rgba(201, 161, 74, 0.1) 0%, rgba(251, 146, 60, 0.1) 100%);
+    border: 2px solid var(--gold);
+    box-shadow: 0 0 30px rgba(201, 161, 74, 0.3);
+}
+
+.pricing-card.popular::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(45deg, var(--gold), var(--accent), var(--gold));
+    border-radius: 18px;
+    z-index: -1;
+    opacity: 0.7;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+}
+
+/* Animações dos cartões de preço */
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.pricing-card {
+    animation: slideUp 0.6s ease-out;
+}
+
+.pricing-card:nth-child(1) { animation-delay: 0.1s; }
+.pricing-card:nth-child(2) { animation-delay: 0.2s; }
+.pricing-card:nth-child(3) { animation-delay: 0.3s; }
+
+/* Responsividade para preços */
+@media (max-width: 768px) {
+    .pricing-card {
+        transform: none !important;
+        margin-bottom: 2rem;
+    }
+    
+    .pricing-card:hover {
+        transform: translateY(-5px) !important;
+    }
+}
+
+/* ====== SEÇÃO DE DEPOIMENTOS ====== */
+.testimonial-card {
+    transition: all 0.3s ease;
+    position: relative;
+    backdrop-filter: blur(10px);
+}
+
+.testimonial-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(201, 161, 74, 0.15);
+    border-color: rgba(201, 161, 74, 0.5);
+}
+
+.testimonial-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(45deg, transparent, rgba(201, 161, 74, 0.1), transparent);
+    border-radius: 16px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.testimonial-card:hover::before {
+    opacity: 1;
+}
+
+.success-case {
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.success-case:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* Animações para depoimentos */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.testimonial-card {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.testimonial-card:nth-child(1) { animation-delay: 0.1s; }
+.testimonial-card:nth-child(2) { animation-delay: 0.2s; }
+.testimonial-card:nth-child(3) { animation-delay: 0.3s; }
+
+.success-case {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.success-case:nth-child(1) { animation-delay: 0.4s; }
+.success-case:nth-child(2) { animation-delay: 0.5s; }
+
+/* Efeito especial nas estrelas */
+.testimonial-card .fa-star {
+    transition: all 0.3s ease;
+}
+
+.testimonial-card:hover .fa-star {
+    transform: scale(1.1);
+    text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+}
+
+/* Responsividade para depoimentos */
+@media (max-width: 768px) {
+    .testimonial-card,
+    .success-case {
+        transform: none !important;
+        margin-bottom: 1.5rem;
+    }
+    
+    .testimonial-card:hover,
+    .success-case:hover {
+        transform: translateY(-3px) !important;
+    }
+}
+
+/* ====== SEÇÃO DE PARCERIAS ====== */
+.partner-category {
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.partner-category:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(201, 161, 74, 0.15);
+}
+
+.partner-highlight {
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.partner-highlight:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    border-color: rgba(201, 161, 74, 0.3);
+}
+
+/* Animações para parcerias */
+.partner-category {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.partner-category:nth-child(1) { animation-delay: 0.1s; }
+.partner-category:nth-child(2) { animation-delay: 0.2s; }
+.partner-category:nth-child(3) { animation-delay: 0.3s; }
+.partner-category:nth-child(4) { animation-delay: 0.4s; }
+
+.partner-highlight {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.partner-highlight:nth-child(1) { animation-delay: 0.2s; }
+.partner-highlight:nth-child(2) { animation-delay: 0.3s; }
+.partner-highlight:nth-child(3) { animation-delay: 0.4s; }
+
+/* Responsividade para parcerias */
+@media (max-width: 768px) {
+    .partner-category,
+    .partner-highlight {
+        transform: none !important;
+        margin-bottom: 1.5rem;
+    }
+    
+    .partner-category:hover,
+    .partner-highlight:hover {
+        transform: translateY(-3px) !important;
+    }
+}
+
+/* ====== SEÇÃO SEJA UM PARCEIRO ====== */
+.partner-plan {
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.partner-plan:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+}
+
+/* Destaque do plano mais vendido */
+.partner-plan.scale-105 {
+    border: 2px solid var(--gold);
+    box-shadow: 0 0 30px rgba(201, 161, 74, 0.2);
+}
+
+/* Animações para planos de parceiro */
+.partner-plan {
+    animation: slideUpPartner 0.6s ease-out;
+}
+
+.partner-plan:nth-child(1) { animation-delay: 0.1s; }
+.partner-plan:nth-child(2) { animation-delay: 0.2s; }
+.partner-plan:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes slideUpPartner {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Calculadora de ROI */
+.calculator-input {
+    transition: all 0.3s ease;
+}
+
+.calculator-input:focus {
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+    border-color: #22c55e !important;
+}
+
+/* Responsividade para seção de parceiros */
+@media (max-width: 768px) {
+    .partner-plan {
+        transform: none !important;
+        margin-bottom: 2rem;
+    }
+    
+    .partner-plan:hover {
+        transform: translateY(-5px) !important;
+    }
+    
+    .partner-plan.scale-105 {
+        transform: none !important;
+    }
+}
+
+/* ====== MÁQUINA DE CAPTURA DE PARCEIROS ====== */
+#partner-magnet {
+    animation: none;
+    transition: all 0.3s ease;
+}
+
+.animate-pulse-slow {
+    animation: pulse-slow 3s ease-in-out infinite;
+}
+
+@keyframes pulse-slow {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.9;
+        transform: scale(1.02);
+    }
+}
+
+.animate-slideInRight {
+    animation: slideInRight 0.5s ease-out;
+}
+
+.animate-slideOutRight {
+    animation: slideOutRight 0.5s ease-in;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+}
+
+/* Modal de captura */
+#modal-captura {
+    backdrop-filter: blur(10px);
+}
+
+#modal-captura .bg-white {
+    animation: modalAppear 0.3s ease-out;
+}
+
+@keyframes modalAppear {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Delays para animações */
+.animation-delay-75 {
+    animation-delay: 75ms;
+}
+
+.animation-delay-150 {
+    animation-delay: 150ms;
+}
+
+/* Efeito de pulso nos números */
+.number-update {
+    transition: all 0.3s ease;
+}
+
+.number-update.updating {
+    color: #10b981 !important;
+    transform: scale(1.1);
+    font-weight: bold;
+}
+
+/* Widget responsivo */
+@media (max-width: 768px) {
+    #partner-magnet {
+        bottom: 1rem;
+        right: 1rem;
+        left: 1rem;
+        max-width: none;
+    }
+    
+    #modal-captura .bg-white {
+        margin: 1rem;
+        max-width: none;
+    }
+}
+
+/* Urgência visual */
+.urgency-blink {
+    animation: urgencyBlink 2s ease-in-out infinite;
+}
+
+@keyframes urgencyBlink {
+    0%, 50%, 100% {
+        opacity: 1;
+    }
+    25%, 75% {
+        opacity: 0.7;
+    }
+}
+
+/* Hover states especiais */
+#partner-magnet:hover {
+    transform: scale(1.05);
+    box-shadow: 0 20px 40px rgba(34, 197, 94, 0.3);
+}
+
+/* Loading states para botões */
+.btn-loading {
+    position: relative;
+    color: transparent !important;
+}
+
+.btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 50%;
+    left: 50%;
+    margin-left: -8px;
+    margin-top: -8px;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Animações para notificações sociais */
+.animate-slideInLeft {
+    animation: slideInLeft 0.5s ease-out;
+}
+
+.animate-slideOutLeft {
+    animation: slideOutLeft 0.5s ease-in;
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideOutLeft {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(-100%);
+    }
+}
+
+/* Efeitos de pressão social */
+.social-proof-notification {
+    transition: all 0.3s ease;
+}
+
+.social-proof-notification:hover {
+    transform: scale(1.02);
+    box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);
+}
