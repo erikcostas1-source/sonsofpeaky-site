@@ -9,9 +9,9 @@
     
     <!-- Security Headers -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
-    <meta http-equiv="X-Frame-Options" content="DENY" />
     <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
     <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
+    <!-- X-Frame-Options deve ser configurado no servidor, não em meta tag -->
     
     <!-- Performance & Compatibility -->
     <meta http-equiv="Cache-Control" content="public, max-age=31536000" />
@@ -64,8 +64,11 @@
                 if (tailwindProd) tailwindProd.disabled = true;
                 console.log('🏠 Usando Tailwind CDN (desenvolvimento)');
             } else {
-                // Em produção, remove CDN e usa CSS local
-                if (tailwindCdn) tailwindCdn.remove();
+                // Em produção, remove CDN completamente e usa CSS local
+                if (tailwindCdn) {
+                    tailwindCdn.remove();
+                    console.log('🌐 Tailwind CDN removido - usando CSS local');
+                }
                 console.log('🌐 Usando Tailwind local (produção)');
             }
         })();
@@ -522,6 +525,10 @@
                                                     🎭 Cultura
                                                 </label>
                                             </div>
+                                            <textarea id="preferencias-extras" 
+                                                     class="input-field mt-3" 
+                                                     rows="2" 
+                                                     placeholder="Outros interesses específicos (opcional)..."></textarea>
                                         </div>
                                     </div>
                                 </div>

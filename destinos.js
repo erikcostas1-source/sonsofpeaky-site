@@ -455,9 +455,18 @@ function sugerirHorario(destino, horaVoltaDesejada = null) {
     return destino.melhorHorario;
 }
 
+// Criar array simples para compatibilidade com gerador.js
+const destinos = [];
+Object.values(DESTINOS_DATABASE).forEach(categoria => {
+    if (Array.isArray(categoria)) {
+        destinos.push(...categoria);
+    }
+});
+
 // Exportar para uso global
 if (typeof window !== 'undefined') {
     window.DESTINOS_DATABASE = DESTINOS_DATABASE;
+    window.destinos = destinos; // Para compatibilidade com gerador.js
     window.buscarDestinos = buscarDestinos;
     window.sugerirHorario = sugerirHorario;
     window.calcularCustoTotal = calcularCustoTotal;

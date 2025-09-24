@@ -194,7 +194,7 @@ async function handleFormSubmit(event) {
         return;
     }
     
-    const formData = getFormData();
+    const formData = getFormData(true); // true = validação rigorosa para submissão
     console.log('📝 Dados do formulário:', formData);
     
     // Salva dados do formulário para compartilhamento
@@ -1155,9 +1155,14 @@ function getFormData() {
         const perfilPilotagem = getFieldValue('perfil-pilotagem');
         const experienciaDesejada = getFieldValue('experiencia-desejada');
         
-        // Validação de campos obrigatórios
-        if (!enderecoPartida || !dataRole || !horarioSaida || !horarioVolta || !tipoMoto || !perfilPilotagem || !experienciaDesejada) {
+        // Validação para submissão (mais rigorosa)
+        const isForSubmission = arguments[0] === true;
+        const hasRequiredFields = enderecoPartida && dataRole && horarioSaida && horarioVolta && tipoMoto && perfilPilotagem && experienciaDesejada;
+        
+        if (isForSubmission && !hasRequiredFields) {
             throw new Error('Campos obrigatórios não preenchidos');
+        } else if (!hasRequiredFields) {
+            console.log('⚠️ Alguns campos obrigatórios ainda não foram preenchidos');
         }
         
         // Campos opcionais
@@ -1435,8 +1440,13 @@ function exportToPDF(index) {
 
 // Persistência de dados
 function saveFormData() {
-    const formData = getFormData();
-    localStorage.setItem('gerador_form_data', JSON.stringify(formData));
+    try {
+        const formData = getFormData();
+        localStorage.setItem('gerador_form_data', JSON.stringify(formData));
+    } catch (error) {
+        // Falha silenciosa - não é crítico para o funcionamento
+        console.log('⚠️ Não foi possível salvar dados do formulário (campos incompletos)');
+    }
 }
 
 function loadSavedData() {
