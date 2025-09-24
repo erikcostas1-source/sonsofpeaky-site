@@ -18,21 +18,30 @@
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
     <link rel="preconnect" href="https://generativelanguage.googleapis.com" />
     <link rel="dns-prefetch" href="//fonts.googleapis.com" />
-    <title>Gerador de Rolês de Moto - IA para Motociclistas</title>
+    
+    <!-- Preload Critical Images -->
+    <link rel="preload" href="assets/img/hero-banner.jpg" as="image" media="(min-width: 769px)">
+    <link rel="preload" href="assets/img/hero-banner-mobile.jpg" as="image" media="(max-width: 768px)">
+    <link rel="preload" href="assets/img/background-texture.png" as="image">
+    <link rel="preload" href="assets/img/loading-spinner.png" as="image">
+    <title>Sons of Peaky - Gerador de Rolês de Moto</title>
     <link rel="icon" href="assets/img/moto-icon.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="assets/img/moto-icon-192.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/img/moto-icon-192.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="assets/img/moto-icon-512.png" />
     
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Gerador de Rolês de Moto - IA para Motociclistas" />
+    <meta property="og:title" content="Sons of Peaky - Gerador de Rolês de Moto" />
     <meta property="og:description" content="IA que cria roteiros personalizados para motociclistas. Descubra destinos únicos, calcule custos e planeje a aventura perfeita." />
-    <meta property="og:image" content="assets/img/moto-icon.png" />
+    <meta property="og:image" content="assets/img/hero-banner.jpg" />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://gerador-roles.com/" />
+    <meta property="og:url" content="https://sonsofpeaky.com/" />
     
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Gerador de Rolês de Moto - IA para Motociclistas" />
+    <meta name="twitter:title" content="Sons of Peaky - Gerador de Rolês de Moto" />
     <meta name="twitter:description" content="IA que cria roteiros personalizados para motociclistas. Descubra destinos únicos, calcule custos e planeje a aventura perfeita." />
-    <meta name="twitter:image" content="assets/img/moto-icon.png" />
+    <meta name="twitter:image" content="assets/img/hero-banner.jpg" />
     
     <!-- CSS Styling -->
     <link rel="stylesheet" href="tailwind-prod.css?v=2.0.3" id="tailwind-prod" />
@@ -212,6 +221,24 @@
             padding: 2rem;
             margin-bottom: 2rem;
         }
+        
+        /* Error 404 Styles */
+        .error-404 {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 1rem;
+            padding: 3rem 2rem;
+            text-align: center;
+            max-width: 600px;
+            margin: 2rem auto;
+        }
+        
+        .error-404 img {
+            max-width: 300px;
+            margin: 0 auto 2rem;
+            opacity: 0.8;
+            border-radius: 1rem;
+        }
     </style>
 </head>
 <body>
@@ -292,8 +319,21 @@
     <!-- Main Content -->
     <main class="pt-20 min-h-screen">
         <!-- Hero Section -->
-        <section class="hero-gradient py-12">
-            <div class="container mx-auto px-4 text-center">
+        <section class="hero-gradient py-12 relative overflow-hidden">
+            <!-- Hero Banner Background -->
+            <div class="absolute inset-0 z-0">
+                <picture>
+                    <source media="(max-width: 768px)" srcset="assets/img/hero-banner-mobile.jpg">
+                    <img src="assets/img/hero-banner.jpg" 
+                         alt="Sons of Peaky - Motociclistas em estrada brasileira" 
+                         class="w-full h-full object-cover opacity-30"
+                         loading="eager"
+                         decoding="async">
+                </picture>
+                <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/80"></div>
+            </div>
+            
+            <div class="container mx-auto px-4 text-center relative z-10">
                 <div class="max-w-3xl mx-auto">
                     <h1 class="text-3xl md:text-4xl font-bold mb-4">
                         <span class="bg-gradient-to-r from-gold-primary to-accent-primary bg-clip-text text-transparent">
@@ -320,6 +360,76 @@
                             <i class="fas fa-brain text-gold-primary mr-2"></i>
                             IA Avançada
                         </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Resources Section -->
+        <section class="py-16 bg-gray-900/50">
+            <div class="container mx-auto px-4">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-white mb-4">
+                        🏍️ Recursos Inteligentes
+                    </h2>
+                    <p class="text-gray-300 max-w-2xl mx-auto">
+                        Tecnologia de ponta para criar o rolê perfeito com precisão e inteligência
+                    </p>
+                </div>
+                
+                <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                    <!-- Card IA -->
+                    <div class="card group cursor-pointer">
+                        <div class="relative overflow-hidden rounded-lg mb-4">
+                            <img src="assets/img/card-ia.jpg" 
+                                 alt="Inteligência Artificial para Roteiros" 
+                                 class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
+                                 loading="lazy">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent group-hover:from-black/40 transition-all duration-300"></div>
+                            <div class="absolute bottom-4 left-4">
+                                <i class="fas fa-brain text-gold-primary text-2xl"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">IA Avançada</h3>
+                        <p class="text-gray-300 text-sm">
+                            Algoritmos inteligentes que analisam seus gostos e criam roteiros únicos baseados em dados reais
+                        </p>
+                    </div>
+                    
+                    <!-- Card Custos -->
+                    <div class="card group cursor-pointer">
+                        <div class="relative overflow-hidden rounded-lg mb-4">
+                            <img src="assets/img/card-custos.jpg" 
+                                 alt="Cálculo Inteligente de Custos" 
+                                 class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
+                                 loading="lazy">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent group-hover:from-black/40 transition-all duration-300"></div>
+                            <div class="absolute bottom-4 left-4">
+                                <i class="fas fa-calculator text-gold-primary text-2xl"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Custos Precisos</h3>
+                        <p class="text-gray-300 text-sm">
+                            Cálculos detalhados incluindo combustível, alimentação, entradas e custos extras com base no seu orçamento
+                        </p>
+                    </div>
+                    
+                    <!-- Card Mapas -->
+                    <div class="card group cursor-pointer">
+                        <div class="relative overflow-hidden rounded-lg mb-4">
+                            <img src="assets/img/card-mapas.jpg" 
+                                 alt="Rotas e Mapas Inteligentes" 
+                                 class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
+                                 loading="lazy">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent group-hover:from-black/40 transition-all duration-300"></div>
+                            <div class="absolute bottom-4 left-4">
+                                <i class="fas fa-map-marked-alt text-gold-primary text-2xl"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Rotas Inteligentes</h3>
+                        <p class="text-gray-300 text-sm">
+                            Endereços completos, rotas otimizadas e pontos de interesse com base na autonomia da sua moto
+                        </p>
                     </div>
                 </div>
             </div>
@@ -536,6 +646,68 @@
             </div>
         </section>
         
+        <!-- Process Section -->
+        <section class="py-16 bg-gradient-to-b from-gray-900 to-black">
+            <div class="container mx-auto px-4">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-white mb-4">
+                        ⚡ Como Funciona
+                    </h2>
+                    <p class="text-gray-300 max-w-2xl mx-auto">
+                        Processo inteligente que garante que seu rolê seja perfeito do planejamento à execução
+                    </p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+                    <!-- Banner Checklist -->
+                    <div class="relative overflow-hidden rounded-xl group cursor-pointer">
+                        <img src="assets/img/checklist-banner.jpg" 
+                             alt="Checklist Inteligente para Motociclistas" 
+                             class="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-105"
+                             loading="lazy">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent group-hover:from-black/60 transition-all duration-300"></div>
+                        <div class="absolute bottom-0 left-0 right-0 p-6">
+                            <div class="flex items-center mb-3">
+                                <div class="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center mr-4">
+                                    <i class="fas fa-check-circle text-white text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold text-white">Checklist Inteligente</h3>
+                                    <p class="text-green-300 text-sm">Preparação profissional</p>
+                                </div>
+                            </div>
+                            <p class="text-gray-200 text-sm">
+                                Sistema adaptativo que cria checklists personalizados baseados no seu tipo de moto, distância e condições da viagem
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Banner Timeline -->
+                    <div class="relative overflow-hidden rounded-xl group cursor-pointer">
+                        <img src="assets/img/timeline-banner.jpg" 
+                             alt="Timeline e Cronograma Inteligente" 
+                             class="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-105"
+                             loading="lazy">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent group-hover:from-black/60 transition-all duration-300"></div>
+                        <div class="absolute bottom-0 left-0 right-0 p-6">
+                            <div class="flex items-center mb-3">
+                                <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mr-4">
+                                    <i class="fas fa-clock text-white text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold text-white">Timeline Automática</h3>
+                                    <p class="text-blue-300 text-sm">Cronograma inteligente</p>
+                                </div>
+                            </div>
+                            <p class="text-gray-200 text-sm">
+                                Cronograma detalhado com horários específicos, paradas para combustível e tempo ideal em cada destino
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
         <!-- Results Section -->
         <section id="results-section" class="py-16 hidden">
             <div class="container mx-auto px-4">
@@ -543,7 +715,13 @@
                     <!-- Loading -->
                     <div id="loading-role" class="card text-center mb-8 hidden">
                         <div class="loading-animation">
-                            <div class="inline-block animate-spin w-12 h-12 border-4 border-gold-primary border-t-transparent rounded-full mb-4"></div>
+                            <div class="relative inline-block mb-4">
+                                <img src="assets/img/loading-spinner.png" 
+                                     alt="Carregando..." 
+                                     class="w-16 h-16 animate-spin opacity-80"
+                                     loading="eager">
+                                <div class="absolute inset-0 w-16 h-16 border-4 border-gold-primary border-t-transparent rounded-full animate-spin"></div>
+                            </div>
                             <h3 class="text-2xl font-bold text-gold-primary mb-2">🧠 IA Consultando Conhecimento Mundial</h3>
                             <p class="text-gray-300">Analisando milhares de destinos para criar sua experiência perfeita...</p>
                         </div>
@@ -589,6 +767,45 @@
     <script src="destinos.js?v=2.0.3"></script>
     <script src="gerador.js?v=2.0.3"></script>
     <script>
+        // Lazy Loading for Images
+        document.addEventListener('DOMContentLoaded', function() {
+            // Intersection Observer for lazy loading
+            const imageObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        if (img.dataset.src) {
+                            img.src = img.dataset.src;
+                        }
+                        img.classList.remove('opacity-0');
+                        img.classList.add('opacity-100', 'transition-opacity', 'duration-300');
+                        observer.unobserve(img);
+                    }
+                });
+            }, {
+                rootMargin: '50px 0px',
+                threshold: 0.01
+            });
+
+            // Observe all lazy images
+            document.querySelectorAll('img[loading="lazy"]').forEach(img => {
+                img.classList.add('opacity-0');
+                imageObserver.observe(img);
+            });
+            
+            // Performance monitoring
+            if ('performance' in window) {
+                window.addEventListener('load', () => {
+                    const perfData = performance.getEntriesByType('navigation')[0];
+                    console.log('🚀 Performance:', {
+                        loadTime: Math.round(perfData.loadEventEnd - perfData.loadEventStart),
+                        domReady: Math.round(perfData.domContentLoadedEventEnd - perfData.domContentLoadedEventStart),
+                        totalTime: Math.round(perfData.loadEventEnd - perfData.fetchStart)
+                    });
+                });
+            }
+        });
+        
         // Initialize particles
         function createParticles() {
             const container = document.getElementById('particles');

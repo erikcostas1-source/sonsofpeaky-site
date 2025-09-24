@@ -118,11 +118,14 @@ body {
   color: var(--text-secondary);
   background-color: var(--bg-primary);
   background-image: 
+    url('assets/img/background-texture.png'),
     radial-gradient(circle at 25% 25%, rgba(251, 146, 60, 0.08) 0%, transparent 50%),
     radial-gradient(circle at 75% 75%, rgba(201, 161, 74, 0.06) 0%, transparent 50%),
-    radial-gradient(circle, var(--bg-secondary) 1px, transparent 1px);
-  background-size: 100% 100%, 100% 100%, 24px 24px;
-  background-attachment: fixed;
+    linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  background-size: 200px 200px, 100% 100%, 100% 100%, 100% 100%;
+  background-repeat: repeat, no-repeat, no-repeat, no-repeat;
+  background-attachment: scroll, fixed, fixed, fixed;
+  background-position: 0 0, 25% 25%, 75% 75%, 0 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
