@@ -576,14 +576,33 @@ function parseAIResponse(response, formData) {
                 custo_total_estimado: sugestao.custo_total_estimado || calculateFallbackCost(formData, tipos[index]),
                 nivel_dificuldade: sugestao.nivel_dificuldade || 'Moderado',
                 destinos: Array.isArray(sugestao.destinos) && sugestao.destinos.length > 0 ? 
-                    sugestao.destinos.map(d => ({
+                    sugestao.destinos.map((d, destIndex) => ({
                         nome: d?.nome || 'Destino',
                         endereco: d?.endereco || 'Endereço não especificado',
-                        distancia: d?.distancia || '-- km',
-                        tempo_parada: d?.tempo_parada || '30 min',
+                        distancia_anterior: d?.distancia_anterior || d?.distancia || `${20 + (destIndex * 15)} km`,
+                        tempo_permanencia: d?.tempo_permanencia || d?.tempo_parada || '30 min',
+                        horario_chegada: d?.horario_chegada || `${8 + destIndex}:${(destIndex * 30) % 60}0`,
                         descricao: d?.descricao || 'Local interessante',
-                        custo_estimado: d?.custo_estimado || 'R$ --'
+                        custo_estimado: d?.custo_estimado || 'R$ --',
+                        dicas_motociclista: d?.dicas_motociclista || [
+                            'Verificar condições da estrada',
+                            'Estacionar em local seguro',
+                            'Levar equipamentos de proteção'
+                        ]
                     })) : generateFallbackDestinos(formData, tipos[index]),
+                custos_detalhados: sugestao.custos_detalhados || {
+                    combustivel: calculateCostByType(formData, tipos[index], 'combustivel'),
+                    alimentacao: calculateCostByType(formData, tipos[index], 'alimentacao'),
+                    entradas: calculateCostByType(formData, tipos[index], 'entradas'),
+                    outros: calculateCostByType(formData, tipos[index], 'outros'),
+                    total: sugestao.custo_total_estimado || calculateFallbackCost(formData, tipos[index])
+                },
+                observacoes: Array.isArray(sugestao.observacoes) ? sugestao.observacoes : [
+                    'Verificar combustível antes da saída',
+                    'Levar equipamentos de segurança',
+                    'Conferir previsão do tempo',
+                    `Roteiro otimizado para ${tipos[index].toLowerCase()}`
+                ],
                 dicas_importantes: Array.isArray(sugestao.dicas_importantes) ? sugestao.dicas_importantes : [
                     'Verificar combustível',
                     'Levar equipamentos de segurança',
@@ -603,6 +622,31 @@ function parseAIResponse(response, formData) {
         // Fallback para parsing manual
         return parseResponseManually(response, formData);
     }
+}
+
+/**
+ * Calcula custos por categoria baseado no tipo de roteiro
+ */
+function calculateCostByType(formData, tipo, categoria) {
+    const baseOrcamento = formData.orcamento || 200;
+    const multipliers = {
+        'ECONÔMICA': 0.7,
+        'EQUILIBRADA': 1.0,
+        'PREMIUM': 1.4
+    };
+    
+    const percentages = {
+        'combustivel': 0.35,  // 35% do orçamento
+        'alimentacao': 0.40,  // 40% do orçamento
+        'entradas': 0.15,     // 15% do orçamento
+        'outros': 0.10        // 10% do orçamento
+    };
+    
+    const multiplier = multipliers[tipo] || 1.0;
+    const percentage = percentages[categoria] || 0.25;
+    const custo = Math.round(baseOrcamento * multiplier * percentage);
+    
+    return `R$ ${custo}`;
 }
 
 /**
@@ -680,10 +724,16 @@ function generateFallbackDestinos(formData, tipo) {
     return destinosSelecionados.map((dest, index) => ({
         nome: dest.nome,
         endereco: `${dest.regiao}, ${dest.nome}`,
-        distancia: `${60 + (index * 25)} km`,
-        tempo_parada: tipo === 'PREMIUM' ? '2h' : tipo === 'EQUILIBRADA' ? '1h30' : '1h',
-        descricao: `Destino ${dest.tipo} na região ${dest.regiao}`,
-        custo_estimado: `R$ ${30 + (index * 15)}`
+        distancia_anterior: `${60 + (index * 25)} km`,
+        tempo_permanencia: tipo === 'PREMIUM' ? '2h' : tipo === 'EQUILIBRADA' ? '1h30' : '1h',
+        horario_chegada: `${9 + index}:${index % 2 === 0 ? '00' : '30'}`,
+        descricao: `Destino ${dest.tipo} na região ${dest.regiao}. Local ideal para ${tipo.toLowerCase() === 'econômica' ? 'economizar' : tipo.toLowerCase() === 'premium' ? 'experiência premium' : 'equilibrar custo e diversão'}.`,
+        custo_estimado: `R$ ${30 + (index * 15)}`,
+        dicas_motociclista: [
+            `Estrada ${dest.tipo === 'serra' ? 'serrana com curvas' : dest.tipo === 'praia' ? 'litorânea plana' : 'interior asfaltada'}`,
+            'Estacionamento seguro disponível',
+            `Melhor horário: ${dest.tipo === 'serra' ? 'manhã cedo' : 'qualquer período'}`
+        ]
     }));
 }
 
