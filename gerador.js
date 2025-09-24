@@ -65,13 +65,21 @@ function getAPIConfig() {
             useServerless: true
         };
     } else if (isGitHubPages) {
-        // Em GitHub Pages, não há API disponível - força fallback
-        console.log('📖 GitHub Pages detectado - forçando fallback local');
-        throw new Error('GitHub Pages: API não disponível - usando fallback local');
+        // Em GitHub Pages, usa API direta (chave pública é aceitável para este projeto)
+        const prodKey = 'AIzaSyCiHRVozYYmHB-5W64QdJzn9dQYAyRl9Tk';
+        console.log('📖 GitHub Pages detectado - usando API direta');
+        return {
+            apiUrl: `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${prodKey}`,
+            useServerless: false
+        };
     } else {
-        // Fallback padrão - sem API
-        console.log('🔧 Ambiente desconhecido - forçando fallback local');
-        throw new Error('Ambiente desconhecido: API não configurada - usando fallback local');
+        // Outros ambientes - usa API direta
+        const prodKey = 'AIzaSyCiHRVozYYmHB-5W64QdJzn9dQYAyRl9Tk';
+        console.log('🌐 Produção detectada - usando API direta');
+        return {
+            apiUrl: `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${prodKey}`,
+            useServerless: false
+        };
     }
 }
 
@@ -249,17 +257,10 @@ async function generateRole(formData) {
     const prompt = buildPrompt(formData);
     console.log('🧠 Prompt gerado:', prompt.substring(0, 200) + '...');
     
-    // Tenta obter configuração da API
-    let apiConfig;
-    try {
-        apiConfig = getAPIConfig();
-        console.log('🔧 Usando API:', apiConfig.apiUrl.substring(0, 100) + '...');
-        console.log('🔧 Configuração:', JSON.stringify(apiConfig, null, 2));
-    } catch (configError) {
-        console.log('⚠️ API não disponível:', configError.message);
-        console.log('🔄 Usando fallback local diretamente');
-        return generateFallbackResults(formData);
-    }
+    // Obter configuração da API (sem fallback)
+    const apiConfig = getAPIConfig();
+    console.log('🔧 Usando API:', apiConfig.apiUrl.substring(0, 100) + '...');
+    console.log('🔧 Configuração:', JSON.stringify(apiConfig, null, 2));
     
     try {
         let requestBody, response;
@@ -411,14 +412,8 @@ async function generateRole(formData) {
             }
         }
         
-        // Fallback para destinos locais se tudo falhar
-        if (typeof destinos !== 'undefined') {
-            console.log('🔄 Usando destinos locais como último recurso');
-            return generateFallbackResults(formData);
-        }
-        
-        // Se nada funcionar, lança um erro amigável
-        throw new Error('Não foi possível gerar o rolê. Verifique sua conexão e tente novamente.');
+        // Se a API falhar, mostra erro específico
+        throw new Error('Não foi possível gerar o rolê via IA. Verifique sua conexão com a internet e tente novamente.');
     }
 }
 
@@ -655,9 +650,11 @@ function parseResponseManually(response, formData) {
 }
 
 /**
- * Gera resultados de fallback usando destinos locais
+ * FALLBACK DESABILITADO - Apenas IA generativa deve ser usada
+ * Esta função foi desabilitada conforme solicitação do usuário
  */
 function generateFallbackResults(formData) {
+    throw new Error('Fallback desabilitado - apenas IA generativa deve ser usada');
     // Verificar se destinos está disponível no window
     const destinosArray = window.destinos || window.DESTINOS_DATABASE || [];
     if (!destinosArray || destinosArray.length === 0) {
