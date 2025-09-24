@@ -1,10 +1,10 @@
 /**
  * Gerador de Rolês de Moto - JavaScript Principal
  * Sistema completo de geração de roteiros personalizados
- * Version: 2.0.1 - Fixed GitHub Pages
+ * Version: 2.0.3 - 100% IA Generativa + Cache Busting
  */
 
-console.log('🔧 Gerador.js carregado - Version 2.0.2 - Enhanced Error Handling');
+console.log('🔧 Gerador.js carregado - Version 2.0.3 - 100% IA Generativa');
 
 /**
  * Função utilitária para acessar elementos DOM com segurança
