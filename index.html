@@ -749,33 +749,109 @@
                         </p>
 
                 <div class="grid md:grid-cols-2 gap-8">
-                    <!-- Gerador de Rolê -->
-                    <div class="card group hover:border-amber-500 transition-all duration-300">
-                        <div class="space-y-4">
-                            <div class="flex items-center space-x-3 mb-4">
-                                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center">
-                                    <span class="text-white font-bold text-xl">🗺️</span>
+                    <!-- Gerador de Rolê Avançado -->
+                    <div class="col-span-full">  
+                        <div class="card group hover:border-amber-500 transition-all duration-300">
+                            <div class="space-y-6">
+                                <div class="flex items-center space-x-3 mb-6">
+                                    <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center">
+                                        <span class="text-white font-bold text-2xl">🏍️</span>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-2xl md:text-3xl font-bold text-white group-hover:text-amber-400 transition-colors">Gerador de Rolê Profissional</h3>
+                                        <p class="text-gray-400 text-sm">O mais completo planejador de viagens de moto do Brasil</p>
+                                    </div>
                                 </div>
-                                <h3 class="text-xl md:text-2xl font-bold text-white group-hover:text-amber-400 transition-colors">Gerador de Rolê</h3>
+                                
+                                <!-- Informações Básicas -->
+                                <div class="bg-gray-800 rounded-lg p-6 space-y-4">
+                                    <h4 class="text-lg font-bold text-amber-400 mb-4">📍 Informações da Viagem</h4>
+                                    <div class="grid md:grid-cols-2 gap-4">
+                                        <input id="role-destino" type="text" class="px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 text-gray-100 focus:border-amber-500 outline-none transition-colors" placeholder="Destino (ex: Campos do Jordão, Cunha, Serra da Mantiqueira)" />
+                                        <input id="role-tipo" type="text" class="px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 text-gray-100 focus:border-amber-500 outline-none transition-colors" placeholder="Tipo de rolê (turístico, gastronômico, aventura)" />
+                                    </div>
+                                    <div class="grid md:grid-cols-3 gap-4">
+                                        <input id="role-data" type="date" class="px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 text-gray-100 focus:border-amber-500 outline-none transition-colors" />
+                                        <input id="role-saida" type="time" class="px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 text-gray-100 focus:border-amber-500 outline-none transition-colors" placeholder="Horário de saída" />
+                                        <input id="role-volta" type="time" class="px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 text-gray-100 focus:border-amber-500 outline-none transition-colors" placeholder="Horário de volta desejado" />
+                                    </div>
+                                </div>
+
+                                <!-- Pontos de Encontro -->
+                                <div class="bg-gray-800 rounded-lg p-6 space-y-4">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <h4 class="text-lg font-bold text-amber-400">🚩 Pontos de Encontro</h4>
+                                        <button id="add-ponto-btn" class="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-gray-900 font-bold rounded-lg text-sm transition-colors">
+                                            + Adicionar Ponto
+                                        </button>
+                                    </div>
+                                    <div id="pontos-container" class="space-y-3">
+                                        <div class="ponto-encontro flex gap-3 items-center">
+                                            <input type="text" class="flex-1 px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 text-gray-100 focus:border-amber-500 outline-none transition-colors" placeholder="Galpão SOP - Rua José Flavio, 420, Penha" value="Galpão SOP - Rua José Flavio, 420, Penha" />
+                                            <input type="time" class="px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 text-gray-100 focus:border-amber-500 outline-none transition-colors" value="08:00" />
+                                            <select class="px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 text-gray-100 focus:border-amber-500 outline-none transition-colors">
+                                                <option value="principal">Principal</option>
+                                                <option value="comboio">Comboio</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Configurações da Viagem -->
+                                <div class="grid md:grid-cols-2 gap-6">
+                                    <div class="bg-gray-800 rounded-lg p-6 space-y-4">
+                                        <h4 class="text-lg font-bold text-amber-400 mb-4">⚙️ Configurações</h4>
+                                        <div class="space-y-3">
+                                            <select id="role-perfil" class="w-full px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 text-gray-100 focus:border-amber-500 outline-none transition-colors">
+                                                <option value="conservador">🐌 Perfil Conservador (50-60 km/h média)</option>
+                                                <option value="moderado" selected>🏍️ Perfil Moderado (60-80 km/h média)</option>
+                                                <option value="esportivo">⚡ Perfil Esportivo (80-100 km/h média)</option>
+                                            </select>
+                                            <select id="role-estrada" class="w-full px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 text-gray-100 focus:border-amber-500 outline-colors">
+                                                <option value="asfalto" selected>🛣️ Principalmente Asfalto</option>
+                                                <option value="mista">🌄 Estrada Mista (asfalto + terra)</option>
+                                                <option value="trilha">🏔️ Trilha/Terra (adventure)</option>
+                                            </select>
+                                            <select id="role-grupo" class="w-full px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 text-gray-100 focus:border-amber-500 outline-none transition-colors">
+                                                <option value="2-5">👥 Grupo Pequeno (2-5 motos)</option>
+                                                <option value="6-10" selected>🏍️ Grupo Médio (6-10 motos)</option>
+                                                <option value="11+">🚁 Grupo Grande (11+ motos)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="bg-gray-800 rounded-lg p-6 space-y-4">
+                                        <h4 class="text-lg font-bold text-amber-400 mb-4">🏍️ Dados da Moto</h4>
+                                        <div class="space-y-3">
+                                            <select id="role-cilindrada" class="w-full px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 text-gray-100 focus:border-amber-500 outline-none transition-colors">
+                                                <option value="125">🏍️ 125-150cc (consumo ~35km/l)</option>
+                                                <option value="250">⚡ 250-400cc (consumo ~25km/l)</option>
+                                                <option value="600" selected>🚀 600-800cc (consumo ~18km/l)</option>
+                                                <option value="1000">🔥 1000cc+ (consumo ~15km/l)</option>
+                                            </select>
+                                            <input id="role-tanque" type="number" class="w-full px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 text-gray-100 focus:border-amber-500 outline-none transition-colors" placeholder="Capacidade do tanque (litros)" value="17" />
+                                            <div class="flex items-center space-x-3">
+                                                <input id="role-pedagio" type="checkbox" class="w-4 h-4 text-amber-600 bg-gray-700 border-gray-600 rounded focus:ring-amber-500" checked />
+                                                <label for="role-pedagio" class="text-gray-300">Incluir pedágios no cálculo</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Botão Gerar -->
+                                <div class="flex justify-center">
+                                    <button id="gerar-role-avancado-btn" class="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-bold rounded-xl transition-colors duration-200 transform hover:scale-105 shadow-lg">
+                                        🚀 Gerar Roteiro Completo
+                                    </button>
+                                </div>
+
+                                <div id="loading-indicator-role-avancado" class="hidden items-center justify-center gap-2 text-blue-400 py-4">
+                                    <div class="animate-spin w-6 h-6 border-2 border-blue-400 border-t-transparent rounded-full"></div>
+                                    <span class="text-lg">Calculando o roteiro perfeito...</span>
+                                </div>
+
+                                <div id="role-avancado-output" class="text-gray-300 text-sm bg-gray-900 rounded-xl p-6 hidden"></div>
                             </div>
-                            
-                            <p class="text-gray-300 text-sm md:text-base mb-6">Crie roteiros personalizados para suas aventuras de moto com base na distância e destino desejado.</p>
-                            
-                            <div class="space-y-3">
-                                <input id="role-input" type="text" class="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-600 text-gray-100 focus:border-amber-500 outline-none transition-colors" placeholder="Destino ou tipo de rolê (ex: serra, praia, cidade histórica)" />
-                                <div class="grid grid-cols-2 gap-3">
-                                    <input id="role-km-input" type="number" class="px-4 py-3 rounded-lg bg-gray-800 border border-gray-600 text-gray-100 focus:border-amber-500 outline-none transition-colors" placeholder="KM (ida e volta)" />
-                                    <input id="role-date-input" type="date" class="px-4 py-3 rounded-lg bg-gray-800 border border-gray-600 text-gray-100 focus:border-amber-500 outline-none transition-colors" />
-                                </div>
-                                <button id="gerar-role-btn" class="w-full px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg transition-colors duration-200">
-                                    Gerar Roteiro de Rolê
-                                </button>
-                                <div id="loading-indicator-role" class="hidden items-center justify-center gap-2 text-blue-400 py-2">
-                                    <div class="animate-spin w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full"></div>
-                                    <span>Criando roteiro...</span>
-                                </div>
-                            </div>
-                            <div id="role-output" class="text-gray-300 text-sm bg-gray-900 rounded-lg p-4 hidden"></div>
                         </div>
                     </div>
 

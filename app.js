@@ -491,7 +491,248 @@ Que as estradas nos levem e nos tragam em segurança!
         addConfirmButtonListeners();
     })();
 
-    // Gerador de Rolê (usa API se disponível, caso contrário fallback local)
+    // ===== GERADOR DE ROLÊ AVANÇADO =====
+    
+    // Gerenciar pontos de encontro dinâmicos
+    const addPontoBtn = $('add-ponto-btn');
+    if (addPontoBtn) {
+        addPontoBtn.addEventListener('click', function() {
+            const container = $('pontos-container');
+            if (container) {
+                const novoPonto = document.createElement('div');
+                novoPonto.className = 'ponto-encontro flex gap-3 items-center';
+                novoPonto.innerHTML = `
+                    <input type="text" class="flex-1 px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 text-gray-100 focus:border-amber-500 outline-none transition-colors" placeholder="Nome do local + endereço" />
+                    <input type="time" class="px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 text-gray-100 focus:border-amber-500 outline-none transition-colors" />
+                    <select class="px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 text-gray-100 focus:border-amber-500 outline-none transition-colors">
+                        <option value="comboio">Comboio</option>
+                        <option value="parada">Parada</option>
+                    </select>
+                    <button class="px-3 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg text-sm remove-ponto">×</button>
+                `;
+                container.appendChild(novoPonto);
+                
+                // Adicionar evento de remoção
+                const removeBtn = novoPonto.querySelector('.remove-ponto');
+                removeBtn.addEventListener('click', () => novoPonto.remove());
+            }
+        });
+    }
+
+    // Gerador de Rolê Avançado
+    const gerarRoleAvancadoBtn = $('gerar-role-avancado-btn');
+    if (gerarRoleAvancadoBtn) gerarRoleAvancadoBtn.addEventListener('click', async function () {
+        const destino = $('role-destino')?.value.trim();
+        const tipo = $('role-tipo')?.value.trim();
+        const data = $('role-data')?.value;
+        const horaSaida = $('role-saida')?.value;
+        const horaVolta = $('role-volta')?.value;
+        const perfil = $('role-perfil')?.value;
+        const estrada = $('role-estrada')?.value;
+        const grupo = $('role-grupo')?.value;
+        const cilindrada = $('role-cilindrada')?.value;
+        const tanque = $('role-tanque')?.value;
+        const incluirPedagio = $('role-pedagio')?.checked;
+        
+        const outputDiv = $('role-avancado-output');
+        const loadingIndicator = $('loading-indicator-role-avancado');
+
+        if (!destino || !data || !horaSaida) {
+            if (outputDiv) {
+                outputDiv.innerHTML = '<div class="text-red-400 p-4 bg-red-900 rounded-lg">❌ Por favor, preencha pelo menos o destino, data e horário de saída.</div>';
+                outputDiv.classList.remove('hidden');
+            }
+            return;
+        }
+
+        if (outputDiv) {
+            outputDiv.innerHTML = '';
+            outputDiv.classList.remove('hidden');
+        }
+        if (loadingIndicator) {
+            loadingIndicator.style.display = 'flex';
+            loadingIndicator.classList.remove('hidden');
+        }
+
+        try {
+            // Coletar pontos de encontro
+            const pontos = [];
+            const pontosElements = document.querySelectorAll('.ponto-encontro');
+            pontosElements.forEach(ponto => {
+                const local = ponto.querySelector('input[type="text"]').value.trim();
+                const hora = ponto.querySelector('input[type="time"]').value;
+                const tipo = ponto.querySelector('select').value;
+                if (local && hora) {
+                    pontos.push({ local, hora, tipo });
+                }
+            });
+
+            let roteiro = null;
+            if (API_URL_GENERATE_TEXT) {
+                const prompt = `Atue como um especialista em planejamento de viagens de moto e crie um roteiro COMPLETO e DETALHADO com base nas seguintes informações:
+
+🎯 INFORMAÇÕES DA VIAGEM:
+- Destino: ${destino}
+- Tipo de rolê: ${tipo || 'Turístico'}
+- Data: ${new Date(data).toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })}
+- Horário de saída: ${horaSaida}
+- Horário de volta desejado: ${horaVolta || 'Flexível'}
+
+🏍️ CARACTERÍSTICAS DO GRUPO:
+- Perfil de pilotagem: ${perfil}
+- Tipo de estrada: ${estrada}
+- Tamanho do grupo: ${grupo}
+- Cilindrada predominante: ${cilindrada}cc
+- Capacidade do tanque: ${tanque}L
+- Incluir pedágios: ${incluirPedagio ? 'Sim' : 'Não'}
+
+📍 PONTOS DE ENCONTRO:
+${pontos.map(p => `- ${p.local} às ${p.hora} (${p.tipo})`).join('\n')}
+
+CRIE UM ROTEIRO DETALHADO QUE INCLUA:
+
+1. 📋 RESUMO EXECUTIVO:
+   - Distância total estimada
+   - Tempo de viagem (considerando paradas)
+   - Custo estimado por pessoa (combustível + pedágios + alimentação)
+   - Nível de dificuldade da rota
+
+2. ⏰ CRONOGRAMA DETALHADO:
+   - Horários de encontro em cada ponto
+   - Tempo estimado entre pontos
+   - Horários de paradas obrigatórias
+   - Chegada no destino
+   - Tempo de permanência
+   - Retorno planejado
+
+3. 🛣️ ROTA OTIMIZADA:
+   - Melhor trajeto considerando o tipo de estrada
+   - Rotas alternativas se disponíveis
+   - Pontos de referência importantes
+   - Radares e fiscalizações conhecidas
+
+4. ⛽ PARADAS ESTRATÉGICAS:
+   - Postos de combustível recomendados
+   - Pontos para lanche/almoço
+   - Banheiros e descanso
+   - Pontos turísticos pelo caminho
+
+5. 💰 CUSTOS DETALHADOS:
+   - Combustível por moto (baseado no consumo da cilindrada)
+   - Pedágios (ida e volta)
+   - Alimentação estimada
+   - Estacionamento se aplicável
+
+6. 🌤️ CONSIDERAÇÕES CLIMÁTICAS E SEGURANÇA:
+   - Melhor horário para evitar chuvas
+   - Trechos que exigem mais atenção
+   - Equipamentos recomendados
+   - Contatos de emergência locais
+
+7. 📱 COMUNICAÇÃO:
+   - Grupos de WhatsApp sugeridos
+   - Frequências de rádio se aplicável
+   - Pontos sem sinal de celular
+
+Seja EXTREMAMENTE detalhado e prático. Use informações reais sobre estradas brasileiras, custos atuais e tempos realistas. Formate de maneira clara e profissional.`;
+
+                const payload = { contents: [{ parts: [{ text: prompt }] }] };
+                const response = await fetchWithExponentialBackoff(API_URL_GENERATE_TEXT, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                roteiro = response?.candidates?.[0]?.content?.parts?.[0]?.text;
+            }
+
+            if (!roteiro) {
+                roteiro = `⚠️ Conectando com a IA para gerar roteiro detalhado...
+                
+Por enquanto, aqui estão as informações básicas:
+- Destino: ${destino}
+- Data: ${new Date(data).toLocaleDateString('pt-BR')}
+- Saída: ${horaSaida}
+- Retorno desejado: ${horaVolta || 'Flexível'}
+- Pontos de encontro: ${pontos.length} configurados
+
+Um roteiro completo será gerado quando a conexão for estabelecida.`;
+            }
+
+            // Gerar convite visual avançado
+            const conviteAvancado = `
+                <div class="bg-gradient-to-br from-amber-900 via-orange-900 to-red-900 border-2 border-amber-400 rounded-xl p-8 shadow-2xl">
+                    <div class="text-center space-y-6">
+                        <div class="flex justify-center mb-6">
+                            <img src="assets/img/SONSOFPEAKY_TRANSPARENTE_BRANCO.png" alt="Sons of Peaky" class="h-20 w-auto">
+                        </div>
+                        <h2 class="text-4xl font-bold text-amber-300 mb-4">🏍️ ROLÊ OFICIAL SOP 🏍️</h2>
+                        <div class="bg-black bg-opacity-50 rounded-lg p-6 space-y-4">
+                            <h3 class="text-2xl font-semibold text-white">${destino}</h3>
+                            <div class="grid md:grid-cols-2 gap-4 text-lg">
+                                <div class="text-amber-200">📅 ${new Date(data).toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })}</div>
+                                <div class="text-amber-200">🕒 Saída: ${horaSaida}</div>
+                                <div class="text-amber-200">🏁 Volta: ${horaVolta || 'Flexível'}</div>
+                                <div class="text-amber-200">👥 ${grupo} motos</div>
+                            </div>
+                            <div class="border-t border-amber-500 pt-4">
+                                <p class="text-amber-100 font-semibold text-lg">Pontos de Encontro:</p>
+                                ${pontos.map(p => `<p class="text-gray-200">📍 ${p.local} - ${p.hora}</p>`).join('')}
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-amber-200 italic text-lg">"A estrada nos chama, irmãos!"</p>
+                            <p class="text-sm text-gray-300 mt-2">Por Ordem dos Peaky Blinders</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            if (outputDiv) {
+                outputDiv.innerHTML = `
+                    <div class="space-y-8">
+                        <div class="bg-gradient-to-r from-blue-900 to-blue-800 border border-blue-600 rounded-xl p-6">
+                            <h4 class="text-2xl font-bold text-blue-200 mb-4 flex items-center gap-2">
+                                🗺️ Roteiro Detalhado
+                            </h4>
+                            <div class="prose prose-invert max-w-none whitespace-pre-wrap text-gray-200 leading-relaxed">
+                                ${roteiro}
+                            </div>
+                        </div>
+                        <div class="bg-gray-800 rounded-xl p-6">
+                            <h4 class="text-xl font-bold text-amber-400 mb-4">📢 Convite para Compartilhar</h4>
+                            ${conviteAvancado}
+                            <div class="mt-6 flex flex-wrap gap-4 justify-center">
+                                <button onclick="compartilharWhatsApp('${destino}', '${data}', '${horaSaida}', ${JSON.stringify(pontos).replace(/"/g, '&quot;')})" class="px-6 py-3 bg-green-600 hover:bg-green-500 text-white font-bold rounded-lg transition-colors flex items-center gap-2">
+                                    <span>📱</span> Compartilhar no WhatsApp
+                                </button>
+                                <button onclick="copiarRoteiro()" class="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg transition-colors flex items-center gap-2">
+                                    <span>📋</span> Copiar Roteiro
+                                </button>
+                                <button onclick="salvarPDF('${destino}')" class="px-6 py-3 bg-red-600 hover:bg-red-500 text-white font-bold rounded-lg transition-colors flex items-center gap-2">
+                                    <span>📄</span> Salvar PDF
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+        } catch (error) {
+            console.error('Erro ao gerar roteiro avançado:', error);
+            if (outputDiv) {
+                outputDiv.innerHTML = '<div class="text-red-400 p-4 bg-red-900 rounded-lg">❌ Erro ao gerar roteiro. Tente novamente.</div>';
+                outputDiv.classList.remove('hidden');
+            }
+        } finally {
+            if (loadingIndicator) {
+                loadingIndicator.style.display = 'none';
+                loadingIndicator.classList.add('hidden');
+            }
+        }
+    });
+
+    // Gerador de Rolê Simples (mantendo compatibilidade)
     const gerarRoleBtn = $('gerar-role-btn');
     if (gerarRoleBtn) gerarRoleBtn.addEventListener('click', async function () {
         const input = $('role-input')?.value.trim();
@@ -913,6 +1154,52 @@ Crie algo original e impactante para motivar os irmãos do grupo.`;
     }
 
 });
+
+// ===== FUNÇÕES AUXILIARES PARA GERADOR DE ROLÊ =====
+function compartilharWhatsApp(destino, data, horaSaida, pontos) {
+    const dataFormatada = new Date(data).toLocaleDateString('pt-BR', { 
+        weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' 
+    });
+    
+    let mensagem = `🏍️ *ROLÊ OFICIAL SOP* 🏍️\n\n`;
+    mensagem += `📍 *Destino:* ${destino}\n`;
+    mensagem += `📅 *Data:* ${dataFormatada}\n`;
+    mensagem += `🕒 *Saída:* ${horaSaida}\n\n`;
+    mensagem += `*Pontos de Encontro:*\n`;
+    
+    pontos.forEach(ponto => {
+        mensagem += `• ${ponto.local} - ${ponto.hora}\n`;
+    });
+    
+    mensagem += `\n"A estrada nos chama, irmãos!"\n`;
+    mensagem += `_Por Ordem dos Peaky Blinders_ 🔥\n\n`;
+    mensagem += `Confirme sua presença! 👊`;
+    
+    const url = `https://wa.me/?text=${encodeURIComponent(mensagem)}`;
+    window.open(url, '_blank');
+}
+
+function copiarRoteiro() {
+    const roteiro = document.querySelector('#role-avancado-output .prose').textContent;
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(roteiro).then(() => {
+            alert('✅ Roteiro copiado para a área de transferência!');
+        });
+    } else {
+        // Fallback para navegadores mais antigos
+        const textArea = document.createElement('textarea');
+        textArea.value = roteiro;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        alert('✅ Roteiro copiado para a área de transferência!');
+    }
+}
+
+function salvarPDF(destino) {
+    alert('🚧 Funcionalidade em desenvolvimento!\n\nEm breve você poderá exportar o roteiro em PDF para impressão ou envio offline.');
+}
 
 // ===== FUNÇÃO PARA SEÇÕES COLAPSÁVEIS =====
 function toggleSection(contentId, iconId) {
