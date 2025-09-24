@@ -210,9 +210,70 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Local fallback generators (simple, deterministic) to make the site usable offline
     function localGenerateRide({ input, km, date }) {
-        const destinations = ['Paraty', 'Ilhabela', 'Serra da Mantiqueira', 'Campos do Jordão', 'Serra do Rio do Rastro'];
-        const destination = destinations[Math.min(destinations.length - 1, Math.floor(km / 80))] || 'Cidade Próxima';
-        return `Destino: ${destination}\nRoteiro: Saída do galpão, paradas estratégicas para fotos, almoço típico e retorno ao entardecer.\nTempo estimado: ${Math.max(1, Math.round((km / 80) * 1.2))}h (ida) + permanência + ${Math.max(1, Math.round((km / 80) * 1.2))}h (volta)\nPedágio estimado: R$ ${Math.max(0, Math.round(km * 0.05)).toFixed(2)}\nConvite: "Rolê dia ${new Date(date).toLocaleDateString('pt-BR')} — junte-se aos irmãos do Sons of Peaky!"`;
+        const kmNum = Number(km);
+        const dateObj = new Date(date);
+        
+        // Determinar tipo de rolê baseado na distância
+        let categoria, tempoViagem, sugestaoHorario;
+        if (kmNum <= 100) {
+            categoria = "Rolê Urbano/Regional";
+            tempoViagem = "1-2h";
+            sugestaoHorario = "14h00";
+        } else if (kmNum <= 300) {
+            categoria = "Rolê Intermediário";
+            tempoViagem = "2-4h";
+            sugestaoHorario = "08h00";
+        } else {
+            categoria = "Rolê Longo";
+            tempoViagem = "4-6h";
+            sugestaoHorario = "06h00";
+        }
+
+        const pedagogioEstimado = Math.max(0, Math.round(kmNum * 0.08));
+        const combustivelEstimado = Math.round(kmNum * 0.12);
+        
+        return `🏍️ ROTEIRO DE ROLÊ - SONS OF PEAKY
+
+📍 DESTINO: ${input.toUpperCase()}
+📅 DATA: ${dateObj.toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+📏 DISTÂNCIA: ${kmNum}km (ida e volta)
+⏱️ CATEGORIA: ${categoria}
+
+🕐 PROGRAMAÇÃO:
+• Concentração: 30min antes da saída no Galpão
+• Saída: ${sugestaoHorario}
+• Tempo de viagem: ${tempoViagem} cada trecho
+• Chegada prevista: Final da tarde
+
+🛣️ ROTA SUGERIDA:
+• Ponto de encontro: Galpão - Rua José Flavio, 420, Travessa 1A
+• Parada obrigatória: Combustível + checagem (km 50)
+• Parada para alimentação: Meio do trajeto
+• Pontos fotográficos: Conforme oportunidade
+
+💰 CUSTOS ESTIMADOS:
+• Pedágio: R$ ${pedagogioEstimado},00
+• Combustível: R$ ${combustivelEstimado},00
+• Alimentação: R$ 25-40 (por pessoa)
+
+🔧 CHECKLIST:
+✓ Documentos (CNH, documento da moto)
+✓ Capacete em perfeitas condições
+✓ Equipamentos de proteção
+✓ Celular com bateria/carregador
+✓ Dinheiro para pedágio/emergência
+
+⚠️ SEGURANÇA:
+• Manter distância segura
+• Comunicação por gestos/intercomunicador
+• Ponto de reagrupamento a cada 100km
+• Contato de emergência: Líder do grupo
+
+📞 CONFIRMAÇÃO: Confirme sua presença aqui no site
+💬 DÚVIDAS: WhatsApp do grupo
+
+Que as estradas nos levem e nos tragam em segurança! 
+🔥 By Order of the Sons of Peaky 🔥`;
     }
 
     function localGenerateEvent({ input }) {
@@ -233,10 +294,23 @@ document.addEventListener('DOMContentLoaded', function () {
         document.querySelectorAll('.confirmar-btn').forEach(button => {
             if (!button.dataset.bound) {
                 button.addEventListener('click', function (e) {
-                    const eventCard = e.target.closest('[id^="reuniao-"]') || e.target.closest('.p-4');
-                    if (!eventCard) return showModal('Erro ao localizar evento.');
-                    const eventId = eventCard.id || eventCard.dataset.eventId || 'evento';
-                    const eventTitle = eventCard.querySelector('h3')?.textContent || 'Evento';
+                    console.log('Botão de confirmação clicado');
+                    const eventCard = e.target.closest('[id]') || e.target.closest('.p-4');
+                    
+                    if (!eventCard) {
+                        console.error('Não foi possível encontrar o card do evento');
+                        return showModal('Erro ao localizar evento. Tente recarregar a página.');
+                    }
+                    
+                    let eventId = eventCard.id;
+                    if (!eventId) {
+                        eventId = `evento-${Date.now()}`;
+                        eventCard.id = eventId;
+                        console.log('ID gerado para evento:', eventId);
+                    }
+                    
+                    const eventTitle = eventCard.querySelector('h3')?.textContent || 'Evento Sons of Peaky';
+                    console.log('Abrindo modal para evento:', eventId, eventTitle);
                     openRSVPModal(eventId, eventTitle);
                 });
                 button.dataset.bound = '1';
@@ -405,12 +479,44 @@ document.addEventListener('DOMContentLoaded', function () {
             let imageUrl = '';
 
             if (API_URL_GENERATE_TEXT) {
-                const promptText = `Atue como um especialista em roteiros de viagem de moto para o grupo Sons of Peaky...`;
+                const promptText = `Atue como um especialista em roteiros de viagem de moto para o grupo Sons of Peaky. 
+
+Crie um roteiro detalhado para um rolê de moto com as seguintes informações:
+- Destino/Tipo: ${input}
+- Distância total: ${km}km (ida e volta)
+- Data: ${date}
+
+O roteiro deve incluir:
+1. Ponto de encontro: Galpão - Rua José Flavio, 420, Travessa 1A
+2. Horário sugerido de saída e chegada
+3. Rota sugerida com pontos de interesse
+4. Paradas recomendadas (combustível, alimentação, descanso)
+5. Estimativa de tempo de viagem
+6. Dicas de segurança específicas para o trajeto
+7. O que levar (equipamentos, documentos)
+8. Contatos de emergência locais se aplicável
+
+Escreva de forma clara e objetiva, mantendo o tom fraternal do grupo Sons of Peaky. Use linguagem motociclística apropriada.`;
+
                 const payloadText = { contents: [{ parts: [{ text: promptText }] }] };
                 const responseText = await fetchWithExponentialBackoff(API_URL_GENERATE_TEXT, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payloadText)
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify(payloadText)
                 });
-                generatedText = responseText?.candidates?.[0]?.content?.parts?.[0]?.text;
+                
+                // Debug logging
+                console.log('Gemini API Response:', responseText);
+                
+                if (responseText?.candidates?.[0]?.content?.parts?.[0]?.text) {
+                    generatedText = responseText.candidates[0].content.parts[0].text;
+                } else if (responseText?.error) {
+                    console.error('Gemini API Error:', responseText.error);
+                    throw new Error(`API Error: ${responseText.error.message || 'Unknown error'}`);
+                } else {
+                    console.warn('Resposta inesperada da API:', responseText);
+                    throw new Error('Resposta inválida da API');
+                }
             }
 
             if (!generatedText) {
@@ -438,18 +544,60 @@ document.addEventListener('DOMContentLoaded', function () {
             if (outputDiv) outputDiv.innerHTML = `\n                    <div class="space-y-4">\n                        <h4 class="text-lg font-bold text-white">Detalhes do Rolê:</h4>\n                        <div class="p-4 rounded-md bg-gray-900 border border-gray-700 whitespace-pre-wrap">${generatedText}</div>\n                        <h4 class="text-lg font-bold text-white">Convite Gerado:</h4>\n                        <div class="flex justify-center">\n                            <img src="${imageUrl}" alt="Convite para o Rolê" class="rounded-lg shadow-md max-w-full h-auto">\n                        </div>\n                    </div>\n                `;
 
             // Adicionar o rolê à agenda
-            const agendaContainer = document.querySelector('#agenda-container .space-y-4');
+            const agendaContainer = document.querySelector('#agenda-container');
             if (agendaContainer) {
-                const newEventHTML = `\n                        <div class="p-4 rounded-md bg-gray-900 border border-gray-700">\n                            <h3 class="text-lg font-bold text-amber-500">${new Date(date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' })} - ${input}</h3>\n                            <p class="text-gray-400">Ponto de encontro: Galpão. Distância: ${km}km.</p>\n                            <button class="mt-2 px-4 py-2 bg-amber-600 text-gray-900 font-bold rounded-full transition-transform duration-300 hover:scale-105 confirmar-btn">Confirmar Presença</button>\n                        </div>\n                    `;
+                const eventId = `role-${Date.now()}`;
+                const newEventHTML = `
+                        <div id="${eventId}" class="p-4 rounded-md bg-gray-900 border border-gray-700">
+                            <h3 class="text-lg font-bold text-amber-500">${new Date(date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' })} - ${input}</h3>
+                            <p class="text-gray-400">Ponto de encontro: Galpão. Distância: ${km}km.</p>
+                            <button class="mt-2 px-4 py-2 bg-amber-600 text-gray-900 font-bold rounded-full transition-transform duration-300 hover:scale-105 confirmar-btn">Confirmar Presença</button>
+                        </div>
+                    `;
                 agendaContainer.insertAdjacentHTML('afterbegin', newEventHTML);
                 addConfirmButtonListeners();
+                renderAttendees(eventId);
             }
 
         } catch (error) {
             console.error('Erro ao gerar rolê:', error);
-            if ($('role-output')) {
-                $('role-output').textContent = 'Ocorreu um erro ao conectar com o serviço. Tente novamente mais tarde.';
-                $('role-output').classList.remove('hidden');
+            console.log('Usando geração local como fallback...');
+            
+            // Fallback para geração local
+            try {
+                generatedText = localGenerateRide({ input, km: Number(km), date });
+                
+                if (outputDiv) {
+                    outputDiv.innerHTML = `
+                        <div class="space-y-4">
+                            <h4 class="text-lg font-bold text-white">Roteiro Gerado (Offline):</h4>
+                            <div class="p-4 rounded-md bg-gray-900 border border-gray-700 whitespace-pre-wrap">${generatedText}</div>
+                        </div>
+                    `;
+                }
+                
+                // Adicionar à agenda mesmo com fallback
+                const agendaContainer = document.querySelector('#agenda-container');
+                if (agendaContainer) {
+                    const eventId = `role-${Date.now()}`;
+                    const newEventHTML = `
+                            <div id="${eventId}" class="p-4 rounded-md bg-gray-900 border border-gray-700">
+                                <h3 class="text-lg font-bold text-amber-500">${new Date(date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' })} - ${input}</h3>
+                                <p class="text-gray-400">Ponto de encontro: Galpão. Distância: ${km}km.</p>
+                                <button class="mt-2 px-4 py-2 bg-amber-600 text-gray-900 font-bold rounded-full transition-transform duration-300 hover:scale-105 confirmar-btn">Confirmar Presença</button>
+                            </div>
+                        `;
+                    agendaContainer.insertAdjacentHTML('afterbegin', newEventHTML);
+                    addConfirmButtonListeners();
+                    renderAttendees(eventId);
+                }
+                
+            } catch (fallbackError) {
+                console.error('Erro no fallback local:', fallbackError);
+                if ($('role-output')) {
+                    $('role-output').textContent = 'Ocorreu um erro ao gerar o roteiro. Tente novamente mais tarde.';
+                    $('role-output').classList.remove('hidden');
+                }
             }
         } finally {
             if ($('loading-indicator-role')) {
