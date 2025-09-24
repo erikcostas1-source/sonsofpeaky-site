@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug API Gemini - Sons of Peaky</title>
+    <script src="config.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #0d0d0d; color: white; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .test-section { background: #1a1a1a; padding: 20px; margin: 20px 0; border-radius: 8px; }
+        button { background: #c9a14a; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #b8912a; }
+        textarea { width: 100%; height: 200px; font-family: monospace; background: #2a2a2a; color: white; border: 1px solid #444; padding: 10px; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 4px; }
+        .success { background: #22c55e; color: white; }
+        .error { background: #ef4444; color: white; }
+        .info { background: #3b82f6; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Debug API Gemini - Sons of Peaky</h1>
+        
+        <div class="test-section">
+            <h2>1. Teste de Configuração</h2>
+            <button onclick="testConfig()">Testar Config</button>
+            <div id="config-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>2. Teste Básico da API</h2>
+            <button onclick="testBasicAPI()">Teste Básico</button>
+            <div id="basic-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>3. Teste com Prompt do Gerador</h2>
+            <button onclick="testGeneratorPrompt()">Teste Gerador</button>
+            <div id="generator-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>4. Resposta Completa da API</h2>
+            <textarea id="full-response" placeholder="A resposta completa aparecerá aqui..."></textarea>
+        </div>
+    </div>
+
+    <script>
+        function testConfig() {
+            const result = document.getElementById('config-result');
+            
+            if (typeof window.SOP_CONFIG === 'undefined') {
+                result.innerHTML = '<div class="error">❌ Config não encontrado</div>';
+                return;
+            }
+
+            result.innerHTML = `
+                <div class="success">✅ Config carregado</div>
+                <div class="info">
+                    <strong>URL:</strong> ${window.SOP_CONFIG.textUrl}<br>
+                    <strong>Version:</strong> ${window.SOP_CONFIG.version}<br>
+                    <strong>Environment:</strong> ${window.SOP_CONFIG.environment}
+                </div>
+            `;
+        }
+
+        async function testBasicAPI() {
+            const result = document.getElementById('basic-result');
+            result.innerHTML = '<div class="info">🔄 Testando API...</div>';
+
+            try {
+                const response = await fetch(window.SOP_CONFIG.textUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{
+                                text: "Responda apenas: 'API funcionando corretamente'"
+                            }]
+                        }],
+                        generationConfig: {
+                            temperature: 0.1,
+                            topK: 40,
+                            topP: 0.95,
+                            maxOutputTokens: 50,
+                        }
+                    })
+                });
+
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+
+                const data = await response.json();
+                console.log('Response data:', data);
+                
+                document.getElementById('full-response').value = JSON.stringify(data, null, 2);
+
+                if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0]) {
+                    const text = data.candidates[0].content.parts[0].text;
+                    result.innerHTML = `
+                        <div class="success">✅ API funcionando</div>
+                        <div class="info"><strong>Resposta:</strong> ${text}</div>
+                    `;
+                } else {
+                    result.innerHTML = `
+                        <div class="error">❌ Estrutura de resposta inesperada</div>
+                        <div class="info">Verifique o console e a área de resposta completa</div>
+                    `;
+                }
+
+            } catch (error) {
+                console.error('Erro na API:', error);
+                result.innerHTML = `
+                    <div class="error">❌ Erro: ${error.message}</div>
+                `;
+            }
+        }
+
+        async function testGeneratorPrompt() {
+            const result = document.getElementById('generator-result');
+            result.innerHTML = '<div class="info">🔄 Testando com prompt do gerador...</div>';
+
+            const prompt = `Você é um especialista em turismo de motocicleta no Brasil. Crie um roteiro de viagem para motociclistas com as seguintes especificações:
+
+Tipo de Moto: Sport
+Orçamento: R$ 1000
+Experiência: Aventura
+Duração: 2 dias
+Região: Sudeste
+
+Responda OBRIGATORIAMENTE no formato JSON válido:
+{
+  "roteiro": {
+    "titulo": "Nome do Roteiro",
+    "duracao": "2 dias",
+    "distancia_total": "XXX km",
+    "custo_estimado": "R$ XXX",
+    "tipo_experiencia": "Aventura",
+    "descricao": "Descrição detalhada...",
+    "paradas": [
+      {
+        "nome": "Nome do Local",
+        "cidade": "Cidade, Estado",
+        "distancia": "XX km",
+        "tempo_viagem": "Xh XXmin",
+        "custo": "R$ XX",
+        "descricao": "O que fazer no local",
+        "coordenadas": "lat, lng"
+      }
+    ],
+    "dicas_importantes": ["dica1", "dica2"],
+    "melhor_epoca": "época do ano"
+  }
+}`;
+
+            try {
+                const response = await fetch(window.SOP_CONFIG.textUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{ text: prompt }]
+                        }],
+                        generationConfig: {
+                            temperature: 0.7,
+                            topK: 40,
+                            topP: 0.95,
+                            maxOutputTokens: 2048,
+                        }
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+
+                const data = await response.json();
+                document.getElementById('full-response').value = JSON.stringify(data, null, 2);
+
+                if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0]) {
+                    const text = data.candidates[0].content.parts[0].text;
+                    console.log('Resposta do gerador:', text);
+                    
+                    // Tenta fazer o parse como o gerador faz
+                    try {
+                        const jsonMatch = text.match(/\{[\s\S]*\}/);
+                        if (jsonMatch) {
+                            const parsedJSON = JSON.parse(jsonMatch[0]);
+                            result.innerHTML = `
+                                <div class="success">✅ Prompt do gerador funcionando</div>
+                                <div class="info"><strong>JSON válido encontrado:</strong> ${parsedJSON.roteiro ? 'Sim' : 'Não'}</div>
+                                <div class="info"><strong>Título:</strong> ${parsedJSON.roteiro?.titulo || 'N/A'}</div>
+                            `;
+                        } else {
+                            result.innerHTML = `
+                                <div class="error">❌ JSON não encontrado na resposta</div>
+                                <div class="info">Primeiro char: ${text.charAt(0)} | Último char: ${text.charAt(text.length-1)}</div>
+                            `;
+                        }
+                    } catch (parseError) {
+                        result.innerHTML = `
+                            <div class="error">❌ Erro ao parsear JSON: ${parseError.message}</div>
+                            <div class="info">Resposta começou com: ${text.substring(0, 100)}...</div>
+                        `;
+                    }
+                } else {
+                    result.innerHTML = `
+                        <div class="error">❌ Estrutura de resposta inesperada no teste do gerador</div>
+                    `;
+                }
+
+            } catch (error) {
+                console.error('Erro no teste do gerador:', error);
+                result.innerHTML = `
+                    <div class="error">❌ Erro: ${error.message}</div>
+                `;
+            }
+        }
+
+        // Testa config ao carregar
+        window.onload = function() {
+            testConfig();
+        };
+    </script>
+</body>
+</html>

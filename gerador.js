@@ -185,9 +185,21 @@ async function generateRole(formData) {
         }
         
         const data = await response.json();
+        console.log('📡 Resposta completa da API:', JSON.stringify(data, null, 2));
         
-        if (!data.candidates || !data.candidates[0]?.content?.parts?.[0]?.text) {
-            throw new Error('Resposta inválida da IA');
+        if (!data.candidates || !data.candidates[0]) {
+            console.error('❌ Estrutura de resposta inválida:', data);
+            throw new Error('Resposta inválida da IA: candidates não encontrado');
+        }
+        
+        if (!data.candidates[0].content || !data.candidates[0].content.parts || !data.candidates[0].content.parts[0]) {
+            console.error('❌ Estrutura de content inválida:', data.candidates[0]);
+            throw new Error('Resposta inválida da IA: content.parts não encontrado');
+        }
+        
+        if (!data.candidates[0].content.parts[0].text) {
+            console.error('❌ Texto não encontrado:', data.candidates[0].content.parts[0]);
+            throw new Error('Resposta inválida da IA: texto não encontrado');
         }
         
         const aiResponse = data.candidates[0].content.parts[0].text;
