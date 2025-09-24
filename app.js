@@ -1,4 +1,174 @@
 document.addEventListener('DOMContentLoaded', function () {
+    // ===== FUNCIONALIDADES DE NAVEGAÇÃO E UX =====
+    
+    // Menu mobile toggle
+    const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+    const mobileMenu = document.getElementById('mobile-menu');
+    
+    if (mobileMenuToggle && mobileMenu) {
+        mobileMenuToggle.addEventListener('click', function() {
+            const isExpanded = mobileMenuToggle.getAttribute('aria-expanded') === 'true';
+            
+            mobileMenuToggle.classList.toggle('active');
+            mobileMenu.classList.toggle('show');
+            document.body.classList.toggle('menu-open');
+            
+            // Update ARIA attributes
+            mobileMenuToggle.setAttribute('aria-expanded', !isExpanded);
+            mobileMenuToggle.setAttribute('aria-label', isExpanded ? 'Abrir menu de navegação' : 'Fechar menu de navegação');
+            
+            // Focus management
+            if (!isExpanded) {
+                // Menu opening - focus first link
+                const firstLink = mobileMenu.querySelector('.nav-link');
+                if (firstLink) setTimeout(() => firstLink.focus(), 300);
+            }
+        });
+        
+        // Keyboard navigation for menu toggle
+        mobileMenuToggle.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                mobileMenuToggle.click();
+            }
+        });
+        
+        // Fechar menu ao clicar nos links
+        mobileMenu.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function() {
+                mobileMenuToggle.classList.remove('active');
+                mobileMenu.classList.remove('show');
+                document.body.classList.remove('menu-open');
+                mobileMenuToggle.setAttribute('aria-expanded', 'false');
+                mobileMenuToggle.setAttribute('aria-label', 'Abrir menu de navegação');
+            });
+        });
+        
+        // Fechar menu ao clicar fora
+        document.addEventListener('click', function(e) {
+            if (!mobileMenuToggle.contains(e.target) && !mobileMenu.contains(e.target)) {
+                mobileMenuToggle.classList.remove('active');
+                mobileMenu.classList.remove('show');
+                document.body.classList.remove('menu-open');
+                mobileMenuToggle.setAttribute('aria-expanded', 'false');
+                mobileMenuToggle.setAttribute('aria-label', 'Abrir menu de navegação');
+            }
+        });
+        
+        // Close menu on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && mobileMenu.classList.contains('show')) {
+                mobileMenuToggle.classList.remove('active');
+                mobileMenu.classList.remove('show');
+                document.body.classList.remove('menu-open');
+                mobileMenuToggle.setAttribute('aria-expanded', 'false');
+                mobileMenuToggle.setAttribute('aria-label', 'Abrir menu de navegação');
+                mobileMenuToggle.focus();
+            }
+        });
+    }
+    
+    // Header scroll effect
+    const header = document.querySelector('.site-nav');
+    let lastScrollY = window.scrollY;
+    
+    window.addEventListener('scroll', () => {
+        const currentScrollY = window.scrollY;
+        
+        if (header) {
+            if (currentScrollY > 100) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        }
+        
+        lastScrollY = currentScrollY;
+    });
+    
+    // Scroll to top button
+    const scrollToTopBtn = document.getElementById('scroll-to-top');
+    if (scrollToTopBtn) {
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                scrollToTopBtn.classList.add('show');
+            } else {
+                scrollToTopBtn.classList.remove('show');
+            }
+        });
+        
+        scrollToTopBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    }
+    
+    // Active navigation link highlighting
+    const navLinks = document.querySelectorAll('.nav-link');
+    const sections = document.querySelectorAll('section[id]');
+    
+    function updateActiveNavLink() {
+        let current = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop - 150;
+            const sectionHeight = section.offsetHeight;
+            if (window.scrollY >= sectionTop && window.scrollY < sectionTop + sectionHeight) {
+                current = section.getAttribute('id');
+            }
+        });
+        
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === '#' + current) {
+                link.classList.add('active');
+            }
+        });
+    }
+    
+    window.addEventListener('scroll', updateActiveNavLink);
+    updateActiveNavLink(); // Call once on load
+    
+    // Smooth scrolling for navigation links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href').substring(1);
+            const targetElement = document.getElementById(targetId);
+            if (targetElement) {
+                const headerHeight = header ? header.offsetHeight : 0;
+                const targetPosition = targetElement.offsetTop - headerHeight - 20;
+                window.scrollTo({
+                    top: targetPosition,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+    
+    // Animate elements on scroll
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('fade-in-up');
+            }
+        });
+    }, observerOptions);
+    
+    // Observe cards and sections
+    document.querySelectorAll('.card, section > div').forEach(el => {
+        observer.observe(el);
+    });
+    
+    // ===== CONFIGURAÇÃO API E FUNCIONALIDADES EXISTENTES =====
+    
     // Configuração para chamadas Gemini API.
     // Preferir URLs vindas de window.SOP_CONFIG (config.js). Caso não existam, usar API_KEY local (opcional) ou fallback local.
     const API_KEY = ""; // opcional; deixe vazio para usar as URLs definidas em config.js
@@ -347,7 +517,7 @@ document.addEventListener('DOMContentLoaded', function () {
         } finally { if (loadingIndicator) loadingIndicator.style.display = 'none'; }
     });
 
-    // Lógica para a Assinatura (substituído 'alert' por 'showModal')
+    // Lógica para a Assinatura - Versão Pública (removida do site)
     const assinarBtn = $('assinar-btn');
     if (assinarBtn) assinarBtn.addEventListener('click', function () {
         const assinaturaInput = $('assinatura');
@@ -357,6 +527,19 @@ document.addEventListener('DOMContentLoaded', function () {
             if (assinaturaInput) assinaturaInput.value = '';
         } else {
             showModal('Por favor, digite seu nome completo para assinar.');
+        }
+    });
+
+    // Lógica para a Assinatura da Alta Cúpula
+    const assinarAcBtn = $('assinar-ac-btn');
+    if (assinarAcBtn) assinarAcBtn.addEventListener('click', function () {
+        const assinaturaAcInput = $('assinatura-ac');
+        const nome = assinaturaAcInput?.value.trim();
+        if (nome) {
+            showModal(`${nome}, seu compromisso com a Alta Cúpula foi registrado. Que sua liderança seja sempre guiada pelos valores da irmandade Sons of Peaky.`);
+            if (assinaturaAcInput) assinaturaAcInput.value = '';
+        } else {
+            showModal('Por favor, digite seu nome completo para assinar o compromisso da Alta Cúpula.');
         }
     });
 

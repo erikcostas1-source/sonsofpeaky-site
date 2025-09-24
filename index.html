@@ -1,107 +1,467 @@
 <!DOCTYPE html>
-<html lang="pt-br" class="scroll-smooth">
+<html lang="pt-BR" class="scroll-smooth">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Sons of Peaky — Manifesto, agenda e planejamento da irmandade de motociclistas." />
+    <meta name="description" content="Sons of Peaky — Irmandade de motociclistas. Conheça nossa missão, valores, estatutos e junte-se à nossa comunidade." />
     <meta name="theme-color" content="#0d0d0d" />
-    <title>Sons of Peaky - Manifesto</title>
-    <link rel="icon" href="https://i.imgur.com/uG46v5P.jpg" />
-    <meta property="og:title" content="Sons of Peaky - Manifesto" />
-    <meta property="og:description" content="Manifesto, agenda e planejamento da irmandade Sons of Peaky." />
-    <meta property="og:image" content="https://i.imgur.com/uG46v5P.jpg" />
+    <meta name="author" content="Sons of Peaky" />
+    <title>Sons of Peaky - Irmandade de Motociclistas</title>
+    <link rel="icon" href="assets/img/SONSOFPEAK_TRANSPARENTE_PRETO.png" />
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Sons of Peaky - Irmandade de Motociclistas" />
+    <meta property="og:description" content="Conheça a irmandade Sons of Peaky. Missão, valores, estatutos e comunidade de motociclistas unidos pela paixão das estradas." />
+    <meta property="og:image" content="assets/img/SONSOFPEAK_TRANSPARENTE_PRETO.png" />
     <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://erikcostas1-source.github.io/sonsofpeaky-site/" />
+    
+    <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Sons of Peaky - Manifesto" />
-    <meta name="twitter:description" content="Manifesto, agenda e planejamento da irmandade Sons of Peaky." />
-    <meta name="twitter:image" content="https://i.imgur.com/uG46v5P.jpg" />
+    <meta name="twitter:title" content="Sons of Peaky - Irmandade de Motociclistas" />
+    <meta name="twitter:description" content="Conheça a irmandade Sons of Peaky. Missão, valores, estatutos e comunidade de motociclistas unidos pela paixão das estradas." />
+    <meta name="twitter:image" content="assets/img/SONSOFPEAK_TRANSPARENTE_PRETO.png" />
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom Styles -->
     <link rel="stylesheet" href="styles.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Pirata+One&display=swap" rel="stylesheet" />
+    
+    <!-- Skip link para acessibilidade -->
+    <style>
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 6px;
+            background: var(--accent);
+            color: black;
+            padding: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 4px;
+            z-index: 1000;
+            transition: top 0.3s;
+        }
+        .skip-link:focus {
+            top: 6px;
+        }
+    </style>
 </head>
-<body>
-    <header id="top" class="site-nav text-center py-6 bg-black">
-        <div class="container flex flex-col items-center justify-center">
-            <img src="assets/img/logo-sonsofpeaky.png" alt="Sons of Peaky Logo" class="mx-auto mb-4" style="max-width:320px;" />
-            <h1 class="text-4xl font-bold drop-shadow-lg" style="font-family:'Pirata One','Carnevalee Freakshow',serif;color:#fb923c;">Sons of Peaky</h1>
-            <p class="mt-2 text-lg text-gray-300">Rua José Flavio, 420, Travessa 1A</p>
+<body class="pt-32 md:pt-40">
+    <!-- Skip link para acessibilidade -->
+    <a href="#main-content" class="skip-link" aria-label="Pular para o conteúdo principal">Pular para o conteúdo</a>
+
+    <header id="top" class="site-nav fixed top-0 w-full z-50 bg-black bg-opacity-95 backdrop-blur-sm shadow-lg" role="banner">
+        <div class="container mx-auto px-4">
+            <!-- Logo e título - responsivos -->
+            <div class="flex flex-col md:flex-row items-center justify-between py-4">
+                <div class="flex flex-col items-center md:items-start">
+                    <img src="assets/img/SONSOFPEAK_TRANSPARENTE_PRETO.png" alt="Logotipo Sons of Peaky" class="h-12 md:h-16 w-auto mb-2" />
+                    <h1 class="text-2xl md:text-4xl font-bold drop-shadow-lg" style="font-family:'Pirata One','Carnevalee Freakshow',serif;color:#fb923c;">Sons of Peaky</h1>
+                    <p class="text-sm md:text-lg text-gray-300 hidden md:block">Rua José Flavio, 420, Travessa 1A</p>
+                </div>
+                
+                <!-- Menu mobile toggle -->
+                <button id="mobile-menu-toggle" class="md:hidden flex flex-col justify-center items-center w-8 h-8 relative" 
+                        aria-label="Abrir menu de navegação" aria-expanded="false" aria-controls="mobile-menu">
+                    <span class="block w-6 h-0.5 bg-amber-500 transition-all duration-300 transform rotate-0"></span>
+                    <span class="block w-6 h-0.5 bg-amber-500 transition-all duration-300 transform rotate-0 mt-1"></span>
+                    <span class="block w-6 h-0.5 bg-amber-500 transition-all duration-300 transform rotate-0 mt-1"></span>
+                </button>
+            </div>
+
+            <!-- Navigation - desktop e mobile -->
+            <nav class="main-nav hidden md:flex justify-center gap-4 lg:gap-6 pb-4 text-sm lg:text-base font-semibold" 
+                 id="desktop-nav" role="navigation" aria-label="Navegação principal">
+                <a href="#historia" class="nav-link hover:text-amber-500 transition-colors duration-200 relative" aria-label="Ir para seção História">História</a>
+                <a href="#irmandade" class="nav-link hover:text-amber-500 transition-colors duration-200 relative" aria-label="Ir para seção Irmandade">Irmandade</a>
+                <a href="#missao" class="nav-link hover:text-amber-500 transition-colors duration-200 relative" aria-label="Ir para seção Missão e Visão">Missão & Visão</a>
+                <a href="#estatutos" class="nav-link hover:text-amber-500 transition-colors duration-200 relative" aria-label="Ir para seção Estatutos">Estatutos</a>
+                <a href="#agenda" class="nav-link hover:text-amber-500 transition-colors duration-200 relative" aria-label="Ir para seção Agenda">Agenda</a>
+                <a href="#ferramentas" class="nav-link hover:text-amber-500 transition-colors duration-200 relative" aria-label="Ir para seção Ferramentas">Ferramentas</a>
+                <a href="#bar" class="nav-link hover:text-amber-500 transition-colors duration-200 relative" aria-label="Ir para seção Preços do Bar">Bar</a>
+                <a href="#redes" class="nav-link hover:text-amber-500 transition-colors duration-200 relative" aria-label="Ir para seção Redes Sociais">Redes</a>
+            </nav>
+
+            <!-- Mobile menu -->
+            <nav id="mobile-menu" class="mobile-menu md:hidden fixed top-full left-0 w-full bg-black bg-opacity-95 backdrop-blur-sm transform -translate-y-full opacity-0 transition-all duration-300 ease-in-out z-40"
+                 role="navigation" aria-label="Menu de navegação mobile">
+                <div class="flex flex-col space-y-4 p-6">
+                    <a href="#historia" class="nav-link text-white hover:text-amber-500 transition-colors duration-200 py-2 border-b border-gray-700" aria-label="Ir para seção História">História</a>
+                    <a href="#irmandade" class="nav-link text-white hover:text-amber-500 transition-colors duration-200 py-2 border-b border-gray-700" aria-label="Ir para seção Irmandade">Irmandade</a>
+                    <a href="#missao" class="nav-link text-white hover:text-amber-500 transition-colors duration-200 py-2 border-b border-gray-700" aria-label="Ir para seção Missão e Visão">Missão & Visão</a>
+                    <a href="#estatutos" class="nav-link text-white hover:text-amber-500 transition-colors duration-200 py-2 border-b border-gray-700" aria-label="Ir para seção Estatutos">Estatutos</a>
+                    <a href="#agenda" class="nav-link text-white hover:text-amber-500 transition-colors duration-200 py-2 border-b border-gray-700" aria-label="Ir para seção Agenda">Agenda</a>
+                    <a href="#ferramentas" class="nav-link text-white hover:text-amber-500 transition-colors duration-200 py-2 border-b border-gray-700" aria-label="Ir para seção Ferramentas">Ferramentas</a>
+                    <a href="#bar" class="nav-link text-white hover:text-amber-500 transition-colors duration-200 py-2 border-b border-gray-700" aria-label="Ir para seção Preços do Bar">Bar</a>
+                    <a href="#redes" class="nav-link text-white hover:text-amber-500 transition-colors duration-200 py-2" aria-label="Ir para seção Redes Sociais">Redes</a>
+                </div>
+            </nav>
         </div>
-        <nav class="main-nav flex justify-center gap-8 py-4 text-lg font-semibold">
-            <a href="#irmandade" class="hover:text-amber-500 transition">Irmandade</a>
-            <a href="#missao" class="hover:text-amber-500 transition">Missão & Visão</a>
-            <a href="#estatutos" class="hover:text-amber-500 transition">Estatutos</a>
-            <a href="#agenda" class="hover:text-amber-500 transition">Agenda</a>
-            <a href="#bar" class="hover:text-amber-500 transition">Preços do Bar</a>
-            <a href="#redes" class="hover:text-amber-500 transition">Redes Sociais</a>
-        </nav>
     </header>
 
-    <div id="modal" class="modal-overlay hidden">
+    <!-- Modal de confirmação -->
+    <div id="modal" class="modal-overlay hidden" role="dialog" aria-labelledby="modal-title" aria-modal="true">
         <div class="modal-content">
-            <h3 class="text-xl font-bold text-white mb-4">Acordo de Membros</h3>
+            <h3 id="modal-title" class="text-xl font-bold text-white mb-4">Acordo de Membros</h3>
             <p id="modal-message" class="text-gray-300 mb-6"></p>
-            <button id="modal-close-btn" class="px-6 py-2 bg-amber-600 text-gray-900 font-bold rounded-full transition-colors duration-200">OK</button>
+            <button id="modal-close-btn" class="px-6 py-2 bg-amber-600 hover:bg-amber-500 text-gray-900 font-bold rounded-full transition-colors duration-200">OK</button>
         </div>
     </div>
 
-    <main>
-        <!-- Irmandade -->
-            <section id="irmandade" class="py-16 md:py-24">
-                <div class="container space-y-8">
-                    <h2 class="section-title">O Caminho para a Irmandade</h2>
-                            <div class="grid md:grid-cols-2 gap-6">
-                                <div class="space-y-4">
-                                    <h3 class="text-white font-bold text-lg mb-2">O Caminho para a Irmandade</h3>
-                                    <p class="text-gray-300">A irmandade Sons of Peaky se sustenta na confiança, na franqueza e na intimidade. Não há hierarquia ou regras rígidas, mas um desejo genuíno de pertencer e de contribuir para a força do grupo. O caminho para ser um membro é uma jornada de aproximação, onde a dedicação e o respeito são os únicos pré-requisitos.</p>
-                                    <p class="text-gray-300">Para se tornar um Membro, é necessário um convite formal feito por um Membro da Alta Cúpula. Esse convite surge naturalmente, após a pessoa frequentar o galpão por um tempo e demonstrar, por suas atitudes, que compartilha dos nossos valores. A partir desse convite, os outros membros podem expressar suas opiniões, garantindo que a decisão seja de toda a irmandade.</p>
-                                    <h4 class="text-white font-semibold mt-4">Vantagens e Contribuições</h4>
-                                    <ul class="list-disc list-inside space-y-2 text-gray-300">
-                                        <li><span class="text-white font-semibold">Frequentadores:</span> O frequentador é sempre bem-vindo para compartilhar a energia do galpão, respeitando o estatuto e a boa vizinhança.<br><span class="text-amber-400">Vantagem:</span> Acesso ao galpão para a convivência com a irmandade.<br><span class="text-amber-400">Contribuição:</span> Respeito ao espaço, à vizinhança e às regras. O consumo de comidas e bebidas é pago na hora, via Pix.</li>
-                                        <li><span class="text-white font-semibold">Membros:</span> O Membro é parte do nosso círculo interno, uma família estendida. Sua contribuição mantém a casa e, em troca, ele obtém vantagens exclusivas.<br><span class="text-amber-400">Vantagens:</span> Acesso prioritário a eventos e reuniões exclusivas. Voz ativa: O direito de participar das reuniões e de opinar sobre os rumos do galpão. A possibilidade de propor um novo frequentador para se tornar membro, após demonstrar seu valor à irmandade.<br><span class="text-amber-400">Contribuição:</span> O compromisso de manter a casa. Para cobrir os custos de manutenção, limpeza e contas do galpão, a contribuição mensal é de R$ 100,00. Esse valor é simbólico e garante o acesso ilimitado para as quintas-feiras e a certeza de que a nossa casa estará sempre em ordem.<br><span class="text-amber-400">Responsabilidades:</span> Ajudar ativamente na organização e na limpeza do galpão após as reuniões. Estar presente para colaborar quando necessário.</li>
-                                        <li><span class="text-white font-semibold">Membros da Alta Cúpula:</span> A Alta Cúpula é o pilar da irmandade. Sua posição não é de poder, mas de referência e responsabilidade.<br><span class="text-amber-400">Vantagens:</span> A honra de guiar a irmandade e manter a sua essência. A decisão final sobre o rumo do grupo e a aceitação de novos membros. Chave do galpão: Acesso total ao espaço para uso pessoal e organização de eventos.<br><span class="text-amber-400">Contribuição:</span> O compromisso de zelar pelo galpão e pelos membros. A contribuição mensal é de R$ 250,00, que cobre os custos fixos da liderança e eventuais imprevistos.</li>
-                                    </ul>
+    <main id="main-content" role="main" aria-label="Conteúdo principal do site">
+        <!-- História -->
+        <section id="historia" class="py-12 md:py-16 lg:py-20 bg-gradient-to-b from-black via-gray-900 to-black">
+            <div class="container mx-auto px-4 space-y-10">
+                <h2 class="section-title text-3xl md:text-4xl lg:text-5xl">Como Tudo Começou</h2>
+                
+                <div class="max-w-4xl mx-auto space-y-8">
+                    <!-- Introdução -->
+                    <div class="text-center mb-12">
+                        <p class="text-xl md:text-2xl text-amber-400 font-semibold mb-4">25 de maio de 2021</p>
+                        <p class="text-lg md:text-xl text-gray-300 leading-relaxed">
+                            Nasceu de uma ideia simples entre dois amigos: Erik e Ricardo (Brutos). 
+                            <span class="text-amber-400 font-semibold">Por que gastar dinheiro em bares quando podemos ter nosso próprio espaço?</span>
+                        </p>
+                    </div>
+
+                    <!-- Timeline -->
+                    <div class="grid md:grid-cols-2 gap-8 lg:gap-12">
+                        <!-- A Ideia -->
+                        <div class="card group hover:border-amber-500 transition-all duration-300">
+                            <div class="flex items-start space-x-4">
+                                <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full flex items-center justify-center">
+                                    <span class="text-white font-bold text-xl">💡</span>
                                 </div>
-                                <div class="space-y-4 p-4 rounded-md bg-gray-900 border border-gray-700">
-                                    <h3 class="text-lg font-bold text-white">Assinatura do Acordo</h3>
-                                    <label for="assinatura" class="block text-sm text-gray-400">Assine com seu nome completo para registrar seu compromisso.</label>
-                                    <div class="flex gap-3 items-center">
-                                        <input id="assinatura" type="text" placeholder="Seu nome completo" class="flex-1 px-3 py-2 rounded bg-gray-800 border border-gray-700 text-gray-100" />
-                                        <button id="assinar-btn" class="px-4 py-2 bg-amber-600 text-gray-900 font-bold rounded-full">Assinar</button>
+                                <div class="flex-1">
+                                    <h3 class="text-amber-400 font-bold text-lg md:text-xl mb-3">A Ideia Original</h3>
+                                    <p class="text-gray-300 text-sm md:text-base leading-relaxed">
+                                        Erik e Brutos perceberam que o dinheiro gasto em bares poderia ser investido em algo maior: 
+                                        um espaço próprio para reunir amigos. A ideia era simples, mas revolucionária para eles.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- As Motos -->
+                        <div class="card group hover:border-amber-500 transition-all duration-300">
+                            <div class="flex items-start space-x-4">
+                                <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-red-500 to-red-700 rounded-full flex items-center justify-center">
+                                    <span class="text-white font-bold text-xl">🏍️</span>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="text-red-400 font-bold text-lg md:text-xl mb-3">A Paixão pelas Motos</h3>
+                                    <p class="text-gray-300 text-sm md:text-base leading-relaxed">
+                                        Brutos, que sempre amou motos, influenciou Erik, Lambão e Kazulo a comprarem suas máquinas. 
+                                        Começaram a viajar juntos, criando vínculos únicos que só a estrada proporciona.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- O Nome -->
+                        <div class="card group hover:border-amber-500 transition-all duration-300">
+                            <div class="flex items-start space-x-4">
+                                <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-700 rounded-full flex items-center justify-center">
+                                    <span class="text-white font-bold text-xl">🎮</span>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="text-purple-400 font-bold text-lg md:text-xl mb-3">Sons of... o quê?</h3>
+                                    <p class="text-gray-300 text-sm md:text-base leading-relaxed">
+                                        Jogando GTA 5 toda segunda-feira, usavam "Sons of Nat" (pelos erros de NAT do PS4). 
+                                        O "Sons of" estava definido. Inspirados pela série Peaky Blinders, nasceu 
+                                        <span class="text-amber-400 font-semibold">Sons of Peaky</span>.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- O Galpão -->
+                        <div class="card group hover:border-amber-500 transition-all duration-300">
+                            <div class="flex items-start space-x-4">
+                                <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-green-500 to-green-700 rounded-full flex items-center justify-center">
+                                    <span class="text-white font-bold text-xl">🏠</span>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="text-green-400 font-bold text-lg md:text-xl mb-3">16 de Julho de 2021</h3>
+                                    <p class="text-gray-300 text-sm md:text-base leading-relaxed">
+                                        Encontraram o galpão: 100m², completamente vazio, sem luz, só poeira cinza. 
+                                        Na Rua José Flavio, Penha, SP. Para muitos, um lugar abandonado. 
+                                        <span class="text-amber-400 font-semibold">Para eles, a realização de um sonho.</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- A Transformação -->
+                    <div class="bg-gradient-to-r from-amber-900 via-orange-900 to-amber-900 border border-amber-600 rounded-xl p-6 lg:p-8 shadow-2xl">
+                        <h3 class="text-2xl md:text-3xl font-bold text-amber-100 text-center mb-6">A Transformação</h3>
+                        
+                        <div class="grid md:grid-cols-2 gap-6 text-amber-100">
+                            <div class="space-y-4">
+                                <h4 class="text-xl font-bold text-amber-200">2021 - Os Primeiros Passos</h4>
+                                <ul class="space-y-2 text-sm md:text-base">
+                                    <li class="flex items-start space-x-2">
+                                        <span class="text-amber-400">•</span>
+                                        <span>4 amigos com poucos recursos e muita vontade</span>
+                                    </li>
+                                    <li class="flex items-start space-x-2">
+                                        <span class="text-amber-400">•</span>
+                                        <span>Lavaram exaustivamente o chão cinzento</span>
+                                    </li>
+                                    <li class="flex items-start space-x-2">
+                                        <span class="text-amber-400">•</span>
+                                        <span>Móveis da própria casa, amigos ajudando</span>
+                                    </li>
+                                    <li class="flex items-start space-x-2">
+                                        <span class="text-amber-400">•</span>
+                                        <span>Em menos de um mês: luz, pintura, bar, TV</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <h4 class="text-xl font-bold text-amber-200">2025 - O Presente</h4>
+                                <ul class="space-y-2 text-sm md:text-base">
+                                    <li class="flex items-start space-x-2">
+                                        <span class="text-amber-400">•</span>
+                                        <span>3 TVs + telão + projetor última geração</span>
+                                    </li>
+                                    <li class="flex items-start space-x-2">
+                                        <span class="text-amber-400">•</span>
+                                        <span>Mesa de sinuca + fliperama + som profissional</span>
+                                    </li>
+                                    <li class="flex items-start space-x-2">
+                                        <span class="text-amber-400">•</span>
+                                        <span>Luzes de balada + máquina de fumaça</span>
+                                    </li>
+                                    <li class="flex items-start space-x-2">
+                                        <span class="text-amber-400">•</span>
+                                        <span>9 membros da Alta Cúpula com chave</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- O Movimento Hoje -->
+                    <div class="text-center bg-gray-900 border border-gray-700 rounded-xl p-6 lg:p-8">
+                        <h3 class="text-2xl md:text-3xl font-bold text-amber-400 mb-6">O Movimento Hoje</h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                            <div class="space-y-2">
+                                <div class="text-3xl md:text-4xl font-bold text-amber-500">9</div>
+                                <p class="text-gray-300 text-sm md:text-base">Membros da Alta Cúpula</p>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="text-3xl md:text-4xl font-bold text-amber-500">15K+</div>
+                                <p class="text-gray-300 text-sm md:text-base">Seguidores nas Redes</p>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="text-3xl md:text-4xl font-bold text-amber-500">100+</div>
+                                <p class="text-gray-300 text-sm md:text-base">Comunidade Ativa</p>
+                            </div>
+                        </div>
+                        
+                        <p class="text-lg md:text-xl text-gray-300 leading-relaxed max-w-3xl mx-auto">
+                            <span class="text-amber-400 font-semibold">Sons of Peaky</span> evoluiu de uma ideia entre amigos para um 
+                            <span class="text-white font-semibold">movimento, um estilo de vida</span>. 
+                            Não é só sobre motos - é sobre amizade, ideais compartilhados e uma família que cresce a cada dia.
+                        </p>
+                        
+                        <div class="mt-6 text-center">
+                            <p class="text-amber-400 font-bold text-lg italic">
+                                "Criamos mais que um galpão. Criamos uma família."
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Irmandade -->
+        <section id="irmandade" class="py-12 md:py-16 lg:py-20">
+            <div class="container mx-auto px-4 space-y-8">
+                <h2 class="section-title text-3xl md:text-4xl lg:text-5xl">O Caminho para a Irmandade</h2>
+                <div class="grid lg:grid-cols-2 gap-8 lg:gap-12">
+                    <div class="space-y-6">
+                        <div class="prose prose-invert max-w-none">
+                            <h3 class="text-amber-400 font-bold text-xl md:text-2xl mb-4">A Jornada da Confiança</h3>
+                            <p class="text-gray-300 text-base md:text-lg leading-relaxed">Desde 2021, quando Erik e Brutos transformaram uma ideia simples em realidade, a irmandade Sons of Peaky cresceu através da confiança mútua, franqueza e intimidade. O que começou como quatro amigos em um galpão vazio se tornou uma família unida pelos mesmos valores e pela paixão das estradas.</p>
+                            <p class="text-gray-300 text-base md:text-lg leading-relaxed">Para se tornar um Membro, é necessário um convite formal feito por um Membro da Alta Cúpula. Esse convite surge naturalmente, após demonstrar através de suas atitudes que você compartilha dos valores que construímos ao longo desta jornada. A partir desse convite, os outros membros podem expressar suas opiniões, garantindo que a decisão seja de toda a irmandade.</p>
+                        </div>
+
+                        <div class="space-y-6">
+                            <h4 class="text-amber-400 font-semibold text-lg md:text-xl">Níveis de Participação</h4>
+                            
+                            <!-- Frequentadores -->
+                            <div class="bg-gray-900 border border-gray-700 rounded-lg p-4 md:p-6 hover:border-amber-500 transition-colors duration-300">
+                                <h5 class="text-white font-bold text-lg mb-3">Frequentadores</h5>
+                                <p class="text-gray-300 mb-4 text-sm md:text-base">O frequentador é sempre bem-vindo para compartilhar a energia do galpão, respeitando o estatuto e a boa vizinhança.</p>
+                                <div class="grid sm:grid-cols-2 gap-4 text-sm">
+                                    <div>
+                                        <span class="text-amber-400 font-semibold">Vantagem:</span>
+                                        <p class="text-gray-300">Acesso ao galpão para convivência com a irmandade</p>
+                                    </div>
+                                    <div>
+                                        <span class="text-amber-400 font-semibold">Contribuição:</span>
+                                        <p class="text-gray-300">Respeito às regras, consumo pago via Pix</p>
                                     </div>
                                 </div>
                             </div>
-                </div>
-            </section>
 
-        <!-- Missão & Visão -->
-            <section id="missao" class="py-16 md:py-24">
-                <div class="container space-y-8">
-                    <h2 class="section-title">Missão, Visão, Valores e Cultura</h2>
-                            <div class="grid md:grid-cols-2 gap-6">
-                                <div class="p-4 rounded-md bg-gray-900 border border-gray-700">
-                                    <h3 class="text-white font-bold text-lg mb-2">Missão</h3>
-                                    <p class="text-gray-300">Ser um porto seguro onde a franqueza e a intimidade criam laços verdadeiros. Nossa missão é cultivar um ambiente de respeito e confiança, onde cada pessoa se sinta à vontade para ser ela mesma, e onde a amizade é o maior dos nossos bens.</p>
-                                </div>
-                                <div class="p-4 rounded-md bg-gray-900 border border-gray-700">
-                                    <h3 class="text-white font-bold text-lg mb-2">Visão</h3>
-                                    <p class="text-gray-300">Tornar-nos uma irmandade sólida, reconhecida não por poder ou status, mas pelo exemplo de união e camaradagem que manifestamos. Nossa visão é inspirar outros a buscarem relações autênticas e a construírem algo que perdure.</p>
-                                </div>
-                                <div class="p-4 rounded-md bg-gray-900 border border-gray-700">
-                                    <h3 class="text-white font-bold text-lg mb-2">Valores</h3>
-                                    <ul class="list-disc list-inside text-gray-300 space-y-1">
-                                        <li>Honestidade Acima de Tudo: A verdade é a base de todas as nossas interações. A franqueza, mesmo quando difícil, é a chave para a confiança mútua.</li>
-                                        <li>Respeito pela Jornada: Cada pessoa tem a sua própria história. Valorizamos a individualidade e respeitamos o tempo de cada um, sem julgamentos.</li>
-                                        <li>Comunidade e Colaboração: Nossa força reside na nossa capacidade de cuidar uns dos outros e do nosso espaço. A colaboração é o que mantém a irmandade viva.</li>
-                                        <li>Dedicacão Silenciosa: A contribuição para o grupo não precisa de alarde. Valorizamos a atitude de quem cuida da casa e dos irmãos, mesmo sem que ninguém esteja olhando.</li>
-                                    </ul>
-                                </div>
-                                <div class="p-4 rounded-md bg-gray-900 border border-gray-700">
-                                    <h3 class="text-white font-bold text-lg mb-2">Cultura</h3>
-                                    <p class="text-gray-300">A cultura do Sons of Peaky se manifesta nas nossas atitudes diárias. Somos uma irmandade que valoriza a simplicidade, a autenticidade e a convivência. Não há espaço para excessos, ego ou superficialidade. O que nos define é a nossa capacidade de sentar juntos, compartilhar uma conversa sincera e construir memórias que reforçam nossa amizade. Somos o que fazemos, e nosso galpão é o nosso reflexo.</p>
+                            <!-- Membros -->
+                            <div class="bg-gray-900 border border-gray-700 rounded-lg p-4 md:p-6 hover:border-amber-500 transition-colors duration-300">
+                                <h5 class="text-white font-bold text-lg mb-3">Membros</h5>
+                                <p class="text-gray-300 mb-4 text-sm md:text-base">O Membro é parte do nosso círculo interno, uma família estendida.</p>
+                                <div class="grid sm:grid-cols-2 gap-4 text-sm">
+                                    <div>
+                                        <span class="text-amber-400 font-semibold">Vantagens:</span>
+                                        <p class="text-gray-300">Acesso prioritário, voz ativa, direito de propor novos membros</p>
+                                    </div>
+                                    <div>
+                                        <span class="text-amber-400 font-semibold">Contribuição:</span>
+                                        <p class="text-gray-300">R$ 100,00 mensais + responsabilidades de organização</p>
+                                    </div>
                                 </div>
                             </div>
+
+                            <!-- Alta Cúpula -->
+                            <div class="bg-gradient-to-r from-amber-900 to-gray-900 border border-amber-600 rounded-lg p-4 md:p-6 hover:border-amber-400 transition-colors duration-300">
+                                <h5 class="text-amber-100 font-bold text-lg mb-3">Membros da Alta Cúpula</h5>
+                                <p class="text-amber-100 mb-4 text-sm md:text-base">A Alta Cúpula é o pilar da irmandade. Sua posição não é de poder, mas de referência e responsabilidade.</p>
+                                <div class="grid sm:grid-cols-2 gap-4 text-sm">
+                                    <div>
+                                        <span class="text-amber-300 font-semibold">Vantagens:</span>
+                                        <p class="text-amber-100">Liderança, decisão final, acesso total ao galpão</p>
+                                    </div>
+                                    <div>
+                                        <span class="text-amber-300 font-semibold">Contribuição:</span>
+                                        <p class="text-amber-100">R$ 250,00 mensais + zeladoria completa</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Call to Action -->
+                    <div class="lg:sticky lg:top-32 lg:self-start">
+                        <div class="bg-gradient-to-br from-gray-900 to-gray-800 border border-amber-600 rounded-xl p-6 shadow-xl text-center">
+                            <h3 class="text-xl md:text-2xl font-bold text-amber-400 mb-4">Junte-se à Irmandade</h3>
+                            <p class="text-gray-300 mb-6 text-sm md:text-base">
+                                Interessado em fazer parte da família Sons of Peaky? Conheça nossos estatutos e valores.
+                            </p>
+                            
+                            <div class="space-y-4">
+                                <a href="#estatutos" class="block w-full px-6 py-3 bg-amber-600 hover:bg-amber-500 text-gray-900 font-bold rounded-lg transition-colors duration-200 transform hover:scale-105">
+                                    Ver Estatutos
+                                </a>
+                                <a href="#redes" class="block w-full px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-bold rounded-lg transition-colors duration-200">
+                                    Siga nas Redes
+                                </a>
+                            </div>
+                            
+                            <div class="mt-6 pt-6 border-t border-gray-700">
+                                <p class="text-xs text-gray-400">
+                                    O convite para ser membro é feito por um Membro da Alta Cúpula após frequentar o galpão e demonstrar alinhamento com nossos valores.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </section>
+            </div>
+        </section>
+
+        <!-- Missão & Visão -->
+        <section id="missao" class="py-12 md:py-16 lg:py-20 bg-gradient-to-b from-gray-900 to-black">
+            <div class="container mx-auto px-4 space-y-10">
+                <h2 class="section-title text-3xl md:text-4xl lg:text-5xl">Missão, Visão, Valores e Cultura</h2>
+                <div class="grid md:grid-cols-2 lg:grid-cols-2 gap-6 lg:gap-8">
+                    <!-- Missão -->
+                    <div class="card group hover:border-amber-500 transition-all duration-300">
+                        <div class="flex items-start space-x-4">
+                            <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-amber-400 font-bold text-xl md:text-2xl mb-4 group-hover:text-amber-300 transition-colors">Missão</h3>
+                                <p class="text-gray-300 text-base md:text-lg leading-relaxed">Desde aquele primeiro galpão vazio onde tudo começou, nossa missão é ser um porto seguro onde a franqueza e a intimidade criam laços verdadeiros. Cultivamos um ambiente de respeito e confiança, onde cada pessoa se sinta à vontade para ser ela mesma, honrando os valores que nos uniram desde o início: a amizade como o maior dos nossos bens.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Visão -->
+                    <div class="card group hover:border-amber-500 transition-all duration-300">
+                        <div class="flex items-start space-x-4">
+                            <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-blue-400 font-bold text-xl md:text-2xl mb-4 group-hover:text-blue-300 transition-colors">Visão</h3>
+                                <p class="text-gray-300 text-base md:text-lg leading-relaxed">Tornar-nos uma irmandade sólida, reconhecida não por poder ou status, mas pelo exemplo de união e camaradagem que manifestamos. Nossa visão é inspirar outros a buscarem relações autênticas e a construírem algo que perdure.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Valores -->
+                    <div class="card group hover:border-amber-500 transition-all duration-300">
+                        <div class="flex items-start space-x-4">
+                            <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-green-500 to-teal-600 rounded-lg flex items-center justify-center">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-green-400 font-bold text-xl md:text-2xl mb-4 group-hover:text-green-300 transition-colors">Valores</h3>
+                                <ul class="space-y-3 text-gray-300 text-sm md:text-base">
+                                    <li class="flex items-start space-x-2">
+                                        <span class="flex-shrink-0 w-2 h-2 bg-amber-500 rounded-full mt-2"></span>
+                                        <span><strong class="text-white">Honestidade Acima de Tudo:</strong> A verdade é a base de todas as nossas interações.</span>
+                                    </li>
+                                    <li class="flex items-start space-x-2">
+                                        <span class="flex-shrink-0 w-2 h-2 bg-amber-500 rounded-full mt-2"></span>
+                                        <span><strong class="text-white">Respeito pela Jornada:</strong> Cada pessoa tem a sua própria história.</span>
+                                    </li>
+                                    <li class="flex items-start space-x-2">
+                                        <span class="flex-shrink-0 w-2 h-2 bg-amber-500 rounded-full mt-2"></span>
+                                        <span><strong class="text-white">Comunidade e Colaboração:</strong> Nossa força reside na capacidade de cuidar uns dos outros.</span>
+                                    </li>
+                                    <li class="flex items-start space-x-2">
+                                        <span class="flex-shrink-0 w-2 h-2 bg-amber-500 rounded-full mt-2"></span>
+                                        <span><strong class="text-white">Dedicação Silenciosa:</strong> Valorizamos quem cuida da casa e dos irmãos.</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cultura -->
+                    <div class="card group hover:border-amber-500 transition-all duration-300">
+                        <div class="flex items-start space-x-4">
+                            <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-purple-400 font-bold text-xl md:text-2xl mb-4 group-hover:text-purple-300 transition-colors">Cultura</h3>
+                                <p class="text-gray-300 text-base md:text-lg leading-relaxed">A cultura do Sons of Peaky se manifesta nas nossas atitudes diárias. Somos uma irmandade que valoriza a simplicidade, a autenticidade e a convivência. Não há espaço para excessos, ego ou superficialidade. O que nos define é a nossa capacidade de sentar juntos, compartilhar uma conversa sincera e construir memórias que reforçam nossa amizade.</p>
+                                <div class="mt-4 p-3 bg-gradient-to-r from-amber-900 to-orange-900 rounded-lg border border-amber-600">
+                                    <p class="text-amber-100 text-sm font-medium italic">"Somos o que fazemos, e nosso galpão é o nosso reflexo."</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
         <!-- Estatutos -->
             <section id="estatutos" class="py-16 md:py-24">
@@ -135,6 +495,27 @@
                                                 <h5 class="text-amber-400 font-bold">O NOSSO CÓDIGO</h5>
                                                 <p class="text-gray-300"><b>Transparência e Honestidade:</b> Seja claro sobre suas ações e o consumo. A confiança mútua é o que nos mantém unidos.<br><br><b>Apoio e Camaragem:</b> Se um irmão precisa de ajuda, seja em uma reforma ou em um passeio de moto, o SOP está aqui para apoiar.<br><br><b>Comunicação:</b> Use os canais de comunicação do grupo para alinhar expectativas, planejar eventos ou simplesmente para compartilhar a sua paixão. Nossa voz é o que constrói nosso futuro.</p>
                                                 <p class="text-gray-300">Este estatuto é a nossa promessa. A promessa de que o sonho que construímos juntos nunca irá parar de evoluir.</p>
+                                                
+                                                <!-- Formulário de Assinatura - Exclusivo Alta Cúpula -->
+                                                <div class="mt-8 pt-8 border-t border-amber-600">
+                                                    <h5 class="text-amber-400 font-bold text-xl mb-4">Assinatura do Compromisso</h5>
+                                                    <p class="text-gray-300 mb-6">Como membro da Alta Cúpula, registre aqui seu compromisso com os estatutos e valores da irmandade.</p>
+                                                    
+                                                    <div class="bg-black bg-opacity-50 rounded-lg p-6 space-y-4">
+                                                        <label for="assinatura-ac" class="block text-sm text-amber-300 font-semibold">Nome completo do membro:</label>
+                                                        <input id="assinatura-ac" type="text" placeholder="Seu nome completo" 
+                                                               class="w-full px-4 py-3 rounded-lg bg-gray-800 border border-amber-600 text-gray-100 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none transition-colors duration-200" />
+                                                        <button id="assinar-ac-btn" class="w-full px-6 py-3 bg-amber-600 hover:bg-amber-500 text-gray-900 font-bold rounded-lg transition-colors duration-200 transform hover:scale-105">
+                                                            Assinar Compromisso da Alta Cúpula
+                                                        </button>
+                                                        
+                                                        <div class="mt-4 pt-4 border-t border-amber-700 text-center">
+                                                            <p class="text-xs text-amber-200">
+                                                                Esta assinatura confirma seu compromisso com a liderança, responsabilidade e zeladoria da irmandade Sons of Peaky.
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                         </div>
@@ -182,153 +563,476 @@
                 </div>
             </section>
 
-        <!-- Agenda + Geradores -->
-        <section id="agenda" class="py-16 md:py-24">
-            <div class="container space-y-10">
-                <h2 class="section-title">Agenda</h2>
-
-                <!-- Gerador de Rolê -->
-                <div class="space-y-3 p-4 rounded-md bg-gray-900 border border-gray-700">
-                    <h3 class="text-xl font-bold text-white">Gerador de Rolê</h3>
-                    <div class="grid md:grid-cols-3 gap-3">
-                        <input id="role-input" type="text" class="px-3 py-2 rounded bg-gray-800 border border-gray-700 text-gray-100" placeholder="O que fazer (ex: bate e volta, serra, praia)" />
-                        <input id="role-km-input" type="number" class="px-3 py-2 rounded bg-gray-800 border border-gray-700 text-gray-100" placeholder="KM (ida e volta)" />
-                        <input id="role-date-input" type="date" class="px-3 py-2 rounded bg-gray-800 border border-gray-700 text-gray-100" />
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <button id="gerar-role-btn" class="px-4 py-2 bg-amber-600 text-gray-900 font-bold rounded-full">Gerar Rolê</button>
-                        <div id="loading-indicator-role" class="hidden items-center gap-2 text-gray-400"><span class="animate-pulse">Gerando...</span></div>
-                    </div>
-                    <div id="role-output" class="text-gray-300"></div>
-                </div>
-
-                <!-- Gerador de Ideias de Eventos -->
-                <div class="space-y-3 p-4 rounded-md bg-gray-900 border border-gray-700">
-                    <h3 class="text-xl font-bold text-white">Gerador de Ideias de Eventos</h3>
-                    <input id="evento-input" type="text" class="w-full px-3 py-2 rounded bg-gray-800 border border-gray-700 text-gray-100" placeholder="Descreva o tipo de evento" />
-                    <div class="flex items-center gap-3">
-                        <button id="gerar-evento-btn" class="px-4 py-2 bg-amber-600 text-gray-900 font-bold rounded-full">Gerar Ideias</button>
-                        <div id="loading-indicator-evento" class="hidden items-center gap-2 text-gray-400"><span class="animate-pulse">Gerando...</span></div>
-                    </div>
-                    <div id="evento-output" class="text-gray-300"></div>
-                </div>
-
-                <!-- Gerador de Post do Instagram -->
-                <div class="space-y-3 p-4 rounded-md bg-gray-900 border border-gray-700">
-                    <h3 class="text-xl font-bold text-white">Gerador de Post do Instagram</h3>
-                    <input id="instagram-input" type="text" class="w-full px-3 py-2 rounded bg-gray-800 border border-gray-700 text-gray-100" placeholder="Tema do post" />
-                    <div class="flex items-center gap-3">
-                        <button id="gerar-instagram-btn" class="px-4 py-2 bg-amber-600 text-gray-900 font-bold rounded-full">Gerar Post</button>
-                        <div id="loading-indicator-instagram" class="hidden items-center gap-2 text-gray-400"><span class="animate-pulse">Gerando...</span></div>
-                    </div>
-                    <div id="instagram-output" class="text-gray-300"></div>
-                </div>
-
-                <!-- Mensagem do Dia -->
-                <div class="space-y-3 p-4 rounded-md bg-gray-900 border border-gray-700">
-                    <h3 class="text-xl font-bold text-white">Mensagem do Dia</h3>
-                    <div class="flex items-center gap-3">
-                        <button id="gerar-mensagem-btn" class="px-4 py-2 bg-amber-600 text-gray-900 font-bold rounded-full">Gerar Mensagem</button>
-                        <div id="loading-indicator-mensagem" class="hidden items-center gap-2 text-gray-400"><span class="animate-pulse">Gerando...</span></div>
-                    </div>
-                    <div id="mensagem-output" class="text-gray-300"></div>
-                </div>
-
-                        <!-- Lista da Agenda -->
-                        <div id="agenda-container" class="space-y-6">
-                            <h3 class="text-xl font-bold text-white">Próximos Eventos</h3>
-                            <div class="space-y-4"></div>
-                        </div>
-
-                        <!-- RSVP Modal -->
-                        <div id="rsvp-modal" class="modal-overlay hidden">
-                            <div class="modal-content">
-                                <h3 class="text-xl font-bold text-white mb-4">Confirme sua presença</h3>
-                                <p id="rsvp-event-title" class="text-gray-300 mb-2"></p>
-                                <input id="rsvp-name" type="text" placeholder="Seu nome completo" class="w-full px-3 py-2 rounded bg-gray-800 border border-gray-700 text-gray-100 mb-4" />
-                                <div class="flex gap-3">
-                                    <button id="rsvp-confirm-btn" class="px-6 py-2 bg-amber-600 text-gray-900 font-bold rounded-full">Confirmar</button>
-                                    <button id="rsvp-cancel-btn" class="px-6 py-2 bg-gray-700 text-gray-300 font-bold rounded-full">Cancelar</button>
-                                </div>
-                                <p id="rsvp-status" class="text-sm text-red-400 mt-2 hidden">Digite seu nome para confirmar.</p>
+        <!-- Agenda -->
+        <section id="agenda" class="py-12 md:py-16 lg:py-20 bg-gradient-to-b from-gray-900 to-black">
+            <div class="container mx-auto px-4 space-y-10">
+                <h2 class="section-title text-3xl md:text-4xl lg:text-5xl">Agenda de Eventos</h2>
+                
+                <!-- Próximos Eventos -->
+                <div id="agenda-container" class="space-y-6">
+                    <!-- Evento em destaque -->
+                    <div class="bg-gradient-to-r from-amber-900 via-orange-900 to-amber-900 border border-amber-600 rounded-xl p-6 lg:p-8 shadow-2xl">
+                        <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-4">
+                            <div>
+                                <h3 class="text-2xl font-bold text-amber-100 mb-2">Reunião Quinzenal - Quinta</h3>
+                                <p class="text-amber-300 text-lg">Todo Quinta às 19h • Galpão Sons of Peaky</p>
+                            </div>
+                            <div class="text-right mt-4 md:mt-0">
+                                <div class="text-3xl font-bold text-amber-400">19h</div>
+                                <div class="text-sm text-amber-200">Horário fixo</div>
                             </div>
                         </div>
+                        
+                        <p class="text-amber-100 mb-6 text-base md:text-lg">
+                            Encontro semanal da irmandade para confraternização, planejamento de rolês e discussão de melhorias no galpão. 
+                            Aberto para membros e frequentadores.
+                        </p>
+                        
+                        <div class="flex flex-wrap gap-4 items-center">
+                            <button class="confirmar-btn px-6 py-3 bg-amber-600 hover:bg-amber-500 text-gray-900 font-bold rounded-lg transition-colors duration-200">
+                                Confirmar Presença
+                            </button>
+                            <div class="flex items-center space-x-4 text-amber-200 text-sm">
+                                <span class="flex items-center space-x-1">
+                                    <span>📍</span>
+                                    <span>Rua José Flavio, 420, Travessa 1A</span>
+                                </span>
+                                <span class="flex items-center space-x-1">
+                                    <span>🏍️</span>
+                                    <span>Motos bem-vindas</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lista de eventos futuros -->
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <!-- Evento exemplo 1 -->
+                        <div class="card group hover:border-amber-500 transition-all duration-300">
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <h4 class="text-white font-bold text-lg">Rolê Serra da Mantiqueira</h4>
+                                    <span class="text-xs bg-green-600 text-white px-2 py-1 rounded-full">Confirmado</span>
+                                </div>
+                                <div class="text-gray-400 text-sm space-y-1">
+                                    <p>📅 Sábado, 28 de Setembro • 8h</p>
+                                    <p>📍 Saída do Galpão</p>
+                                    <p>🏍️ Aproximadamente 200km ida/volta</p>
+                                </div>
+                                <p class="text-gray-300 text-sm">Aventura pelas curvas da Serra da Mantiqueira com parada para almoço em Campos do Jordão. Ideal para motos de qualquer cilindrada.</p>
+                                <button class="confirmar-btn w-full px-4 py-2 bg-amber-600 hover:bg-amber-500 text-gray-900 font-bold rounded-lg transition-colors duration-200">
+                                    Quero Participar
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Evento exemplo 2 -->
+                        <div class="card group hover:border-amber-500 transition-all duration-300">
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <h4 class="text-white font-bold text-lg">Churrasco de Confraternização</h4>
+                                    <span class="text-xs bg-blue-600 text-white px-2 py-1 rounded-full">Planejando</span>
+                                </div>
+                                <div class="text-gray-400 text-sm space-y-1">
+                                    <p>📅 Sábado, 05 de Outubro • 16h</p>
+                                    <p>📍 Galpão Sons of Peaky</p>
+                                    <p>🍖 R$ 40 por pessoa</p>
+                                </div>
+                                <p class="text-gray-300 text-sm">Confraternização com churrasco, sinuca, música e muita conversa boa. Traga a família e os amigos para conhecer a irmandade.</p>
+                                <button class="confirmar-btn w-full px-4 py-2 bg-gray-600 hover:bg-gray-500 text-white font-bold rounded-lg transition-colors duration-200">
+                                    Demonstrar Interesse
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chamada para sugerir eventos -->
+                    <div class="bg-gray-900 border border-gray-700 rounded-xl p-6 text-center">
+                        <h4 class="text-xl font-bold text-white mb-4">Tem uma ideia de evento?</h4>
+                        <p class="text-gray-300 mb-6">A irmandade está sempre aberta a novas aventuras e confraternizações. Compartilhe sua ideia conosco!</p>
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                            <a href="#ferramentas" class="px-6 py-3 bg-amber-600 hover:bg-amber-500 text-gray-900 font-bold rounded-lg transition-colors duration-200">
+                                Usar Gerador de Ideias
+                            </a>
+                            <a href="#redes" class="px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-bold rounded-lg transition-colors duration-200">
+                                Contatar no WhatsApp
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RSVP Modal -->
+                <div id="rsvp-modal" class="modal-overlay hidden" role="dialog" aria-labelledby="rsvp-title" aria-modal="true">
+                    <div class="modal-content">
+                        <h3 id="rsvp-title" class="text-xl font-bold text-white mb-4">Confirme sua presença</h3>
+                        <p id="rsvp-event-title" class="text-gray-300 mb-4"></p>
+                        <input id="rsvp-name" type="text" placeholder="Seu nome completo" class="w-full px-3 py-2 rounded bg-gray-800 border border-gray-700 text-gray-100 mb-4" />
+                        <div class="flex gap-3">
+                            <button id="rsvp-confirm-btn" class="px-6 py-2 bg-amber-600 hover:bg-amber-500 text-gray-900 font-bold rounded-full transition-colors duration-200">Confirmar</button>
+                            <button id="rsvp-cancel-btn" class="px-6 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 font-bold rounded-full transition-colors duration-200">Cancelar</button>
+                        </div>
+                        <p id="rsvp-status" class="text-sm text-red-400 mt-2 hidden">Digite seu nome para confirmar.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Ferramentas -->
+        <section id="ferramentas" class="py-12 md:py-16 lg:py-20 bg-gradient-to-b from-black to-gray-900">
+            <div class="container mx-auto px-4 space-y-10">
+                <h2 class="section-title text-3xl md:text-4xl lg:text-5xl">Ferramentas da Irmandade</h2>
+                
+                <p class="text-center text-gray-300 text-lg md:text-xl max-w-3xl mx-auto mb-12">
+                    Ferramentas exclusivas para membros da irmandade Sons of Peaky planejarem rolês, eventos e criarem conteúdo para as redes sociais.
+                </p>
+
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- Gerador de Rolê -->
+                    <div class="card group hover:border-amber-500 transition-all duration-300">
+                        <div class="space-y-4">
+                            <div class="flex items-center space-x-3 mb-4">
+                                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center">
+                                    <span class="text-white font-bold text-xl">🗺️</span>
+                                </div>
+                                <h3 class="text-xl md:text-2xl font-bold text-white group-hover:text-amber-400 transition-colors">Gerador de Rolê</h3>
+                            </div>
+                            
+                            <p class="text-gray-300 text-sm md:text-base mb-6">Crie roteiros personalizados para suas aventuras de moto com base na distância e destino desejado.</p>
+                            
+                            <div class="space-y-3">
+                                <input id="role-input" type="text" class="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-600 text-gray-100 focus:border-amber-500 outline-none transition-colors" placeholder="Destino ou tipo de rolê (ex: serra, praia, cidade histórica)" />
+                                <div class="grid grid-cols-2 gap-3">
+                                    <input id="role-km-input" type="number" class="px-4 py-3 rounded-lg bg-gray-800 border border-gray-600 text-gray-100 focus:border-amber-500 outline-none transition-colors" placeholder="KM (ida e volta)" />
+                                    <input id="role-date-input" type="date" class="px-4 py-3 rounded-lg bg-gray-800 border border-gray-600 text-gray-100 focus:border-amber-500 outline-none transition-colors" />
+                                </div>
+                                <button id="gerar-role-btn" class="w-full px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg transition-colors duration-200">
+                                    Gerar Roteiro de Rolê
+                                </button>
+                                <div id="loading-indicator-role" class="hidden items-center justify-center gap-2 text-blue-400 py-2">
+                                    <div class="animate-spin w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full"></div>
+                                    <span>Criando roteiro...</span>
+                                </div>
+                            </div>
+                            <div id="role-output" class="text-gray-300 text-sm bg-gray-900 rounded-lg p-4 hidden"></div>
+                        </div>
+                    </div>
+
+                    <!-- Gerador de Ideias de Eventos -->
+                    <div class="card group hover:border-amber-500 transition-all duration-300">
+                        <div class="space-y-4">
+                            <div class="flex items-center space-x-3 mb-4">
+                                <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-green-700 rounded-full flex items-center justify-center">
+                                    <span class="text-white font-bold text-xl">🎉</span>
+                                </div>
+                                <h3 class="text-xl md:text-2xl font-bold text-white group-hover:text-amber-400 transition-colors">Gerador de Eventos</h3>
+                            </div>
+                            
+                            <p class="text-gray-300 text-sm md:text-base mb-6">Crie ideias criativas para eventos e confraternizações da irmandade no galpão ou em outros locais.</p>
+                            
+                            <div class="space-y-3">
+                                <input id="evento-input" type="text" class="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-600 text-gray-100 focus:border-amber-500 outline-none transition-colors" placeholder="Tipo de evento (ex: churrasco, aniversário, comemoração)" />
+                                <button id="gerar-evento-btn" class="w-full px-6 py-3 bg-green-600 hover:bg-green-500 text-white font-bold rounded-lg transition-colors duration-200">
+                                    Gerar Ideias de Evento
+                                </button>
+                                <div id="loading-indicator-evento" class="hidden items-center justify-center gap-2 text-green-400 py-2">
+                                    <div class="animate-spin w-4 h-4 border-2 border-green-400 border-t-transparent rounded-full"></div>
+                                    <span>Criando ideias...</span>
+                                </div>
+                            </div>
+                            <div id="evento-output" class="text-gray-300 text-sm bg-gray-900 rounded-lg p-4 hidden"></div>
+                        </div>
+                    </div>
+
+                    <!-- Gerador de Post do Instagram -->
+                    <div class="card group hover:border-amber-500 transition-all duration-300">
+                        <div class="space-y-4">
+                            <div class="flex items-center space-x-3 mb-4">
+                                <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center">
+                                    <span class="text-white font-bold text-xl">📸</span>
+                                </div>
+                                <h3 class="text-xl md:text-2xl font-bold text-white group-hover:text-amber-400 transition-colors">Posts para Instagram</h3>
+                            </div>
+                            
+                            <p class="text-gray-300 text-sm md:text-base mb-6">Crie legendas engajantes para posts nas redes sociais da irmandade com hashtags e call-to-actions.</p>
+                            
+                            <div class="space-y-3">
+                                <input id="instagram-input" type="text" class="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-600 text-gray-100 focus:border-amber-500 outline-none transition-colors" placeholder="Tema do post (ex: rolê na serra, encontro no galpão)" />
+                                <button id="gerar-instagram-btn" class="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold rounded-lg transition-colors duration-200">
+                                    Gerar Post para Redes
+                                </button>
+                                <div id="loading-indicator-instagram" class="hidden items-center justify-center gap-2 text-purple-400 py-2">
+                                    <div class="animate-spin w-4 h-4 border-2 border-purple-400 border-t-transparent rounded-full"></div>
+                                    <span>Criando conteúdo...</span>
+                                </div>
+                            </div>
+                            <div id="instagram-output" class="text-gray-300 text-sm bg-gray-900 rounded-lg p-4 hidden"></div>
+                        </div>
+                    </div>
+
+                    <!-- Mensagem do Dia -->
+                    <div class="card group hover:border-amber-500 transition-all duration-300">
+                        <div class="space-y-4">
+                            <div class="flex items-center space-x-3 mb-4">
+                                <div class="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full flex items-center justify-center">
+                                    <span class="text-white font-bold text-xl">💭</span>
+                                </div>
+                                <h3 class="text-xl md:text-2xl font-bold text-white group-hover:text-amber-400 transition-colors">Mensagem do Dia</h3>
+                            </div>
+                            
+                            <p class="text-gray-300 text-sm md:text-base mb-6">Gere mensagens inspiradoras no estilo Sons of Peaky para motivar a irmandade e compartilhar valores.</p>
+                            
+                            <div class="space-y-3">
+                                <button id="gerar-mensagem-btn" class="w-full px-6 py-3 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-gray-900 font-bold rounded-lg transition-colors duration-200">
+                                    Gerar Mensagem Inspiradora
+                                </button>
+                                <div id="loading-indicator-mensagem" class="hidden items-center justify-center gap-2 text-amber-400 py-2">
+                                    <div class="animate-spin w-4 h-4 border-2 border-amber-400 border-t-transparent rounded-full"></div>
+                                    <span>Gerando inspiração...</span>
+                                </div>
+                            </div>
+                            <div id="mensagem-output" class="text-gray-300 text-sm bg-gray-900 rounded-lg p-4 hidden"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Informações sobre as ferramentas -->
+                <div class="bg-gradient-to-r from-gray-800 via-gray-700 to-gray-800 border border-amber-600 rounded-xl p-6 lg:p-8 text-center">
+                    <h4 class="text-2xl font-bold text-amber-400 mb-4">Ferramentas Exclusivas</h4>
+                    <p class="text-gray-300 text-lg mb-6 max-w-2xl mx-auto">
+                        Estas ferramentas foram criadas especialmente para ajudar a irmandade Sons of Peaky a planejar aventuras épicas e criar conteúdo autêntico.
+                    </p>
+                    <div class="text-sm text-gray-400">
+                        <p>💡 Sugestão de melhoria? Fale com a Alta Cúpula!</p>
+                    </div>
+                </div>
             </div>
         </section>
 
         <!-- Preços do Bar -->
-            <section id="bar" class="py-16 md:py-24">
-                <div class="container space-y-8">
-                    <h2 class="section-title">Preços do Bar</h2>
-                    <div class="grid md:grid-cols-3 gap-6">
-                        <div class="p-4 rounded-md bg-gray-900 border border-gray-700 flex flex-col items-center">
-                            <img src="assets/img/heineken.jpg" alt="Heineken" class="mb-2 rounded shadow-md" style="max-width:80px;max-height:80px;" />
-                            <span class="text-white font-bold">Heineken</span>
-                            <span class="text-amber-400 font-bold text-lg">R$ 5,00</span>
-                        </div>
-                        <div class="p-4 rounded-md bg-gray-900 border border-gray-700 flex flex-col items-center">
-                            <img src="assets/img/duplo-malte.jpg" alt="Duplo Malte" class="mb-2 rounded shadow-md" style="max-width:80px;max-height:80px;" />
-                            <span class="text-white font-bold">Duplo Malte</span>
-                            <span class="text-amber-400 font-bold text-lg">R$ 4,50</span>
-                        </div>
-                        <div class="p-4 rounded-md bg-gray-900 border border-gray-700 flex flex-col items-center">
-                            <img src="assets/img/coca.jpg" alt="Coca-Cola" class="mb-2 rounded shadow-md" style="max-width:80px;max-height:80px;" />
-                            <span class="text-white font-bold">Coca-Cola Normal/Zero</span>
-                            <span class="text-amber-400 font-bold text-lg">R$ 4,00</span>
-                        </div>
-                        <div class="p-4 rounded-md bg-gray-900 border border-gray-700 flex flex-col items-center">
-                            <img src="assets/img/h2o.jpg" alt="H2O Limoneto" class="mb-2 rounded shadow-md" style="max-width:80px;max-height:80px;" />
-                            <span class="text-white font-bold">H2O Limoneto</span>
-                            <span class="text-amber-400 font-bold text-lg">R$ 4,50</span>
-                        </div>
-                        <div class="p-4 rounded-md bg-gray-900 border border-gray-700 flex flex-col items-center">
-                            <img src="assets/img/agua.jpg" alt="Água" class="mb-2 rounded shadow-md" style="max-width:80px;max-height:80px;" />
-                            <span class="text-white font-bold">Água</span>
-                            <span class="text-amber-400 font-bold text-lg">R$ 2,00</span>
-                        </div>
-                        <div class="p-4 rounded-md bg-gray-900 border border-gray-700 flex flex-col items-center">
-                            <img src="assets/img/energetico.jpg" alt="Energético" class="mb-2 rounded shadow-md" style="max-width:80px;max-height:80px;" />
-                            <span class="text-white font-bold">Energético</span>
-                            <span class="text-amber-400 font-bold text-lg">R$ 10,00</span>
+        <section id="bar" class="py-12 md:py-16 lg:py-20 bg-gradient-to-b from-black to-gray-900">
+            <div class="container mx-auto px-4 space-y-10">
+                <h2 class="section-title text-3xl md:text-4xl lg:text-5xl">Preços do Bar</h2>
+                
+                <!-- Grid de produtos -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                    <div class="card group hover:border-amber-500 transition-all duration-300 text-center">
+                        <div class="flex flex-col items-center space-y-4">
+                            <div class="w-20 h-20 bg-gradient-to-br from-green-600 to-green-800 rounded-full flex items-center justify-center shadow-lg">
+                                <span class="text-white font-bold text-2xl">🍺</span>
+                            </div>
+                            <h3 class="text-white font-bold text-lg md:text-xl group-hover:text-amber-400 transition-colors">Heineken</h3>
+                            <p class="text-amber-400 font-bold text-2xl md:text-3xl">R$ 5,00</p>
+                            <p class="text-gray-400 text-sm">Cerveja premium gelada</p>
                         </div>
                     </div>
-                    <div class="mt-8 flex flex-col md:flex-row items-center gap-6">
-                        <div class="flex flex-col items-center">
-                            <span class="text-gray-300">Pagamento via Pix:</span>
-                            <span class="text-amber-400 font-bold text-lg">sonsofpeaky@gmail.com</span>
+
+                    <div class="card group hover:border-amber-500 transition-all duration-300 text-center">
+                        <div class="flex flex-col items-center space-y-4">
+                            <div class="w-20 h-20 bg-gradient-to-br from-amber-600 to-orange-800 rounded-full flex items-center justify-center shadow-lg">
+                                <span class="text-white font-bold text-2xl">🍺</span>
+                            </div>
+                            <h3 class="text-white font-bold text-lg md:text-xl group-hover:text-amber-400 transition-colors">Duplo Malte</h3>
+                            <p class="text-amber-400 font-bold text-2xl md:text-3xl">R$ 4,50</p>
+                            <p class="text-gray-400 text-sm">Cerveja nacional gelada</p>
                         </div>
-                        <div class="flex flex-col items-center">
-                            <span class="text-gray-300">QR Code Pix:</span>
-                            <img src="assets/img/pix-qr.png" alt="QR Code Pix" class="rounded shadow-md" style="max-width:120px;max-height:120px;" />
+                    </div>
+
+                    <div class="card group hover:border-amber-500 transition-all duration-300 text-center">
+                        <div class="flex flex-col items-center space-y-4">
+                            <div class="w-20 h-20 bg-gradient-to-br from-red-600 to-red-800 rounded-full flex items-center justify-center shadow-lg">
+                                <span class="text-white font-bold text-2xl">🥤</span>
+                            </div>
+                            <h3 class="text-white font-bold text-lg md:text-xl group-hover:text-amber-400 transition-colors">Coca-Cola</h3>
+                            <p class="text-amber-400 font-bold text-2xl md:text-3xl">R$ 4,00</p>
+                            <p class="text-gray-400 text-sm">Normal ou Zero, gelada</p>
+                        </div>
+                    </div>
+
+                    <div class="card group hover:border-amber-500 transition-all duration-300 text-center">
+                        <div class="flex flex-col items-center space-y-4">
+                            <div class="w-20 h-20 bg-gradient-to-br from-blue-600 to-cyan-800 rounded-full flex items-center justify-center shadow-lg">
+                                <span class="text-white font-bold text-2xl">💧</span>
+                            </div>
+                            <h3 class="text-white font-bold text-lg md:text-xl group-hover:text-amber-400 transition-colors">H2O Limoneto</h3>
+                            <p class="text-amber-400 font-bold text-2xl md:text-3xl">R$ 4,50</p>
+                            <p class="text-gray-400 text-sm">Água saborizada gelada</p>
+                        </div>
+                    </div>
+
+                    <div class="card group hover:border-amber-500 transition-all duration-300 text-center">
+                        <div class="flex flex-col items-center space-y-4">
+                            <div class="w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center shadow-lg">
+                                <span class="text-white font-bold text-2xl">💧</span>
+                            </div>
+                            <h3 class="text-white font-bold text-lg md:text-xl group-hover:text-amber-400 transition-colors">Água</h3>
+                            <p class="text-amber-400 font-bold text-2xl md:text-3xl">R$ 2,00</p>
+                            <p class="text-gray-400 text-sm">Água mineral gelada</p>
+                        </div>
+                    </div>
+
+                    <div class="card group hover:border-amber-500 transition-all duration-300 text-center">
+                        <div class="flex flex-col items-center space-y-4">
+                            <div class="w-20 h-20 bg-gradient-to-br from-purple-600 to-indigo-800 rounded-full flex items-center justify-center shadow-lg">
+                                <span class="text-white font-bold text-2xl">⚡</span>
+                            </div>
+                            <h3 class="text-white font-bold text-lg md:text-xl group-hover:text-amber-400 transition-colors">Energético</h3>
+                            <p class="text-amber-400 font-bold text-2xl md:text-3xl">R$ 10,00</p>
+                            <p class="text-gray-400 text-sm">Para manter a energia</p>
                         </div>
                     </div>
                 </div>
-            </section>
+
+                <!-- Informações de pagamento -->
+                <div class="bg-gradient-to-r from-amber-900 via-orange-900 to-amber-900 border border-amber-600 rounded-xl p-6 lg:p-8 shadow-2xl">
+                    <h3 class="text-2xl md:text-3xl font-bold text-amber-100 text-center mb-6">Formas de Pagamento</h3>
+                    
+                    <div class="grid md:grid-cols-2 gap-6 lg:gap-8 items-center">
+                        <!-- Informações do PIX -->
+                        <div class="space-y-4 text-center md:text-left">
+                            <div class="flex items-center justify-center md:justify-start space-x-3">
+                                <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-green-700 rounded-full flex items-center justify-center">
+                                    <span class="text-white font-bold text-xl">💰</span>
+                                </div>
+                                <div>
+                                    <h4 class="text-amber-200 font-bold text-lg">Pagamento via PIX</h4>
+                                    <p class="text-amber-300 text-sm">Rápido, seguro e instantâneo</p>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-black bg-opacity-50 rounded-lg p-4 border border-amber-500">
+                                <p class="text-amber-100 text-sm mb-2">Chave PIX:</p>
+                                <p class="text-amber-400 font-bold text-lg break-all">sonsofpeaky@gmail.com</p>
+                            </div>
+                            
+                            <div class="text-xs text-amber-200 space-y-1">
+                                <p>• Pagamento imediato na hora do consumo</p>
+                                <p>• Não trabalhamos com fiado</p>
+                                <p>• Confirme o valor antes de enviar</p>
+                            </div>
+                        </div>
+
+                        <!-- QR Code área -->
+                        <div class="flex flex-col items-center space-y-4">
+                            <div class="w-32 h-32 bg-white rounded-lg p-2 shadow-lg">
+                                <div class="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 rounded flex items-center justify-center">
+                                    <span class="text-gray-600 text-xs text-center font-medium">QR CODE<br/>PIX</span>
+                                </div>
+                            </div>
+                            <p class="text-amber-200 text-sm text-center">Escaneie o QR Code<br/>para pagamento instantâneo</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 pt-6 border-t border-amber-600 text-center">
+                        <p class="text-amber-100 text-sm">
+                            <span class="font-semibold">Horário:</span> Quintas-feiras a partir das 19h | 
+                            <span class="font-semibold">Local:</span> Galpão Sons of Peaky
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
 
         <!-- Redes Sociais -->
-            <section id="redes" class="py-16 md:py-24">
-                <div class="container space-y-8">
-                    <h2 class="section-title">Redes Sociais</h2>
-                    <div class="grid md:grid-cols-3 gap-6">
-                        <a href="https://www.tiktok.com/@sonsofpeaky?_t=ZM-8zywTjumGD5&_r=1" target="_blank" rel="noopener" class="p-4 rounded-md bg-gray-900 border border-gray-700 flex flex-col items-center hover:bg-gray-800 transition">
-                            <img src="assets/img/tiktok.png" alt="TikTok" class="mb-2" style="max-width:60px;max-height:60px;" />
-                            <span class="text-white font-bold">TikTok</span>
-                            <span class="text-gray-400 text-sm">@sonsofpeaky</span>
-                        </a>
-                        <a href="https://www.instagram.com/sonsofpeaky?igsh=d3c0Z2p2Z3J2bmJp&utm_source=qr" target="_blank" rel="noopener" class="p-4 rounded-md bg-gray-900 border border-gray-700 flex flex-col items-center hover:bg-gray-800 transition">
-                            <img src="assets/img/instagram.png" alt="Instagram" class="mb-2" style="max-width:60px;max-height:60px;" />
-                            <span class="text-white font-bold">Instagram</span>
-                            <span class="text-gray-400 text-sm">@sonsofpeaky</span>
-                        </a>
-                        <a href="https://youtube.com/@sonsofpeakytv2852?si=2Hj8DIm3Nfx_Nhjt" target="_blank" rel="noopener" class="p-4 rounded-md bg-gray-900 border border-gray-700 flex flex-col items-center hover:bg-gray-800 transition">
-                            <img src="assets/img/youtube.png" alt="YouTube" class="mb-2" style="max-width:60px;max-height:60px;" />
-                            <span class="text-white font-bold">YouTube</span>
-                            <span class="text-gray-400 text-sm">@sonsofpeakytv2852</span>
-                        </a>
+        <section id="redes" class="py-12 md:py-16 lg:py-20 bg-gradient-to-b from-gray-900 to-black">
+            <div class="container mx-auto px-4 space-y-10">
+                <h2 class="section-title text-3xl md:text-4xl lg:text-5xl">Redes Sociais</h2>
+                
+                <p class="text-center text-gray-300 text-lg md:text-xl max-w-3xl mx-auto">
+                    Acompanhe nossa jornada e fique por dentro de todos os rolês, eventos e momentos épicos da irmandade Sons of Peaky
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+                    <!-- TikTok -->
+                    <a href="https://www.tiktok.com/@sonsofpeaky?_t=ZM-8zywTjumGD5&_r=1" target="_blank" rel="noopener" 
+                       class="card group hover:border-pink-500 transition-all duration-300 text-center hover:scale-105 hover:shadow-2xl">
+                        <div class="flex flex-col items-center space-y-6">
+                            <div class="w-20 h-20 bg-gradient-to-br from-pink-500 via-red-500 to-yellow-500 rounded-2xl flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300">
+                                <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+                                </svg>
+                            </div>
+                            
+                            <div class="space-y-2">
+                                <h3 class="text-white font-bold text-xl md:text-2xl group-hover:text-pink-400 transition-colors">TikTok</h3>
+                                <p class="text-pink-400 font-semibold text-lg">@sonsofpeaky</p>
+                                <p class="text-gray-400 text-sm">Vídeos dos rolês e momentos épicos</p>
+                            </div>
+                            
+                            <div class="bg-pink-500 bg-opacity-10 rounded-lg p-3 w-full group-hover:bg-opacity-20 transition-colors">
+                                <p class="text-pink-300 text-sm font-medium">Seguir no TikTok</p>
+                            </div>
+                        </div>
+                    </a>
+
+                    <!-- Instagram -->
+                    <a href="https://www.instagram.com/sonsofpeaky?igsh=d3c0Z2p2Z3J2bmJp&utm_source=qr" target="_blank" rel="noopener" 
+                       class="card group hover:border-purple-500 transition-all duration-300 text-center hover:scale-105 hover:shadow-2xl">
+                        <div class="flex flex-col items-center space-y-6">
+                            <div class="w-20 h-20 bg-gradient-to-br from-purple-600 via-pink-600 to-orange-400 rounded-2xl flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300">
+                                <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                                </svg>
+                            </div>
+                            
+                            <div class="space-y-2">
+                                <h3 class="text-white font-bold text-xl md:text-2xl group-hover:text-purple-400 transition-colors">Instagram</h3>
+                                <p class="text-purple-400 font-semibold text-lg">@sonsofpeaky</p>
+                                <p class="text-gray-400 text-sm">Fotos, stories e updates da irmandade</p>
+                            </div>
+                            
+                            <div class="bg-purple-500 bg-opacity-10 rounded-lg p-3 w-full group-hover:bg-opacity-20 transition-colors">
+                                <p class="text-purple-300 text-sm font-medium">Seguir no Instagram</p>
+                            </div>
+                        </div>
+                    </a>
+
+                    <!-- YouTube -->
+                    <a href="https://youtube.com/@sonsofpeakytv2852?si=2Hj8DIm3Nfx_Nhjt" target="_blank" rel="noopener" 
+                       class="card group hover:border-red-500 transition-all duration-300 text-center hover:scale-105 hover:shadow-2xl">
+                        <div class="flex flex-col items-center space-y-6">
+                            <div class="w-20 h-20 bg-gradient-to-br from-red-600 to-red-800 rounded-2xl flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300">
+                                <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                                </svg>
+                            </div>
+                            
+                            <div class="space-y-2">
+                                <h3 class="text-white font-bold text-xl md:text-2xl group-hover:text-red-400 transition-colors">YouTube</h3>
+                                <p class="text-red-400 font-semibold text-lg">@sonsofpeakytv2852</p>
+                                <p class="text-gray-400 text-sm">Vlogs, documentários e aventuras completas</p>
+                            </div>
+                            
+                            <div class="bg-red-500 bg-opacity-10 rounded-lg p-3 w-full group-hover:bg-opacity-20 transition-colors">
+                                <p class="text-red-300 text-sm font-medium">Se inscrever no canal</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Call to Action -->
+                <div class="bg-gradient-to-r from-gray-800 via-gray-700 to-gray-800 border border-amber-600 rounded-xl p-6 lg:p-8 text-center shadow-2xl">
+                    <h3 class="text-2xl md:text-3xl font-bold text-amber-400 mb-4">Junte-se à Nossa Comunidade</h3>
+                    <p class="text-gray-300 text-lg mb-6 max-w-2xl mx-auto">
+                        Siga nossas redes sociais e seja parte da jornada. Compartilhe suas aventuras com a hashtag 
+                        <span class="text-amber-400 font-bold">#SonsOfPeaky</span>
+                    </p>
+                    <div class="flex flex-wrap justify-center gap-4 text-sm">
+                        <span class="bg-amber-600 text-gray-900 px-4 py-2 rounded-full font-semibold">#SonsOfPeaky</span>
+                        <span class="bg-gray-600 text-white px-4 py-2 rounded-full font-semibold">#Irmandade</span>
+                        <span class="bg-gray-600 text-white px-4 py-2 rounded-full font-semibold">#Motociclismo</span>
+                        <span class="bg-gray-600 text-white px-4 py-2 rounded-full font-semibold">#Brotherhood</span>
                     </div>
                 </div>
-            </section>
+            </div>
+        </section>
     </main>
+
+    <!-- Botão Voltar ao Topo -->
+    <a href="#top" id="scroll-to-top" class="scroll-to-top opacity-0 invisible transition-all duration-300" aria-label="Voltar ao topo">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+        </svg>
+    </a>
 
     <!-- Scripts -->
     <script src="config.js"></script>
