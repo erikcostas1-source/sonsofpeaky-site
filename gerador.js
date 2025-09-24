@@ -5,19 +5,29 @@
 
 // Configuração da API - usando função serverless para segurança
 function getAPIConfig() {
+    // Força modo desenvolvimento se configurado
+    const forceDevelopment = window.FORCE_DEVELOPMENT_MODE === true;
+    
     // Detecta se está em produção (GitHub Pages/Netlify) ou desenvolvimento local
-    const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const isDevelopment = forceDevelopment || 
+                         window.location.hostname === 'localhost' || 
+                         window.location.hostname === '127.0.0.1' ||
+                         window.location.port !== '';
     
     if (isDevelopment) {
-        // Para desenvolvimento local, fallback para API direta (apenas para testes)
+        // Para desenvolvimento local, usa API direta com chave de desenvolvimento
+        const devKey = window.DEV_API_KEY || 'AIzaSyCiHRVozYYmHB-5W64QdJzn9dQYAyRl9Tk';
+        console.log('🏠 Modo desenvolvimento detectado - usando API direta');
+        
         return {
-            apiUrl: window.SOP_CONFIG?.textUrl || 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyCiHRVozYYmHB-5W64QdJzn9dQYAyRl9Tk',
+            apiUrl: `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${devKey}`,
             useServerless: false
         };
     } else {
-        // Em produção, usa função serverless do Netlify/GitHub Pages
+        // Em produção, usa função serverless do Netlify
+        console.log('🌐 Modo produção detectado - usando função serverless');
         return {
-            apiUrl: '/api/generate-role',
+            apiUrl: '/.netlify/functions/generate-role',
             useServerless: true
         };
     }

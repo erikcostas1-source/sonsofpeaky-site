@@ -8,6 +8,9 @@ node_modules/
 .env.production
 .env.development
 
+# Development config (local only)
+dev-config.js
+
 # OS files
 Thumbs.db
 

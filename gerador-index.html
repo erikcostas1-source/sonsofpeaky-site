@@ -566,6 +566,14 @@
     
     <!-- Scripts -->
     <script src="config.js"></script>
+    <!-- Configuração de desenvolvimento (apenas para localhost) -->
+    <script>
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            const devScript = document.createElement('script');
+            devScript.src = 'dev-config.js';
+            document.head.appendChild(devScript);
+        }
+    </script>
     <script src="destinos.js"></script>
     <script src="gerador.js"></script>
     <script>
