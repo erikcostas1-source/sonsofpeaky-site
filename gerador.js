@@ -160,32 +160,52 @@ async function generateRole(formData) {
     console.log('🔧 Usando API:', apiConfig.apiUrl.substring(0, 100) + '...');
     
     try {
+        const requestBody = {
+            contents: [{
+                parts: [{
+                    text: prompt
+                }]
+            }],
+            generationConfig: {
+                temperature: 0.8,
+                topK: 40,
+                topP: 0.95,
+                maxOutputTokens: 2048,
+            }
+        };
+        
+        console.log('📤 Request body:', JSON.stringify(requestBody, null, 2));
+        console.log('📡 URL:', apiConfig.apiUrl);
+        
         const response = await fetch(apiConfig.apiUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                contents: [{
-                    parts: [{
-                        text: prompt
-                    }]
-                }],
-                generationConfig: {
-                    temperature: 0.8,
-                    topK: 40,
-                    topP: 0.95,
-                    maxOutputTokens: 2048,
-                }
-            })
+            body: JSON.stringify(requestBody)
         });
         
+        console.log('📨 Response received:', response.status, response.statusText);
+        console.log('📨 Response headers:', [...response.headers.entries()]);
+        
         if (!response.ok) {
-            throw new Error(`Erro na API: ${response.status} - ${response.statusText}`);
+            const errorText = await response.text();
+            console.error('❌ Erro HTTP:', errorText);
+            throw new Error(`Erro na API: ${response.status} - ${response.statusText}: ${errorText}`);
         }
         
-        const data = await response.json();
-        console.log('📡 Resposta completa da API:', JSON.stringify(data, null, 2));
+        const responseText = await response.text();
+        console.log('📄 Response text completo:', responseText);
+        
+        let data;
+        try {
+            data = JSON.parse(responseText);
+            console.log('📡 Resposta parseada da API:', JSON.stringify(data, null, 2));
+        } catch (parseError) {
+            console.error('❌ Erro ao parsear JSON:', parseError);
+            console.error('📄 Texto que não pôde ser parseado:', responseText);
+            throw new Error(`Erro ao parsear resposta da API: ${parseError.message}`);
+        }
         
         if (!data.candidates || !data.candidates[0]) {
             console.error('❌ Estrutura de resposta inválida:', data);
