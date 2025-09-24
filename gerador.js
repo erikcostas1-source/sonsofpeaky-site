@@ -491,33 +491,32 @@ function buildPrompt(formData) {
     // Monta informações de orçamento
     const orcamentoInfo = orcamento ? `R$ ${orcamento}` : 'Não especificado (sem limite definido)';
     
+    const tempoDisponivel = calcularTempoDisponivel(formData);
+    const maxDestinos = tempoDisponivel <= 4 ? 1 : tempoDisponivel <= 6 ? 2 : 3;
+    
     return `
 Especialista em turismo rodoviário brasileiro. Crie 3 roteiros de moto baseado em:
 
-DADOS:
-- Saída: ${enderecoPartida}
-- Data: ${dataRole} 
-- Horário: ${horarioSaida} às ${horarioVolta}
-- Moto: ${tipoMoto} (${consumoMoto}km/l)
-- Pilotagem: ${perfilPilotagem} (${velocidadeMedia}km/h)
-- Quilometragem: ${quilometragemInfo}
+🎯 EXPERIÊNCIA DESEJADA (PRIORIDADE MÁXIMA):
+"${experienciaDesejada}"
+→ OBRIGATÓRIO: Inclua destinos que atendam EXATAMENTE esta experiência
+
+DADOS TÉCNICOS:
+- Saída: ${enderecoPartida}  
+- Janela: ${horarioSaida} às ${horarioVolta} (${tempoDisponivel}h disponíveis)
 - Orçamento: ${orcamentoInfo}
-- Aventura: ${nivelAventura}
-- Companhia: ${companhia}
 - Interesses: ${preferencias.join(', ') || 'Variados'}
-- Experiência: ${experienciaDesejada}
 
-REGRAS OBRIGATÓRIAS:
-1. DESTINOS ESPECÍFICOS: Nomes reais + endereços completos (nunca genéricos)
-2. DISTÂNCIAS REAIS: Calculadas cumulativamente do ponto de partida
-3. TEMPO REALISTA: Máximo ${calcularTempoDisponivel(formData)}h disponíveis (${formData.horarioSaida}-${formData.horarioVolta})
-4. DICAS ESPECÍFICAS: 2-3 dicas reais do local (não genéricas)
-5. CUSTOS REAIS: Valores atuais de 2024
+REGRAS CRÍTICAS:
+1. EXPERIÊNCIA EM PRIMEIRO LUGAR: Se pediu "café da manhã", inclua local específico para café
+2. TEMPO REALISTA: Máximo ${maxDestinos} ${maxDestinos === 1 ? 'destino' : 'destinos'} para ${tempoDisponivel}h disponíveis
+3. DESTINOS ESPECÍFICOS: Nomes reais + endereços completos
+4. DICAS REAIS: Específicas do local sugerido
 
-CRIAR 3 ROTEIROS:
-1. ECONÔMICA: Locais gratuitos/baratos, distância menor
-2. EQUILIBRADA: Custo-benefício, distância média  
-3. PREMIUM: Experiência completa, sem limite de distância
+CRIAR 3 ROTEIROS (${maxDestinos} ${maxDestinos === 1 ? 'destino' : 'destinos'} cada):
+1. ECONÔMICA: Atende experiência com menor custo
+2. EQUILIBRADA: Atende experiência com custo-benefício
+3. PREMIUM: Atende experiência sem limite de custo
 
 FORMATO JSON:
 {
@@ -740,79 +739,85 @@ function getTypeCharacteristics(tipo) {
 const DESTINOS_REAIS = {
     'ECONÔMICA': [
         {
+            nome: 'Padaria Central de Atibaia',
+            endereco: 'Rua 13 de Maio, 45 - Centro, Atibaia - SP',
+            distancia_sp: 65,
+            custo_entrada: 25,
+            tempo_permanencia: '1h30',
+            experiencias: ['café da manhã', 'comida tradicional'],
+            dicas_reais: [
+                'Pão de açúcar famoso na região há 40 anos',
+                'Estacionamento para motos na lateral da padaria',
+                'Funciona das 6h às 12h - chegue cedo'
+            ]
+        },
+        {
             nome: 'Mirante da Serra da Cantareira',
             endereco: 'Estrada da Cantareira, km 12 - Horto Florestal, São Paulo - SP',
             distancia_sp: 35,
             custo_entrada: 0,
             tempo_permanencia: '1h',
+            experiencias: ['estrada bonita', 'vista', 'natureza'],
             dicas_reais: [
                 'Estrada sinuosa com curvas fechadas - reduzir velocidade',
                 'Estacionamento gratuito no Horto Florestal',
                 'Melhor vista pela manhã (menos neblina)'
             ]
-        },
-        {
-            nome: 'Centro Histórico de Atibaia',
-            endereco: 'Praça Bento Paes, Centro - Atibaia, SP',
-            distancia_sp: 65,
-            custo_entrada: 0,
-            tempo_permanencia: '1h30',
-            dicas_reais: [
-                'Estacionamento fácil na região central',
-                'Visite a Igreja do Rosário (marco histórico)',
-                'Café da manhã na Padaria Central (tradicional)'
-            ]
         }
     ],
     'EQUILIBRADA': [
+        {
+            nome: 'Café da Fazenda - São Roque',
+            endereco: 'Estrada do Vinho, km 15 - Zona Rural, São Roque - SP',
+            distancia_sp: 85,
+            custo_entrada: 45,
+            tempo_permanencia: '2h',
+            experiencias: ['café da manhã', 'estrada bonita', 'natureza'],
+            dicas_reais: [
+                'Café colonial servido até 11h nos fins de semana',
+                'Estrada rural asfaltada com paisagem vinícola',
+                'Estacionamento coberto para motos disponível'
+            ]
+        },
         {
             nome: 'Pico do Itapeva - Campos do Jordão',
             endereco: 'Estrada do Itapeva, s/n - Campos do Jordão, SP',
             distancia_sp: 180,
             custo_entrada: 15,
             tempo_permanencia: '2h',
+            experiencias: ['estrada bonita', 'vista', 'aventura'],
             dicas_reais: [
                 'Estrada de terra nos últimos 3km - moto trail ideal',
                 'Temperatura 10°C menor que na cidade',
                 'Melhor pôr do sol da região (17h no inverno)'
             ]
-        },
-        {
-            nome: 'Cachoeira dos Pretos - Joanópolis',
-            endereco: 'Estrada Municipal JNP-364, km 8 - Joanópolis, SP',
-            distancia_sp: 120,
-            custo_entrada: 20,
-            tempo_permanencia: '2h30',
-            dicas_reais: [
-                'Trilha de 15min a pé após estacionar a moto',
-                'Proibido banho na cachoeira (área de preservação)',
-                'Leve repelente - muitos mosquitos na mata'
-            ]
         }
     ],
     'PREMIUM': [
         {
-            nome: 'Hotel Toriba - Campos do Jordão',
+            nome: 'Hotel Toriba - Brunch Premium',
             endereco: 'Av. Ernesto Diederichsen, 2962 - Campos do Jordão, SP',
             distancia_sp: 185,
             custo_entrada: 180,
             tempo_permanencia: '3h',
+            experiencias: ['café da manhã', 'luxo', 'vista'],
             dicas_reais: [
+                'Brunch premium servido até 12h nos fins de semana',
                 'Valet parking gratuito para motos no hotel',
-                'Brunch servido até 12h nos fins de semana',
                 'Reserve com antecedência (alta procura)'
             ]
         },
         {
-            nome: 'Restaurante Baden Baden - Campos do Jordão',
-            endereco: 'Rua Djalma Forjaz, 93 - Capivari, Campos do Jordão, SP',
-            distancia_sp: 182,
-            custo_entrada: 250,
+            nome: 'Estrada Romântica - Monte Verde',
+            endereco: 'MG-295, km 23 - Monte Verde, Camanducaia - MG',
+            distancia_sp: 145,
+            custo_entrada: 0,
             tempo_permanencia: '2h',
+            experiencias: ['estrada bonita', 'vista', 'natureza'],
             dicas_reais: [
-                'Estacionamento privativo seguro para motos',
-                'Cerveja artesanal produzida no local',
-                'Prato típico: joelho de porco com chucrute'
+                'Uma das estradas mais bonitas da região sudeste',
+                'Mirantes naturais a cada 5km do percurso',
+                'Estrada asfaltada em excelente estado'
             ]
         }
     ]
@@ -921,23 +926,48 @@ function generateObservacoesPercurso(formData, tipo, destinos) {
 }
 
 /**
+ * Seleciona destinos baseados na experiência desejada
+ */
+function selecionarDestinosPorExperiencia(destinosDisponiveis, experienciaDesejada) {
+    if (!experienciaDesejada) return destinosDisponiveis;
+    
+    const experienciaLower = experienciaDesejada.toLowerCase();
+    const palavrasChave = ['café da manhã', 'estrada bonita', 'vista', 'natureza', 'aventura', 'comida'];
+    
+    // Priorizar destinos que atendem a experiência
+    const destinosPrioritarios = destinosDisponiveis.filter(dest => 
+        dest.experiencias?.some(exp => experienciaLower.includes(exp))
+    );
+    
+    // Se encontrou destinos específicos, usar eles primeiro
+    if (destinosPrioritarios.length > 0) {
+        return [...destinosPrioritarios, ...destinosDisponiveis.filter(d => !destinosPrioritarios.includes(d))];
+    }
+    
+    return destinosDisponiveis;
+}
+
+/**
  * Gera destinos realistas quando IA não fornece
  */
 function generateFallbackDestinos(formData, tipo) {
     const destinosDisponiveis = DESTINOS_REAIS[tipo] || DESTINOS_REAIS['EQUILIBRADA'];
+    const destinosOrdenados = selecionarDestinosPorExperiencia(destinosDisponiveis, formData.experienciaDesejada);
 
-    // Validar janela de tempo disponível
+    // Validar janela de tempo disponível - mais restritivo
     const tempoDisponivel = calcularTempoDisponivel(formData);
     let quantidadeDestinos = destinosDisponiveis.length;
     
-    // Ajustar quantidade baseado no tempo disponível
-    if (tempoDisponivel <= 6) {
+    // Ajustar quantidade baseado no tempo disponível (mais conservador)
+    if (tempoDisponivel <= 4) {
+        quantidadeDestinos = 1; // Apenas 1 destino para até 4h
+    } else if (tempoDisponivel <= 6) {
         quantidadeDestinos = Math.min(2, quantidadeDestinos); // Máximo 2 destinos em 6h
     } else if (tempoDisponivel <= 8) {
         quantidadeDestinos = Math.min(3, quantidadeDestinos); // Máximo 3 destinos em 8h
     }
     
-    const destinosSelecionados = destinosDisponiveis.slice(0, quantidadeDestinos);
+    const destinosSelecionados = destinosOrdenados.slice(0, quantidadeDestinos);
     let distanciaAcumulada = 0;
     let horarioAtual = parseHorario(formData.horarioSaida || '08:00');
 
