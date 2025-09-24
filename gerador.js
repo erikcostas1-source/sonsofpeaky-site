@@ -4,7 +4,35 @@
  * Version: 2.0.1 - Fixed GitHub Pages
  */
 
-console.log('🔧 Gerador.js carregado - Version 2.0.1');
+console.log('🔧 Gerador.js carregado - Version 2.0.2 - Enhanced Error Handling');
+
+/**
+ * Função utilitária para acessar elementos DOM com segurança
+ */
+function safeGetElement(id, required = false) {
+    const element = document.getElementById(id);
+    if (!element && required) {
+        console.error(`❌ Elemento obrigatório "${id}" não encontrado`);
+        throw new Error(`Elemento DOM "${id}" não encontrado`);
+    } else if (!element) {
+        console.warn(`⚠️ Elemento "${id}" não encontrado`);
+    }
+    return element;
+}
+
+/**
+ * Função utilitária para acessar elementos DOM com segurança (querySelector)
+ */
+function safeQuerySelector(selector, required = false) {
+    const element = document.querySelector(selector);
+    if (!element && required) {
+        console.error(`❌ Elemento obrigatório "${selector}" não encontrado`);
+        throw new Error(`Elemento DOM "${selector}" não encontrado`);
+    } else if (!element) {
+        console.warn(`⚠️ Elemento "${selector}" não encontrado`);
+    }
+    return element;
+}
 
 // Configuração da API - usando função serverless para segurança
 function getAPIConfig() {
@@ -37,19 +65,13 @@ function getAPIConfig() {
             useServerless: true
         };
     } else if (isGitHubPages) {
-        // Em GitHub Pages, usa API direta (temporário)
-        console.log('📖 GitHub Pages detectado - usando API direta');
-        return {
-            apiUrl: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyCiHRVozYYmHB-5W64QdJzn9dQYAyRl9Tk',
-            useServerless: false
-        };
+        // Em GitHub Pages, não há API disponível - força fallback
+        console.log('📖 GitHub Pages detectado - forçando fallback local');
+        throw new Error('GitHub Pages: API não disponível - usando fallback local');
     } else {
-        // Fallback padrão
-        console.log('🔧 Ambiente desconhecido - usando API direta');
-        return {
-            apiUrl: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyCiHRVozYYmHB-5W64QdJzn9dQYAyRl9Tk',
-            useServerless: false
-        };
+        // Fallback padrão - sem API
+        console.log('🔧 Ambiente desconhecido - forçando fallback local');
+        throw new Error('Ambiente desconhecido: API não configurada - usando fallback local');
     }
 }
 
@@ -77,59 +99,83 @@ document.addEventListener('DOMContentLoaded', function() {
 function initializeApp() {
     console.log('🚀 Gerador de Rolês iniciado');
     
-    // Verifica se é um link colaborativo
-    checkCollaborativeLink();
-    
-    // Define data atual
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('data-role').value = today;
-    
-    // Carrega destinos se disponível
-    if (typeof destinos !== 'undefined') {
-        console.log(`📍 ${destinos.length} destinos carregados`);
+    try {
+        // Verifica se é um link colaborativo
+        checkCollaborativeLink();
+        
+        // Define data atual - com verificação de elemento
+        const dataRoleInput = safeGetElement('data-role');
+        if (dataRoleInput) {
+            const today = new Date().toISOString().split('T')[0];
+            dataRoleInput.value = today;
+        }
+        
+        // Carrega destinos se disponível
+        if (typeof destinos !== 'undefined') {
+            console.log(`📍 ${destinos.length} destinos carregados`);
+        } else {
+            console.warn('⚠️ Destinos não carregados - fallback será limitado');
+        }
+        
+        // Carrega roteiro compartilhado se houver
+        loadSharedRoteiro();
+        
+        // Inicializa PWA
+        initializePWA();
+        
+        // Analytics
+        trackPageView();
+        
+    } catch (error) {
+        console.error('❌ Erro na inicialização:', error);
+        // Continua a execução mesmo com erros
     }
-    
-    // Carrega roteiro compartilhado se houver
-    loadSharedRoteiro();
-    
-    // Inicializa PWA
-    initializePWA();
-    
-    // Analytics
-    trackPageView();
 }
 
 /**
  * Configuração dos event listeners
  */
 function setupEventListeners() {
-    const form = document.getElementById('gerador-form');
-    if (form) {
-        form.addEventListener('submit', handleFormSubmit);
+    try {
+        const form = safeGetElement('gerador-form');
+        if (form) {
+            form.addEventListener('submit', handleFormSubmit);
+            
+            // Auto-save no formulário
+            const inputs = form.querySelectorAll('input, select, textarea');
+            inputs.forEach(input => {
+                input.addEventListener('change', saveFormData);
+                input.addEventListener('input', debounce(saveFormData, 1000));
+            });
+        }
+        
+        // Smooth scroll para resultados
+        window.addEventListener('scroll', handleScroll);
+        
+    } catch (error) {
+        console.error('❌ Erro ao configurar event listeners:', error);
     }
-    
-    // Auto-save no formulário
-    const inputs = form.querySelectorAll('input, select, textarea');
-    inputs.forEach(input => {
-        input.addEventListener('change', saveFormData);
-        input.addEventListener('input', debounce(saveFormData, 1000));
-    });
-    
-    // Smooth scroll para resultados
-    window.addEventListener('scroll', handleScroll);
 }
 
 /**
  * Configuração de validação do formulário
  */
 function setupFormValidation() {
-    const form = document.getElementById('gerador-form');
-    const inputs = form.querySelectorAll('input[required], select[required], textarea[required]');
-    
-    inputs.forEach(input => {
-        input.addEventListener('blur', validateField);
-        input.addEventListener('input', clearFieldError);
-    });
+    try {
+        const form = safeGetElement('gerador-form');
+        if (form) {
+            const inputs = form.querySelectorAll('input[required], select[required], textarea[required]');
+            
+            inputs.forEach(input => {
+                input.addEventListener('blur', validateField);
+                input.addEventListener('input', clearFieldError);
+            });
+            
+            console.log(`✅ Validação configurada para ${inputs.length} campos`);
+        }
+    } catch (error) {
+        console.error('❌ Erro ao configurar validação:', error);
+    }
 }
 
 /**
@@ -200,8 +246,17 @@ async function generateRole(formData) {
     const prompt = buildPrompt(formData);
     console.log('🧠 Prompt gerado:', prompt.substring(0, 200) + '...');
     
-    const apiConfig = getAPIConfig();
-    console.log('🔧 Usando API:', apiConfig.apiUrl.substring(0, 100) + '...');
+    // Tenta obter configuração da API
+    let apiConfig;
+    try {
+        apiConfig = getAPIConfig();
+        console.log('🔧 Usando API:', apiConfig.apiUrl.substring(0, 100) + '...');
+        console.log('🔧 Configuração:', JSON.stringify(apiConfig, null, 2));
+    } catch (configError) {
+        console.log('⚠️ API não disponível:', configError.message);
+        console.log('🔄 Usando fallback local diretamente');
+        return generateFallbackResults(formData);
+    }
     
     try {
         let requestBody, response;
@@ -303,13 +358,64 @@ async function generateRole(formData) {
     } catch (error) {
         console.error('❌ Erro na chamada da API:', error);
         
-        // Fallback para destinos locais se a API falhar
+        // Tratamento específico para diferentes tipos de erro
+        if (error.message.includes('405') || error.message.includes('Method Not Allowed')) {
+            console.warn('⚠️ Erro 405: Tentativa de usar serverless no GitHub Pages');
+            // Força uso da API direta como fallback
+            try {
+                console.log('🔄 Tentando novamente com API direta...');
+                const directApiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyCiHRVozYYmHB-5W64QdJzn9dQYAyRl9Tk';
+                
+                const directRequestBody = {
+                    contents: [{
+                        parts: [{
+                            text: prompt
+                        }]
+                    }],
+                    generationConfig: {
+                        temperature: 0.8,
+                        topK: 40,
+                        topP: 0.95,
+                        maxOutputTokens: 2048,
+                    }
+                };
+                
+                const directResponse = await fetch(directApiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(directRequestBody)
+                });
+                
+                if (directResponse.ok) {
+                    const directData = await directResponse.json();
+                    if (directData.candidates?.[0]?.content?.parts?.[0]?.text) {
+                        const aiResponse = directData.candidates[0].content.parts[0].text;
+                        const results = parseAIResponse(aiResponse, formData);
+                        
+                        // Salva no cache
+                        cache.set(cacheKey, {
+                            data: results,
+                            timestamp: Date.now()
+                        });
+                        
+                        return results;
+                    }
+                }
+            } catch (fallbackError) {
+                console.error('❌ Fallback API também falhou:', fallbackError);
+            }
+        }
+        
+        // Fallback para destinos locais se tudo falhar
         if (typeof destinos !== 'undefined') {
-            console.log('🔄 Usando destinos locais como fallback');
+            console.log('🔄 Usando destinos locais como último recurso');
             return generateFallbackResults(formData);
         }
         
-        throw error;
+        // Se nada funcionar, lança um erro amigável
+        throw new Error('Não foi possível gerar o rolê. Verifique sua conexão e tente novamente.');
     }
 }
 
@@ -1025,33 +1131,62 @@ function createResultCard(roteiro, index) {
  * Utilitários
  */
 function getFormData() {
-    const preferencias = [];
-    document.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => {
-        const label = cb.closest('label').textContent.trim();
-        preferencias.push(label);
-    });
-    
-    // Campos opcionais
-    const orcamentoValue = document.getElementById('orcamento-role').value;
-    const quilometragemValue = document.getElementById('quilometragem-desejada').value;
-    
-    return {
-        // Obrigatórios
-        enderecoPartida: document.getElementById('endereco-partida').value,
-        dataRole: document.getElementById('data-role').value,
-        horarioSaida: document.getElementById('horario-saida').value,
-        horarioVolta: document.getElementById('horario-volta').value,
-        tipoMoto: document.getElementById('tipo-moto').value,
-        perfilPilotagem: document.getElementById('perfil-pilotagem').value,
-        experienciaDesejada: document.getElementById('experiencia-desejada').value,
+    try {
+        const preferencias = [];
+        document.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => {
+            const label = cb.closest('label');
+            if (label) {
+                preferencias.push(label.textContent.trim());
+            }
+        });
         
-        // Opcionais (com valores padrão)
-        orcamento: orcamentoValue ? parseInt(orcamentoValue) : null,
-        quilometragemDesejada: quilometragemValue || null,
-        nivelAventura: document.getElementById('nivel-aventura').value || 'moderado',
-        companhia: document.getElementById('companhia').value || 'dupla',
-        preferencias: preferencias
-    };
+        // Função helper para obter valor com fallback
+        const getFieldValue = (id, defaultValue = '') => {
+            const element = safeGetElement(id);
+            return element ? element.value : defaultValue;
+        };
+        
+        // Campos obrigatórios
+        const enderecoPartida = getFieldValue('endereco-partida');
+        const dataRole = getFieldValue('data-role');
+        const horarioSaida = getFieldValue('horario-saida');
+        const horarioVolta = getFieldValue('horario-volta');
+        const tipoMoto = getFieldValue('tipo-moto');
+        const perfilPilotagem = getFieldValue('perfil-pilotagem');
+        const experienciaDesejada = getFieldValue('experiencia-desejada');
+        
+        // Validação de campos obrigatórios
+        if (!enderecoPartida || !dataRole || !horarioSaida || !horarioVolta || !tipoMoto || !perfilPilotagem || !experienciaDesejada) {
+            throw new Error('Campos obrigatórios não preenchidos');
+        }
+        
+        // Campos opcionais
+        const orcamentoValue = getFieldValue('orcamento-role');
+        const quilometragemValue = getFieldValue('quilometragem-desejada');
+        
+        return {
+            // Obrigatórios
+            enderecoPartida,
+            dataRole,
+            horarioSaida,
+            horarioVolta,
+            tipoMoto,
+            perfilPilotagem,
+            experienciaDesejada,
+            
+            // Opcionais (com valores padrão)
+            orcamento: orcamentoValue ? parseInt(orcamentoValue) : null,
+            quilometragemDesejada: quilometragemValue || null,
+            nivelAventura: getFieldValue('nivel-aventura', 'moderado'),
+            companhia: getFieldValue('companhia', 'dupla'),
+            preferenciasExtras: getFieldValue('preferencias-extras'),
+            preferencias: preferencias
+        };
+        
+    } catch (error) {
+        console.error('❌ Erro ao coletar dados do formulário:', error);
+        throw new Error('Erro ao processar formulário. Verifique se todos os campos obrigatórios estão preenchidos.');
+    }
 }
 
 function getConsumoMoto(tipo) {
