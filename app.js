@@ -385,11 +385,20 @@ document.addEventListener('DOMContentLoaded', function () {
         const loadingIndicator = $('loading-indicator-role');
 
         if (!input || !km || !date) {
-            if (outputDiv) outputDiv.textContent = 'Por favor, preencha todos os campos para gerar o rolê.';
+            if (outputDiv) {
+                outputDiv.textContent = 'Por favor, preencha todos os campos para gerar o rolê.';
+                outputDiv.classList.remove('hidden');
+            }
             return;
         }
-        if (outputDiv) outputDiv.innerHTML = '';
-        if (loadingIndicator) loadingIndicator.style.display = 'flex';
+        if (outputDiv) {
+            outputDiv.innerHTML = '';
+            outputDiv.classList.remove('hidden');
+        }
+        if (loadingIndicator) {
+            loadingIndicator.style.display = 'flex';
+            loadingIndicator.classList.remove('hidden');
+        }
 
         try {
             let generatedText = null;
@@ -438,9 +447,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
         } catch (error) {
             console.error('Erro ao gerar rolê:', error);
-            if ($('role-output')) $('role-output').textContent = 'Ocorreu um erro ao conectar com o serviço. Tente novamente mais tarde.';
+            if ($('role-output')) {
+                $('role-output').textContent = 'Ocorreu um erro ao conectar com o serviço. Tente novamente mais tarde.';
+                $('role-output').classList.remove('hidden');
+            }
         } finally {
-            if ($('loading-indicator-role')) $('loading-indicator-role').style.display = 'none';
+            if ($('loading-indicator-role')) {
+                $('loading-indicator-role').style.display = 'none';
+                $('loading-indicator-role').classList.add('hidden');
+            }
         }
     });
 
@@ -450,9 +465,21 @@ document.addEventListener('DOMContentLoaded', function () {
         const input = $('evento-input')?.value.trim();
         const outputDiv = $('evento-output');
         const loadingIndicator = $('loading-indicator-evento');
-        if (!input) { if (outputDiv) outputDiv.textContent = 'Por favor, descreva o tipo de evento que você quer planejar.'; return; }
-        if (outputDiv) outputDiv.textContent = '';
-        if (loadingIndicator) loadingIndicator.style.display = 'flex';
+        if (!input) { 
+            if (outputDiv) {
+                outputDiv.textContent = 'Por favor, descreva o tipo de evento que você quer planejar.'; 
+                outputDiv.classList.remove('hidden');
+            }
+            return; 
+        }
+        if (outputDiv) {
+            outputDiv.textContent = '';
+            outputDiv.classList.remove('hidden');
+        }
+        if (loadingIndicator) {
+            loadingIndicator.style.display = 'flex';
+            loadingIndicator.classList.remove('hidden');
+        }
         try {
             let text = null;
             if (API_URL_GENERATE_TEXT) {
@@ -465,8 +492,16 @@ document.addEventListener('DOMContentLoaded', function () {
             if (outputDiv) outputDiv.textContent = text;
         } catch (error) {
             console.error('Erro ao gerar ideias de evento:', error);
-            if ($('evento-output')) $('evento-output').textContent = 'Ocorreu um erro ao conectar com o serviço. Tente novamente mais tarde.';
-        } finally { if (loadingIndicator) loadingIndicator.style.display = 'none'; }
+            if ($('evento-output')) {
+                $('evento-output').textContent = 'Ocorreu um erro ao conectar com o serviço. Tente novamente mais tarde.';
+                $('evento-output').classList.remove('hidden');
+            }
+        } finally { 
+            if (loadingIndicator) {
+                loadingIndicator.style.display = 'none'; 
+                loadingIndicator.classList.add('hidden');
+            }
+        }
     });
 
     // Gerador de Posts do Instagram
@@ -475,9 +510,21 @@ document.addEventListener('DOMContentLoaded', function () {
         const input = $('instagram-input')?.value.trim();
         const outputDiv = $('instagram-output');
         const loadingIndicator = $('loading-indicator-instagram');
-        if (!input) { if (outputDiv) outputDiv.textContent = 'Por favor, descreva o conteúdo do post para gerar a legenda e hashtags.'; return; }
-        if (outputDiv) outputDiv.textContent = '';
-        if (loadingIndicator) loadingIndicator.style.display = 'flex';
+        if (!input) { 
+            if (outputDiv) {
+                outputDiv.textContent = 'Por favor, descreva o conteúdo do post para gerar a legenda e hashtags.'; 
+                outputDiv.classList.remove('hidden');
+            }
+            return; 
+        }
+        if (outputDiv) {
+            outputDiv.textContent = '';
+            outputDiv.classList.remove('hidden');
+        }
+        if (loadingIndicator) {
+            loadingIndicator.style.display = 'flex';
+            loadingIndicator.classList.remove('hidden');
+        }
         try {
             let text = null;
             if (API_URL_GENERATE_TEXT) {
@@ -490,8 +537,16 @@ document.addEventListener('DOMContentLoaded', function () {
             if (outputDiv) outputDiv.textContent = text;
         } catch (error) {
             console.error('Erro ao gerar post do Instagram:', error);
-            if ($('instagram-output')) $('instagram-output').textContent = 'Ocorreu um erro ao conectar com o serviço. Tente novamente mais tarde.';
-        } finally { if (loadingIndicator) loadingIndicator.style.display = 'none'; }
+            if ($('instagram-output')) {
+                $('instagram-output').textContent = 'Ocorreu um erro ao conectar com o serviço. Tente novamente mais tarde.';
+                $('instagram-output').classList.remove('hidden');
+            }
+        } finally { 
+            if (loadingIndicator) {
+                loadingIndicator.style.display = 'none'; 
+                loadingIndicator.classList.add('hidden');
+            }
+        }
     });
 
     // Mensagem do Dia
@@ -499,8 +554,14 @@ document.addEventListener('DOMContentLoaded', function () {
     if (gerarMensagemBtn) gerarMensagemBtn.addEventListener('click', async function () {
         const outputDiv = $('mensagem-output');
         const loadingIndicator = $('loading-indicator-mensagem');
-        if (outputDiv) outputDiv.textContent = '';
-        if (loadingIndicator) loadingIndicator.style.display = 'flex';
+        if (outputDiv) {
+            outputDiv.textContent = '';
+            outputDiv.classList.remove('hidden');
+        }
+        if (loadingIndicator) {
+            loadingIndicator.style.display = 'flex';
+            loadingIndicator.classList.remove('hidden');
+        }
         try {
             let text = null;
             if (API_URL_GENERATE_TEXT) {
@@ -513,8 +574,16 @@ document.addEventListener('DOMContentLoaded', function () {
             if (outputDiv) outputDiv.textContent = text;
         } catch (error) {
             console.error('Erro ao gerar mensagem do dia:', error);
-            if ($('mensagem-output')) $('mensagem-output').textContent = 'Ocorreu um erro ao conectar com o serviço. Tente novamente mais tarde.';
-        } finally { if (loadingIndicator) loadingIndicator.style.display = 'none'; }
+            if ($('mensagem-output')) {
+                $('mensagem-output').textContent = 'Ocorreu um erro ao conectar com o serviço. Tente novamente mais tarde.';
+                $('mensagem-output').classList.remove('hidden');
+            }
+        } finally { 
+            if (loadingIndicator) {
+                loadingIndicator.style.display = 'none'; 
+                loadingIndicator.classList.add('hidden');
+            }
+        }
     });
 
     // Lógica para a Assinatura - Versão Pública (removida do site)
