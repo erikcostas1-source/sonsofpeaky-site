@@ -1198,6 +1198,46 @@ a:hover, a:focus {
     animation-delay: 150ms;
 }
 
+/* Correções de Alinhamento - Garantir layout consistente */
+.suggestion-card {
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+}
+
+.suggestion-card > div {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Grid de sugestões - alinhamento consistente */
+#suggestions-grid {
+    align-items: stretch;
+}
+
+#suggestions-grid .suggestion-card {
+    height: 100%;
+}
+
+/* Correção para campos de formulário */
+.form-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+/* Correção para botões desalinhados */
+.btn-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
 /* Efeito de pulso nos números */
 .number-update {
     transition: all 0.3s ease;

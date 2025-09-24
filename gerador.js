@@ -593,7 +593,36 @@ function parseAIResponse(response, formData) {
             throw new Error('Formato de resposta inválido - esperado 3 sugestões');
         }
         
-        return data.sugestoes;
+        // Validação e limpeza de dados para evitar null/undefined
+        const cleanedSugestoes = data.sugestoes.map((sugestao, index) => {
+            const tipos = ['ECONÔMICA', 'EQUILIBRADA', 'PREMIUM'];
+            return {
+                tipo: sugestao.tipo || tipos[index] || 'EQUILIBRADA',
+                titulo: sugestao.titulo || `Roteiro ${tipos[index] || 'Personalizado'}`,
+                resumo: sugestao.resumo || 'Roteiro gerado pela IA',
+                distancia_total: sugestao.distancia_total || '-- km',
+                tempo_total: sugestao.tempo_total || '-- horas',
+                custo_total_estimado: sugestao.custo_total_estimado || 'R$ --',
+                nivel_dificuldade: sugestao.nivel_dificuldade || 'Moderado',
+                destinos: Array.isArray(sugestao.destinos) ? sugestao.destinos.map(d => ({
+                    nome: d?.nome || 'Destino',
+                    endereco: d?.endereco || 'Endereço não especificado',
+                    distancia: d?.distancia || '-- km',
+                    tempo_parada: d?.tempo_parada || '30 min',
+                    descricao: d?.descricao || 'Local interessante',
+                    custo_estimado: d?.custo_estimado || 'R$ --'
+                })) : [],
+                dicas_importantes: Array.isArray(sugestao.dicas_importantes) ? sugestao.dicas_importantes : [
+                    'Verificar combustível',
+                    'Levar equipamentos de segurança',
+                    'Conferir previsão do tempo'
+                ],
+                horario_sugerido_saida: sugestao.horario_sugerido_saida || formData.horarioSaida || '08:00',
+                horario_estimado_volta: sugestao.horario_estimado_volta || formData.horarioVolta || '18:00'
+            };
+        });
+        
+        return cleanedSugestoes;
         
     } catch (error) {
         console.error('❌ Erro ao processar resposta da IA:', error);
@@ -905,6 +934,17 @@ function createSuggestionCard(roteiro, index) {
     card.className = 'suggestion-card cursor-pointer transform transition-all duration-300 hover:scale-105';
     card.onclick = () => selectRoteiro(index);
     
+    // Validações defensivas para evitar null/undefined
+    const safeRoteiro = {
+        tipo: roteiro?.tipo || 'EQUILIBRADA',
+        titulo: roteiro?.titulo || 'Roteiro Personalizado',
+        resumo: roteiro?.resumo || 'Roteiro gerado pela IA',
+        custo_total_estimado: roteiro?.custo_total_estimado || 'R$ --',
+        distancia_total: roteiro?.distancia_total || '-- km',
+        tempo_total: roteiro?.tempo_total || '-- horas',
+        destinos: roteiro?.destinos || []
+    };
+    
     // Cores por tipo
     const typeColors = {
         'ECONÔMICA': 'from-green-600 to-green-800 border-green-500',
@@ -918,32 +958,32 @@ function createSuggestionCard(roteiro, index) {
         'PREMIUM': '👑'
     };
     
-    const colorClass = typeColors[roteiro.tipo] || 'from-gray-600 to-gray-800 border-gray-500';
+    const colorClass = typeColors[safeRoteiro.tipo] || 'from-gray-600 to-gray-800 border-gray-500';
     
     card.innerHTML = `
         <div class="bg-gradient-to-br ${colorClass} p-6 rounded-xl border-2 hover:border-opacity-100 border-opacity-50 transition-all">
             <div class="text-center mb-4">
-                <div class="text-4xl mb-2">${typeIcons[roteiro.tipo]}</div>
+                <div class="text-4xl mb-2">${typeIcons[safeRoteiro.tipo] || '🏍️'}</div>
                 <div class="bg-black bg-opacity-30 px-3 py-1 rounded-full text-sm font-bold text-white mb-2">
-                    ${roteiro.tipo}
+                    ${safeRoteiro.tipo}
                 </div>
-                <h3 class="text-xl font-bold text-white mb-2">${roteiro.titulo}</h3>
-                <p class="text-gray-200 text-sm">${roteiro.resumo}</p>
+                <h3 class="text-xl font-bold text-white mb-2">${safeRoteiro.titulo}</h3>
+                <p class="text-gray-200 text-sm">${safeRoteiro.resumo}</p>
             </div>
             
             <div class="space-y-3 mb-6">
                 <div class="flex justify-between items-center bg-black bg-opacity-30 p-3 rounded-lg">
                     <span class="text-white font-semibold">💰 Custo Total</span>
-                    <span class="text-white font-bold text-lg">${roteiro.custo_total_estimado}</span>
+                    <span class="text-white font-bold text-lg">${safeRoteiro.custo_total_estimado}</span>
                 </div>
                 
                 <div class="grid grid-cols-2 gap-2 text-sm">
                     <div class="bg-black bg-opacity-30 p-2 rounded text-center">
-                        <div class="text-white font-semibold">📍 ${roteiro.distancia_total}</div>
+                        <div class="text-white font-semibold">📍 ${safeRoteiro.distancia_total}</div>
                         <div class="text-gray-300">Distância</div>
                     </div>
                     <div class="bg-black bg-opacity-30 p-2 rounded text-center">
-                        <div class="text-white font-semibold">⏱️ ${roteiro.tempo_total}</div>
+                        <div class="text-white font-semibold">⏱️ ${safeRoteiro.tempo_total}</div>
                         <div class="text-gray-300">Tempo</div>
                     </div>
                 </div>
@@ -951,10 +991,10 @@ function createSuggestionCard(roteiro, index) {
                 <div class="bg-black bg-opacity-30 p-3 rounded-lg">
                     <div class="text-white font-semibold mb-2">📍 Principais Destinos:</div>
                     <div class="space-y-1">
-                        ${roteiro.destinos.slice(0, 2).map(d => `
-                            <div class="text-gray-200 text-sm">• ${d.nome}</div>
-                        `).join('')}
-                        ${roteiro.destinos.length > 2 ? `<div class="text-gray-300 text-xs">+ ${roteiro.destinos.length - 2} destinos...</div>` : ''}
+                        ${safeRoteiro.destinos.length > 0 ? safeRoteiro.destinos.slice(0, 2).map(d => `
+                            <div class="text-gray-200 text-sm">• ${d?.nome || 'Destino'}</div>
+                        `).join('') : '<div class="text-gray-300 text-sm">• Destinos serão definidos</div>'}
+                        ${safeRoteiro.destinos.length > 2 ? `<div class="text-gray-300 text-xs">+ ${safeRoteiro.destinos.length - 2} destinos...</div>` : ''}
                     </div>
                 </div>
             </div>
