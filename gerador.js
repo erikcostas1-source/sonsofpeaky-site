@@ -474,7 +474,9 @@ function buildPrompt(formData) {
         horarioVolta,
         orcamento, 
         quilometragemDesejada,
-        tipoMoto, 
+        capacidadeTanque,
+        consumoMedio,
+        autonomia,
         perfilPilotagem,
         experienciaDesejada,
         nivelAventura,
@@ -482,7 +484,7 @@ function buildPrompt(formData) {
         preferencias
     } = formData;
     
-    const consumoMoto = getConsumoMoto(tipoMoto);
+    const consumoMoto = formData.consumoMedio || 22; // Usar consumo real informado pelo usuário
     const velocidadeMedia = getVelocidadeMedia(perfilPilotagem);
     
     // Monta informações de quilometragem
@@ -687,10 +689,11 @@ function calculateSmartCosts(formData, tipoRoteiro, index) {
     const tempoDisponivel = calcularTempoDisponivel(formData);
     const distanciaEstimada = index === 0 ? 120 : index === 1 ? 200 : 300;
     
-    // Combustível - sempre presente, calculado pelo consumo real
-    const consumoMedio = 22; // km/l médio
+    // Combustível - sempre presente, calculado pelos dados reais da moto
+    const consumoReal = formData.consumoMedio || 22; // km/l do usuário ou padrão
     const precoCombustivel = 6.60; // R$ por litro (valor atual)
-    const combustivelCusto = Math.round((distanciaEstimada / consumoMedio) * precoCombustivel);
+    const litrosNecessarios = distanciaEstimada / consumoReal;
+    const combustivelCusto = Math.round(litrosNecessarios * precoCombustivel);
     
     // Alimentação - sempre presente, varia por tempo e tipo
     const alimentacaoMultipliers = [0.7, 1.0, 1.8]; // Econômico, Equilibrado, Premium
@@ -754,8 +757,29 @@ function generateSmartTimeline(formData, destinos) {
         tipo: 'saida'
     });
     
+    // Calcular paradas de combustível necessárias
+    const distanciaTotal = destinos.length > 0 ? `${120 + (destinos.length * 40)} km` : '120 km';
+    const paradasCombustivel = calculateFuelStops(formData, distanciaTotal);
+    
     // Para cada destino
     destinos.forEach((destino, index) => {
+        // Verificar se precisa de parada para combustível antes deste destino
+        const paradaCombustivel = paradasCombustivel.find(p => p.distancia_km === Math.round((120 + (index * 40))));
+        
+        if (paradaCombustivel) {
+            const tempoParadaCombustivel = 15; // 15 minutos para abastecer
+            horarioAtual += tempoParadaCombustivel;
+            
+            cronograma.push({
+                horario: formatMinutesToTime(horarioAtual),
+                evento: paradaCombustivel.nome,
+                endereco: paradaCombustivel.endereco,
+                descricao: `${paradaCombustivel.observacao} - ${paradaCombustivel.custo_abastecimento}`,
+                tempo_permanencia: '15min',
+                tipo: 'combustivel'
+            });
+        }
+        
         // Tempo de viagem até o destino
         const tempoViagem = Math.floor(30 + (index * 15)); // 30-60 min entre destinos
         horarioAtual += tempoViagem;
@@ -803,6 +827,52 @@ function formatMinutesToTime(minutes) {
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
     return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+}
+
+/**
+ * Calcula se são necessárias paradas para combustível e onde
+ */
+function calculateFuelStops(formData, distanciaTotal) {
+    if (!formData.autonomia || !distanciaTotal) return [];
+    
+    const autonomiaReal = formData.autonomia * 0.8; // Margem de segurança de 20%
+    const distanciaNum = parseFloat(distanciaTotal.replace(' km', ''));
+    
+    if (distanciaNum <= autonomiaReal) {
+        return []; // Não precisa parar para abastecer
+    }
+    
+    // Calcular quantas paradas são necessárias
+    const paradasNecessarias = Math.ceil(distanciaNum / autonomiaReal) - 1;
+    const distanciaEntreParadas = distanciaNum / (paradasNecessarias + 1);
+    
+    const postos = [
+        { nome: "Posto Ipiranga", endereco: "Rodovia Presidente Dutra, km 15", preco: 6.60 },
+        { nome: "Shell Select", endereco: "Via Anhanguera, km 25", preco: 6.65 },
+        { nome: "BR Mania", endereco: "Rodovia Fernão Dias, km 18", preco: 6.55 },
+        { nome: "Petrobras", endereco: "Rodovia Castelo Branco, km 22", preco: 6.58 }
+    ];
+    
+    const paradasCombustivel = [];
+    for (let i = 0; i < paradasNecessarias; i++) {
+        const posto = postos[i % postos.length];
+        const distanciaParada = Math.round(distanciaEntreParadas * (i + 1));
+        const litrosNecessarios = Math.round(formData.capacidadeTanque * 0.8); // Encher 80% do tanque
+        const custoAbastecimento = Math.round(litrosNecessarios * posto.preco);
+        
+        paradasCombustivel.push({
+            nome: `⛽ ${posto.nome}`,
+            endereco: posto.endereco,
+            distancia_km: distanciaParada,
+            tipo: 'combustivel',
+            litros_necessarios: litrosNecessarios,
+            custo_abastecimento: `R$ ${custoAbastecimento}`,
+            preco_litro: `R$ ${posto.preco.toFixed(2)}`,
+            observacao: `Parada obrigatória - Autonomia restante: ${Math.round(autonomiaReal - distanciaParada)} km`
+        });
+    }
+    
+    return paradasCombustivel;
 }
 
 /**
@@ -1338,78 +1408,170 @@ function createChecklistSummary(roteiros) {
 }
 
 /**
- * Gera checklist completo com todas as dicas
+ * Gera checklist inteligente e útil para motociclistas
  */
 function generateFullChecklist(roteiros) {
-    const allTips = new Set();
+    const formData = getLastFormData();
+    const isLongTrip = formData && formData.autonomia && formData.autonomia > 200;
+    const hasWeatherRisk = new Date(formData?.dataRole || Date.now()).getMonth() >= 10 || new Date(formData?.dataRole || Date.now()).getMonth() <= 3; // Inverno
     
-    // Coleta todas as dicas únicas de todos os roteiros
-    roteiros.forEach(roteiro => {
-        if (roteiro.destinos) {
-            roteiro.destinos.forEach(destino => {
-                if (destino.dicas_motociclista) {
-                    destino.dicas_motociclista.forEach(dica => {
-                        // Extrai a dica limpa (remove prefixos como "Condições da estrada:")
-                        const cleanTip = dica.replace(/^[^:]+:\s*/, '').trim();
-                        if (cleanTip.length > 10) { // Só adiciona dicas significativas
-                            allTips.add(cleanTip);
-                        }
-                    });
-                }
-            });
+    const checklistCategories = [
+        {
+            title: '🛡️ Equipamentos de Segurança',
+            items: [
+                'Capacete em perfeito estado e fechado corretamente',
+                'Jaqueta com proteções (cotovelo, ombro, costa)',
+                'Luvas de couro ou com proteção',
+                'Calça com proteções ou calça jeans reforçada',
+                'Bota ou calçado fechado e resistente',
+                'Refletivos ou colete de alta visibilidade'
+            ],
+            priority: 'critical'
+        },
+        {
+            title: '📋 Documentação e Identificação',
+            items: [
+                'CNH válida e dentro da validade',
+                'Documento da moto (CRLV) atualizado',
+                'RG ou documento com foto',
+                'Cartão do seguro (se tiver)',
+                'Comprovante de pagamento do IPVA',
+                'Telefone de emergência anotado'
+            ],
+            priority: 'critical'
+        },
+        {
+            title: '🔧 Manutenção e Verificações',
+            items: [
+                'Nível de óleo do motor',
+                'Pressão dos pneus (dianteiro e traseiro)',
+                'Estado dos pneus (desgaste e objetos)',
+                'Funcionamento dos freios',
+                'Corrente limpa e lubrificada',
+                'Luzes (farol, lanterna, setas, freio)',
+                'Buzina funcionando',
+                'Espelhos ajustados e limpos'
+            ],
+            priority: 'high'
+        },
+        {
+            title: '⛽ Combustível e Autonomia',
+            items: [
+                `Tanque cheio (${formData?.capacidadeTanque || 15}L)`,
+                `Autonomia verificada (~${Math.round(formData?.autonomia || 300)}km)`,
+                'Localização de postos no percurso',
+                'Dinheiro/cartão para combustível',
+                'Reserva de combustível considerando trânsito'
+            ],
+            priority: 'high'
+        },
+        {
+            title: '🌤️ Clima e Condições',
+            items: [
+                'Previsão do tempo checada',
+                hasWeatherRisk ? 'Capa de chuva ou jaqueta impermeável' : 'Protetor solar',
+                hasWeatherRisk ? 'Luvas extras para chuva' : 'Óculos de sol',
+                'Roupas adequadas para temperatura',
+                'Verificar condições das estradas'
+            ],
+            priority: 'medium'
+        },
+        {
+            title: '📱 Comunicação e Navegação',
+            items: [
+                'Celular carregado (100%)',
+                'Carregador portátil ou USB da moto',
+                'GPS ou app de navegação configurado',
+                'Suporte de celular na moto',
+                'Contatos de emergência salvos',
+                'App de motociclistas (Waze, etc.)'
+            ],
+            priority: 'medium'
+        },
+        {
+            title: '🎒 Kit de Emergência',
+            items: [
+                'Kit de primeiros socorros básico',
+                'Água (pelo menos 500ml)',
+                'Lanche energético',
+                'Dinheiro em espécie',
+                'Chaves reserva',
+                isLongTrip ? 'Kit básico de ferramentas' : null,
+                isLongTrip ? 'Corda ou elástico' : null,
+                'Sacos plásticos (proteção)'
+            ].filter(item => item !== null),
+            priority: 'medium'
         }
-    });
+    ];
+
+    // Gerar HTML do checklist
+    let checklistHTML = '<div class="space-y-6">';
     
-    // Categoriza as dicas
-    const categories = {
-        '🛡️ Equipamentos': [],
-        '📞 Reservas e Contatos': [],
-        '🛣️ Estrada e Navegação': [],
-        '⏰ Horários e Clima': [],
-        '🚨 Segurança e Emergência': [],
-        '💡 Outras Dicas': []
-    };
-    
-    allTips.forEach(tip => {
-        const lowerTip = tip.toLowerCase();
-        if (lowerTip.includes('equipamento') || lowerTip.includes('capacete') || lowerTip.includes('proteção') || lowerTip.includes('roupas') || lowerTip.includes('lanterna')) {
-            categories['🛡️ Equipamentos'].push(tip);
-        } else if (lowerTip.includes('reserva') || lowerTip.includes('ligar') || lowerTip.includes('telefone') || lowerTip.includes('contato')) {
-            categories['📞 Reservas e Contatos'].push(tip);
-        } else if (lowerTip.includes('estrada') || lowerTip.includes('trajeto') || lowerTip.includes('curva') || lowerTip.includes('subida') || lowerTip.includes('asfalto')) {
-            categories['🛣️ Estrada e Navegação'].push(tip);
-        } else if (lowerTip.includes('horário') || lowerTip.includes('clima') || lowerTip.includes('sol') || lowerTip.includes('chuva') || lowerTip.includes('evite')) {
-            categories['⏰ Horários e Clima'].push(tip);
-        } else if (lowerTip.includes('emergência') || lowerTip.includes('segurança') || lowerTip.includes('saúde') || lowerTip.includes('sinal')) {
-            categories['🚨 Segurança e Emergência'].push(tip);
-        } else {
-            categories['💡 Outras Dicas'].push(tip);
-        }
-    });
-    
-    let checklistHTML = '<div class="grid md:grid-cols-2 gap-4">';
-    
-    Object.entries(categories).forEach(([category, tips]) => {
-        if (tips.length > 0) {
-            checklistHTML += `
-                <div class="bg-white bg-opacity-10 rounded-lg p-4">
-                    <h4 class="text-lg font-bold text-white mb-3">${category}</h4>
-                    <div class="space-y-2">
-                        ${tips.map(tip => `
-                            <label class="flex items-start gap-3 text-blue-100 hover:text-white cursor-pointer transition-colors">
-                                <input type="checkbox" class="mt-1 rounded border-blue-300 text-blue-600 focus:ring-blue-500">
-                                <span class="text-sm">${tip}</span>
-                            </label>
-                        `).join('')}
-                    </div>
+    checklistCategories.forEach(category => {
+        const priorityColors = {
+            'critical': 'border-red-500 bg-red-900 bg-opacity-20',
+            'high': 'border-orange-500 bg-orange-900 bg-opacity-20',
+            'medium': 'border-blue-500 bg-blue-900 bg-opacity-20'
+        };
+        
+        const priorityIcons = {
+            'critical': '🚨',
+            'high': '⚠️',
+            'medium': 'ℹ️'
+        };
+        
+        checklistHTML += `
+            <div class="border-l-4 ${priorityColors[category.priority]} p-4 rounded-lg">
+                <h4 class="font-bold text-white mb-3 flex items-center">
+                    ${priorityIcons[category.priority]} ${category.title}
+                </h4>
+                <div class="grid md:grid-cols-2 gap-2">
+                    ${category.items.map((item, index) => `
+                        <label class="flex items-start space-x-3 p-2 hover:bg-gray-700 rounded cursor-pointer">
+                            <input type="checkbox" class="mt-1 w-4 h-4 text-blue-600 rounded focus:ring-blue-500" 
+                                   id="check-${category.title.replace(/[^a-z0-9]/gi, '')}-${index}">
+                            <span class="text-gray-300 text-sm leading-relaxed">${item}</span>
+                        </label>
+                    `).join('')}
                 </div>
-            `;
-        }
+            </div>
+        `;
     });
     
-    checklistHTML += '</div>';
-    
+    checklistHTML += `
+        <div class="text-center mt-6">
+            <button onclick="markAllAsChecked()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg mr-2">
+                ✅ Marcar Tudo OK
+            </button>
+            <button onclick="resetChecklist()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg">
+                🔄 Resetar Lista
+            </button>
+        </div>
+    </div>`;
+
     return checklistHTML;
+}
+
+/**
+ * Marca todos os itens do checklist como verificados
+ */
+function markAllAsChecked() {
+    const checkboxes = document.querySelectorAll('#checklist-content input[type="checkbox"]');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = true;
+    });
+    showNotification('✅ Todos os itens marcados como OK!', 'success');
+}
+
+/**
+ * Reset do checklist
+ */
+function resetChecklist() {
+    const checkboxes = document.querySelectorAll('#checklist-content input[type="checkbox"]');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    showNotification('🔄 Lista resetada!', 'info');
 }
 
 /**
@@ -1636,13 +1798,15 @@ function createResultCard(roteiro, index) {
                             'saida': '🏠',
                             'chegada': '🏍️',
                             'saida_destino': '🚀',
-                            'chegada_final': '🏡'
+                            'chegada_final': '🏡',
+                            'combustivel': '⛽'
                         };
                         const bgColorMap = {
                             'saida': 'bg-green-600',
                             'chegada': 'bg-blue-600',
                             'saida_destino': 'bg-orange-600',
-                            'chegada_final': 'bg-purple-600'
+                            'chegada_final': 'bg-purple-600',
+                            'combustivel': 'bg-red-600'
                         };
                         return `
                         <div class="flex items-start space-x-3 p-3 bg-gray-700 rounded-lg">
@@ -1741,13 +1905,14 @@ function getFormData() {
         const dataRole = getFieldValue('data-role');
         const horarioSaida = getFieldValue('horario-saida');
         const horarioVolta = getFieldValue('horario-volta');
-        const tipoMoto = getFieldValue('tipo-moto');
+        const capacidadeTanque = getFieldValue('capacidade-tanque');
+        const consumoMedio = getFieldValue('consumo-medio');
         const perfilPilotagem = getFieldValue('perfil-pilotagem');
         const experienciaDesejada = getFieldValue('experiencia-desejada');
         
         // Validação para submissão (mais rigorosa)
         const isForSubmission = arguments[0] === true;
-        const hasRequiredFields = enderecoPartida && dataRole && horarioSaida && horarioVolta && tipoMoto && perfilPilotagem && experienciaDesejada;
+        const hasRequiredFields = enderecoPartida && dataRole && horarioSaida && horarioVolta && capacidadeTanque && consumoMedio && perfilPilotagem && experienciaDesejada;
         
         if (isForSubmission && !hasRequiredFields) {
             throw new Error('Campos obrigatórios não preenchidos');
@@ -1765,9 +1930,13 @@ function getFormData() {
             dataRole,
             horarioSaida,
             horarioVolta,
-            tipoMoto,
+            capacidadeTanque: parseFloat(capacidadeTanque),
+            consumoMedio: parseFloat(consumoMedio),
             perfilPilotagem,
             experienciaDesejada,
+            
+            // Calculado baseado nos dados da moto
+            autonomia: capacidadeTanque && consumoMedio ? (parseFloat(capacidadeTanque) * parseFloat(consumoMedio)) : null,
             
             // Opcionais (com valores padrão)
             orcamento: orcamentoValue ? parseInt(orcamentoValue) : null,
@@ -2804,8 +2973,13 @@ function selectRoteiro(index) {
                         </div>
                         <div class="flex items-center">
                             <span class="text-gold-primary mr-2">🏍️</span>
-                            <span class="text-gray-300">Moto: <strong class="text-white">${formData.tipoMoto || 'Não informada'}</strong></span>
+                            <span class="text-gray-300">Moto: <strong class="text-white">${formData.capacidadeTanque || 0}L | ${formData.consumoMedio || 0}km/L</strong></span>
                         </div>
+                        ${formData.autonomia ? `
+                        <div class="flex items-center">
+                            <span class="text-gold-primary mr-2">📏</span>
+                            <span class="text-gray-300">Autonomia: <strong class="text-white">${Math.round(formData.autonomia)}km</strong></span>
+                        </div>` : ''}
                         <div class="flex items-center md:col-span-2">
                             <span class="text-gold-primary mr-2">📍</span>
                             <span class="text-gray-300">Ponto de Saída: <strong class="text-white">${formData.enderecoPartida || 'Não informado'}</strong></span>
