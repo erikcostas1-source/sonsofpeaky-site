@@ -2758,10 +2758,8 @@ Exemplos:
 
     <!-- Scripts Core -->
     <script src="config.js"></script>
-    <script src="destinos.js"></script>
-    <script src="gerador_role_novo.js"></script>
     
-    <!-- Revolutionary Features Script -->
+    <!-- Sons of Peaky Features Script -->
     <script>
         // Loading screen
         document.addEventListener('DOMContentLoaded', function() {
@@ -2776,8 +2774,8 @@ Exemplos:
             // Initialize AI Chat functionality
             initializeAIChat();
             
-            // Initialize Gerador de Rolês
-            initializeGeradorRoles();
+            // Gerador moved to separate project
+            console.log('Sons of Peaky loaded successfully');
         });
 
         // AI Chat functionality
@@ -2900,23 +2898,8 @@ Exemplos:
             });
         }
 
-        // Initialize Gerador de Rolês functionality
-        function initializeGeradorRoles() {
-            const sugerirBtn = document.getElementById('sugerir-destinos-btn');
-            if (sugerirBtn) {
-                sugerirBtn.addEventListener('click', function() {
-                    console.log('Botão de gerar rolê clicado');
-                    if (typeof gerarRoleDeMoto === 'function') {
-                        gerarRoleDeMoto();
-                    } else {
-                        console.error('Função gerarRoleDeMoto não encontrada');
-                        alert('Erro: Função do gerador não carregada. Verifique se os scripts estão funcionando.');
-                    }
-                });
-            } else {
-                console.error('Botão sugerir-destinos-btn não encontrado');
-            }
-        }
+        // Gerador functionality moved to separate project at /gerador-roles/
+        // Site do clube focado em conteúdo institucional
 
         // Service Worker
         if ('serviceWorker' in navigator) {

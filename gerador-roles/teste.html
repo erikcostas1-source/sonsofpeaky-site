@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste - Gerador de Rolês</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #1a1a1a; color: white; }
+        .container { max-width: 800px; margin: 0 auto; text-align: center; }
+        .status { padding: 20px; margin: 20px 0; border-radius: 8px; }
+        .success { background: #22c55e; }
+        .error { background: #ef4444; }
+        .test-btn { background: #2563eb; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💼 Teste - Gerador de Rolês</h1>
+        
+        <div id="config-status" class="status">
+            <h3>Testando configurações...</h3>
+        </div>
+        
+        <div id="assets-status" class="status">
+            <h3>Testando assets...</h3>
+        </div>
+        
+        <button class="test-btn" onclick="testAll()">🔧 Executar Todos os Testes</button>
+        <button class="test-btn" onclick="testAPI()">🤖 Testar API</button>
+        
+        <div id="results"></div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="destinos.js"></script>
+    <script>
+        function testAll() {
+            const results = document.getElementById('results');
+            let report = '<h3>📊 Relatório de Testes:</h3>';
+            
+            // Teste 1: Config carregado
+            if (typeof window.GERADOR_CONFIG !== 'undefined') {
+                report += '<div class="status success">✅ Config carregado corretamente</div>';
+                report += '<div class="status success">🔑 API Key: ' + window.GERADOR_CONFIG.apiKey.substring(0, 20) + '...</div>';
+            } else {
+                report += '<div class="status error">❌ Config não carregado</div>';
+            }
+            
+            // Teste 2: Destinos carregados
+            if (typeof destinos !== 'undefined' && destinos.length > 0) {
+                report += '<div class="status success">✅ Base de destinos carregada (' + destinos.length + ' destinos)</div>';
+            } else {
+                report += '<div class="status error">❌ Base de destinos não carregada</div>';
+            }
+            
+            // Teste 3: CSS funcionando
+            const body = document.body;
+            const bodyStyle = window.getComputedStyle(body);
+            if (bodyStyle.backgroundColor === 'rgb(26, 26, 26)') {
+                report += '<div class="status success">✅ CSS aplicado corretamente</div>';
+            } else {
+                report += '<div class="status error">❌ CSS não aplicado</div>';
+            }
+            
+            results.innerHTML = report;
+        }
+
+        async function testAPI() {
+            const results = document.getElementById('results');
+            try {
+                const response = await fetch(window.GERADOR_CONFIG.textUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: 'Teste simples da API' }] }],
+                        generationConfig: { temperature: 0.7, maxOutputTokens: 100 }
+                    })
+                });
+                
+                if (response.ok) {
+                    results.innerHTML += '<div class="status success">✅ API Google Gemini respondendo</div>';
+                } else {
+                    results.innerHTML += '<div class="status error">❌ API retornou erro: ' + response.status + '</div>';
+                }
+            } catch (error) {
+                results.innerHTML += '<div class="status error">❌ Erro na API: ' + error.message + '</div>';
+            }
+        }
+
+        // Auto-executar ao carregar
+        window.addEventListener('load', () => {
+            setTimeout(testAll, 1000);
+        });
+    </script>
+</body>
+</html>

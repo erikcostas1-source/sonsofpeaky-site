@@ -1,7 +1,7 @@
 {
-  "name": "Gerador de Rolês de Moto",
-  "short_name": "Gerador Rolês",
-  "description": "IA que cria roteiros personalizados para motociclistas. Descubra destinos únicos, calcule custos e planeje a aventura perfeita.",
+  "name": "Sons of Peaky - Clube de Motos",
+  "short_name": "Sons of Peaky",
+  "description": "Site oficial do clube de motociclistas Sons of Peaky. Unidos pela estrada, fortalecidos pela irmandade.",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#000000",

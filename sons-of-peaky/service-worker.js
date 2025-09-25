@@ -3,17 +3,16 @@
  * Gerador de Rolês - Background notifications e cache
  */
 
-const CACHE_NAME = 'gerador-roles-v1';
+const CACHE_NAME = 'sons-of-peaky-v1';
 const urlsToCache = [
     '/',
     '/index.html',
     '/styles.css',
     '/app.js',
-    '/database.js',
-    '/auth.js',
-    '/notifications.js',
+    '/config.js',
     '/assets/img/SOP_LOGO_PRINCIPAL.svg',
-    '/assets/img/sopwatermark.png'
+    '/assets/img/sopwatermark.png',
+    '/assets/img/SONSOFPEAKY_TRANSPARENTE_BRANCO.png'
 ];
 
 // Install event - cache resources

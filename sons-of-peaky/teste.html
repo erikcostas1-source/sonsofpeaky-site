@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste - Sons of Peaky</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #0d0d0d; color: white; }
+        .container { max-width: 800px; margin: 0 auto; text-align: center; }
+        .status { padding: 20px; margin: 20px 0; border-radius: 8px; }
+        .success { background: #22c55e; }
+        .error { background: #ef4444; }
+        .test-btn { background: #c9a14a; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏍️ Teste - Sons of Peaky</h1>
+        
+        <div id="config-status" class="status">
+            <h3>Testando configurações...</h3>
+        </div>
+        
+        <div id="assets-status" class="status">
+            <h3>Testando assets...</h3>
+        </div>
+        
+        <button class="test-btn" onclick="testAll()">🔧 Executar Todos os Testes</button>
+        
+        <div id="results"></div>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        function testAll() {
+            const results = document.getElementById('results');
+            let report = '<h3>📊 Relatório de Testes:</h3>';
+            
+            // Teste 1: Config carregado
+            if (typeof window.SOP_CONFIG !== 'undefined') {
+                report += '<div class="status success">✅ Config carregado corretamente</div>';
+            } else {
+                report += '<div class="status error">❌ Config não carregado</div>';
+            }
+            
+            // Teste 2: CSS funcionando
+            const body = document.body;
+            const bodyStyle = window.getComputedStyle(body);
+            if (bodyStyle.backgroundColor === 'rgb(13, 13, 13)') {
+                report += '<div class="status success">✅ CSS aplicado corretamente</div>';
+            } else {
+                report += '<div class="status error">❌ CSS não aplicado</div>';
+            }
+            
+            // Teste 3: JavaScript básico
+            try {
+                console.log('Teste JS funcionando');
+                report += '<div class="status success">✅ JavaScript funcionando</div>';
+            } catch(e) {
+                report += '<div class="status error">❌ JavaScript com erro: ' + e.message + '</div>';
+            }
+            
+            results.innerHTML = report;
+        }
+
+        // Auto-executar ao carregar
+        window.addEventListener('load', () => {
+            setTimeout(testAll, 1000);
+        });
+    </script>
+</body>
+</html>
