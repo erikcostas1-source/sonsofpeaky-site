@@ -70,7 +70,6 @@ document.addEventListener('DOMContentLoaded', function () {
     
     // Header scroll effect
     const header = document.querySelector('.site-nav');
-    let lastScrollY = window.scrollY;
     
     window.addEventListener('scroll', () => {
         const currentScrollY = window.scrollY;
@@ -82,8 +81,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 header.classList.remove('scrolled');
             }
         }
-        
-        lastScrollY = currentScrollY;
     });
     
     // Scroll to top button
@@ -172,9 +169,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // Configuração para chamadas Gemini API.
     // Usar URLs definidas em config.js com nova chave da API
     const API_KEY = "AIzaSyCiHRVozYYmHB-5W64QdJzn9dQYAyRl9Tk"; // Nova chave da API
-    const API_URL_GENERATE_TEXT = (window.SOP_CONFIG && window.SOP_CONFIG.textUrl)
-        ? window.SOP_CONFIG.textUrl
-        : `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${API_KEY}`;
+    const API_URL_GENERATE_TEXT = window.SOP_CONFIG?.textUrl 
+        ?? `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${API_KEY}`;
 
     // Safe DOM helpers
     const $ = id => document.getElementById(id);
@@ -225,72 +221,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Local fallback generators (simple, deterministic) to make the site usable offline
-    function localGenerateRide({ input, km, date }) {
-        const kmNum = Number(km);
-        const dateObj = new Date(date);
-        
-        // Determinar tipo de rolê baseado na distância
-        let categoria, tempoViagem, sugestaoHorario;
-        if (kmNum <= 100) {
-            categoria = "Rolê Urbano/Regional";
-            tempoViagem = "1-2h";
-            sugestaoHorario = "14h00";
-        } else if (kmNum <= 300) {
-            categoria = "Rolê Intermediário";
-            tempoViagem = "2-4h";
-            sugestaoHorario = "08h00";
-        } else {
-            categoria = "Rolê Longo";
-            tempoViagem = "4-6h";
-            sugestaoHorario = "06h00";
-        }
-
-        const pedagogioEstimado = Math.max(0, Math.round(kmNum * 0.08));
-        const combustivelEstimado = Math.round(kmNum * 0.12);
-        
-        return `🏍️ ROTEIRO DE ROLÊ - SONS OF PEAKY
-
-📍 DESTINO: ${input.toUpperCase()}
-📅 DATA: ${dateObj.toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-📏 DISTÂNCIA: ${kmNum}km (ida e volta)
-⏱️ CATEGORIA: ${categoria}
-
-🕐 PROGRAMAÇÃO:
-• Concentração: 30min antes da saída no Galpão
-• Saída: ${sugestaoHorario}
-• Tempo de viagem: ${tempoViagem} cada trecho
-• Chegada prevista: Final da tarde
-
-🛣️ ROTA SUGERIDA:
-• Ponto de encontro: Galpão - Rua José Flavio, 420, Travessa 1A
-• Parada obrigatória: Combustível + checagem (km 50)
-• Parada para alimentação: Meio do trajeto
-• Pontos fotográficos: Conforme oportunidade
-
-💰 CUSTOS ESTIMADOS:
-• Pedágio: R$ ${pedagogioEstimado},00
-• Combustível: R$ ${combustivelEstimado},00
-• Alimentação: R$ 25-40 (por pessoa)
-
-🔧 CHECKLIST:
-✓ Documentos (CNH, documento da moto)
-✓ Capacete em perfeitas condições
-✓ Equipamentos de proteção
-✓ Celular com bateria/carregador
-✓ Dinheiro para pedágio/emergência
-
-⚠️ SEGURANÇA:
-• Manter distância segura
-• Comunicação por gestos/intercomunicador
-• Ponto de reagrupamento a cada 100km
-• Contato de emergência: Líder do grupo
-
-📞 CONFIRMAÇÃO: Confirme sua presença aqui no site
-💬 DÚVIDAS: WhatsApp do grupo
-
-Que as estradas nos levem e nos tragam em segurança! 
-🔥 By Order of the Sons of Peaky 🔥`;
-    }
 
     function localGenerateEvent({ input }) {
         return `Evento: ${input}\nTema sugerido: "Noite da Irmandade"\nAtividades: Música ao vivo, roda de histórias, campeonato de sinuca.\nCardápio sugerido: Churrasco (faixa de preço por pessoa R$30-50), bebidas conforme tabela do bar.\nConvite: Venha celebrar com a gente — confirme presença aqui no site.`;
@@ -393,7 +323,9 @@ Que as estradas nos levem e nos tragam em segurança!
         if (attendees.length === 0) {
             list.innerHTML = '<span class="text-gray-400 text-sm">Nenhum confirmado ainda.</span>';
         } else {
-            list.innerHTML = `<span class="text-amber-400 font-bold">${attendees.length} confirmado(s):</span> <span class="text-gray-300">${attendees.map(n => `<span>${n}</span>`).join(', ')}</span>`;
+            // Criar lista de participantes de forma mais legível
+            const attendeesSpans = attendees.map(n => `<span>${n}</span>`).join(', ');
+            list.innerHTML = `<span class="text-amber-400 font-bold">${attendees.length} confirmado(s):</span> <span class="text-gray-300">${attendeesSpans}</span>`;
         }
     }
 
@@ -440,7 +372,7 @@ Que as estradas nos levem e nos tragam em segurança!
     if (acUnlockBtn) acUnlockBtn.addEventListener('click', () => {
         const pwd = (document.getElementById('ac-password')?.value || '').trim();
         const status = document.getElementById('ac-status');
-        const correctPassword = (window.SOP_CONFIG && window.SOP_CONFIG.altaCupulaPassword) ? window.SOP_CONFIG.altaCupulaPassword : 'cangaiba';
+        const correctPassword = window.SOP_CONFIG?.altaCupulaPassword ?? 'cangaiba';
 
         if (pwd.toLowerCase() === correctPassword.toLowerCase()) {
             if (status) status.classList.add('hidden');
@@ -448,11 +380,9 @@ Que as estradas nos levem e nos tragam em segurança!
             // Limpar campo de senha
             const passwordField = document.getElementById('ac-password');
             if (passwordField) passwordField.value = '';
-        } else {
-            if (status) {
-                status.textContent = 'Senha incorreta. Acesso negado.';
-                status.classList.remove('hidden');
-            }
+        } else if (status) {
+            status.textContent = 'Senha incorreta. Acesso negado.';
+            status.classList.remove('hidden');
         }
     });
     
@@ -493,134 +423,9 @@ Que as estradas nos levem e nos tragam em segurança!
         addConfirmButtonListeners();
     })();
 
-    // Renderizar sugestões na interface
-    function renderizarSugestoes(sugestoes, destinosLocais) {
-        const sugestoesList = $('sugestoes-list');
-        if (!sugestoesList) return;
-        
-        sugestoesList.innerHTML = sugestoes.map((sugestao, index) => {
-            const destinoLocal = destinosLocais.find(d => d.nome.includes(sugestao.nome) || sugestao.nome.includes(d.nome));
-            const distancia = destinoLocal ? destinoLocal.distancia : '~200';
-            const custoTotal = destinoLocal ? calcularCustoTotal(destinoLocal) : 150;
-            const infoTempo = destinoLocal?.infoTempo;
-            
-            return `
-                <div class="bg-gray-800 rounded-lg p-4 cursor-pointer hover:bg-gray-700 transition-colors sugestao-card" 
-                     data-nome="${sugestao.nome}" 
-                     data-tipo="${destinoLocal?.categoria || 'turístico'}"
-                     data-horario="${sugestao.horarioSaida}"
-                     data-destino='${JSON.stringify(destinoLocal)}'>
-                    <div class="flex justify-between items-start mb-2">
-                        <h6 class="text-amber-300 font-bold text-lg">${sugestao.nome}</h6>
-                        <span class="text-gray-400 text-sm">${distancia}km</span>
-                    </div>
-                    <p class="text-gray-300 text-sm mb-2">${sugestao.razao}</p>
-                    
-                    ${infoTempo ? `
-                        <div class="bg-gray-900 rounded-lg p-3 mb-2">
-                            <div class="text-xs text-gray-400 mb-1">⏱️ Análise de Tempo:</div>
-                            <div class="grid grid-cols-2 gap-2 text-xs">
-                                <div class="text-blue-300">📍 Ida: ${infoTempo.detalhes.ida}h</div>
-                                <div class="text-green-300">🏖️ Local: ${infoTempo.detalhes.permanencia}h</div>
-                                <div class="text-blue-300">🏠 Volta: ${infoTempo.detalhes.volta}h</div>
-                                <div class="text-amber-300">⏰ Sobra: ${infoTempo.sobra}h</div>
-                            </div>
-                        </div>
-                    ` : ''}
-                    
-                    <div class="flex flex-wrap gap-2 mb-2">
-                        <span class="bg-blue-600 text-white px-2 py-1 rounded-full text-xs">⏰ Saída: ${sugestao.horarioSaida}</span>
-                        <span class="bg-green-600 text-white px-2 py-1 rounded-full text-xs">💰 ~R$${custoTotal}</span>
-                        ${infoTempo ? `<span class="bg-amber-600 text-white px-2 py-1 rounded-full text-xs">✅ Tempo OK</span>` : ''}
-                    </div>
-                    <div class="text-xs text-gray-400">
-                        <strong>Atrativos:</strong> ${sugestao.atrativos.slice(0, 3).join(', ')}
-                    </div>
-                    <div class="mt-2 text-center">
-                        <button class="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-gray-900 font-bold rounded-lg text-sm transition-colors escolher-destino">
-                            🎯 Escolher Este Destino
-                        </button>
-                    </div>
-                </div>
-            `;
-        }).join('');
-        
-        // Adicionar eventos de clique
-        sugestoesList.querySelectorAll('.escolher-destino').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                const card = btn.closest('.sugestao-card');
-                const nome = card.dataset.nome;
-                const tipo = card.dataset.tipo;
-                const horario = card.dataset.horario;
-                const destinoData = JSON.parse(card.dataset.destino || '{}');
-                
-                // Salvar destino globalmente para uso no prompt da IA
-                window.destinoSelecionado = destinoData;
-                
-                // Preencher campos ocultos para compatibilidade
-                if ($('role-destino')) $('role-destino').value = nome;
-                if ($('role-saida-final')) $('role-saida-final').value = $('role-saida-desejada')?.value || horario;
-                
-                // Mostrar etapa 3 - Confirmação
-                const confirmacaoContainer = $('confirmacao-container');
-                const destinoSelecionado = $('destino-selecionado');
-                const horarioSelecionado = $('horario-selecionado');
-                
-                if (confirmacaoContainer) confirmacaoContainer.classList.remove('hidden');
-                if (destinoSelecionado) destinoSelecionado.textContent = nome;
-                if (horarioSelecionado) {
-                    const saidaDesejada = $('role-saida-desejada')?.value || horario;
-                    const voltaDesejada = $('role-chegada-desejada')?.value || '19:00';
-                    horarioSelecionado.textContent = `Saída ${saidaDesejada} • Volta ${voltaDesejada}`;
-                }
-                
-                // Scroll para confirmação
-                confirmacaoContainer?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            });
-        });
-    }
+    // (Função renderizarSugestoes removida - não utilizada)
     
-    // Função auxiliar para calcular custos de combustível baseado na cilindrada
-    function calcularCombustivel(distanciaKm, cilindrada) {
-        const consumoPorCilindrada = {
-            125: 35, // km/l
-            250: 25,
-            600: 18,
-            1000: 15
-        };
-        
-        const consumo = consumoPorCilindrada[cilindrada] || 20;
-        const precoLitro = 6.50; // Preço médio da gasolina
-        const litrosNecessarios = distanciaKm / consumo;
-        
-        return Math.round(litrosNecessarios * precoLitro);
-    }
-    
-    // Função para estimar pedágios por região
-    function estimarPedagios(destino, distanciaKm) {
-        const regionsPedagio = {
-            'santos': 25,
-            'campos do jordão': 45,
-            'ubatuba': 35,
-            'serra': 30,
-            'litoral': 25,
-            'sul': 20,
-            'norte': 15
-        };
-        
-        for (const [regiao, valor] of Object.entries(regionsPedagio)) {
-            if (destino.toLowerCase().includes(regiao)) {
-                return valor;
-            }
-        }
-        
-        // Estimativa baseada na distância se não encontrar região específica
-        if (distanciaKm > 250) return 35;
-        if (distanciaKm > 150) return 20;
-        if (distanciaKm > 80) return 10;
-        return 0;
-    }
+    // (Funções calcularCombustivel e estimarPedagios removidas - não utilizadas)
     
     // Função para compartilhar no WhatsApp
     window.compartilharWhatsApp = function(destino, data, horaSaida, pontos) {
@@ -1209,20 +1014,46 @@ function compartilharWhatsApp(destino, data, horaSaida, pontos) {
 }
 
 function copiarRoteiro() {
-    const roteiro = document.querySelector('#role-avancado-output .prose').textContent;
-    if (navigator.clipboard) {
+    const roteiro = document.querySelector('#role-avancado-output .prose')?.textContent;
+    if (!roteiro) {
+        alert('❌ Nenhum roteiro encontrado para copiar.');
+        return;
+    }
+    
+    if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(roteiro).then(() => {
             alert('✅ Roteiro copiado para a área de transferência!');
+        }).catch(err => {
+            console.error('Erro ao copiar:', err);
+            fallbackCopy(roteiro);
         });
     } else {
-        // Fallback para navegadores mais antigos
-        const textArea = document.createElement('textarea');
-        textArea.value = roteiro;
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand('copy');
+        fallbackCopy(roteiro);
+    }
+}
+
+function fallbackCopy(text) {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    textArea.style.top = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+        const successful = document.execCommand('copy');
+        if (successful) {
+            alert('✅ Roteiro copiado para a área de transferência!');
+        } else {
+            alert('❌ Erro ao copiar o roteiro.');
+        }
+    } catch (err) {
+        console.error('Fallback copy failed:', err);
+        alert('❌ Não foi possível copiar o roteiro.');
+    } finally {
         document.body.removeChild(textArea);
-        alert('✅ Roteiro copiado para a área de transferência!');
     }
 }
 

@@ -72,7 +72,7 @@
     
     <!-- Header -->
     <header class="fixed top-0 w-full z-50 bg-black bg-opacity-95 backdrop-blur-sm shadow-lg">
-        <nav class="container mx-auto px-4 py-4">
+        <nav class="container mx-auto px-4 py-4" aria-label="Navegação principal">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-3">
                     <div class="w-10 h-10 bg-gradient-to-br from-gold-primary to-accent-primary rounded-full flex items-center justify-center">
@@ -122,7 +122,7 @@
             </div>
             
             <!-- Mobile Menu -->
-            <div id="mobile-menu" class="hidden md:hidden bg-black bg-opacity-95 border-t border-gray-800" role="navigation">
+            <nav id="mobile-menu" class="hidden md:hidden bg-black bg-opacity-95 border-t border-gray-800" aria-label="Menu de navegação mobile">
                 <div class="container mx-auto px-4 py-4 space-y-2">
                     <a href="index.html" class="block text-white hover:text-gold-primary transition-colors py-2">
                         <i class="fas fa-home mr-2"></i>Início
@@ -140,7 +140,7 @@
                         <i class="fas fa-shield-alt mr-2"></i>Admin
                     </a>
                 </div>
-            </div>
+            </nav>
         </nav>
     </header>
     
@@ -436,27 +436,27 @@
                                         <div>
                                             <label for="preferencias-extras" class="block text-sm font-medium text-gray-300 mb-2">🎯 Interesses Específicos</label>
                                             <div class="grid grid-cols-2 gap-2 text-sm">
-                                                <label class="flex items-center cursor-pointer">
+                                                <label for="pref-gastronomia" class="flex items-center cursor-pointer">
                                                     <input type="checkbox" id="pref-gastronomia" class="mr-2">
                                                     🍽️ Gastronomia
                                                 </label>
-                                                <label class="flex items-center cursor-pointer">
+                                                <label for="pref-natureza" class="flex items-center cursor-pointer">
                                                     <input type="checkbox" id="pref-natureza" class="mr-2">
                                                     🌿 Natureza
                                                 </label>
-                                                <label class="flex items-center cursor-pointer">
+                                                <label for="pref-historia" class="flex items-center cursor-pointer">
                                                     <input type="checkbox" id="pref-historia" class="mr-2">
                                                     🏛️ História
                                                 </label>
-                                                <label class="flex items-center cursor-pointer">
+                                                <label for="pref-esportes" class="flex items-center cursor-pointer">
                                                     <input type="checkbox" id="pref-esportes" class="mr-2">
                                                     ⚽ Esportes
                                                 </label>
-                                                <label class="flex items-center cursor-pointer">
+                                                <label for="pref-compras" class="flex items-center cursor-pointer">
                                                     <input type="checkbox" id="pref-compras" class="mr-2">
                                                     🛍️ Compras
                                                 </label>
-                                                <label class="flex items-center cursor-pointer">
+                                                <label for="pref-cultura" class="flex items-center cursor-pointer">
                                                     <input type="checkbox" id="pref-cultura" class="mr-2">
                                                     🎭 Cultura
                                                 </label>

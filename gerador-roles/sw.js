@@ -46,8 +46,6 @@ self.addEventListener('activate', event => {
 
 // Fetch
 self.addEventListener('fetch', event => {
-  const url = new URL(event.request.url);
-  
   // Cache-first strategy for static assets
   event.respondWith(
     caches.match(event.request)

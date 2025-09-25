@@ -100,6 +100,8 @@ class NotificationManager {
                 }
             } catch (error) {
                 console.error('Erro ao inicializar push notifications:', error);
+                // Fallback: continuar sem notificações push
+                this.isPushSupported = false;
             }
         }
     }
@@ -120,6 +122,9 @@ class NotificationManager {
             console.log('Push subscription ativa:', subscription);
         } catch (error) {
             console.error('Erro ao subscrever push notifications:', error);
+            // Fallback: marcar push como não disponível
+            this.isPushSupported = false;
+            this.showNotification('Push notifications não disponíveis', 'warning');
         }
     }
 
@@ -485,7 +490,7 @@ class NotificationManager {
     }
 
     generateNotificationId() {
-        return 'notif_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        return 'notif_' + Date.now() + '_' + Math.random().toString(36).substring(2, 11);
     }
 
     processTemplate(template, data) {

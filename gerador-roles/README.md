@@ -1,6 +1,8 @@
 # 💼 Gerador de Rolês - Plataforma IA
 
-**Plataforma comercial de geração inteligente de roteiros motociclísticos**
+## Sobre
+
+Plataforma comercial de geração inteligente de roteiros motociclísticos
 
 ## 🎯 Sobre o Projeto
 
@@ -55,7 +57,7 @@ netlify dev
 
 ## 📁 Estrutura do Projeto
 
-```
+```bash
 gerador-roles/
 ├── index.html          # Dashboard principal
 ├── analytics.html      # Métricas e relatórios
@@ -147,4 +149,7 @@ git push origin main
 
 ---
 
-**💼 Gerador de Rolês - Transformando aventuras em negócios**
+## Slogan
+
+💼 Gerador de Rolês - Transformando aventuras em negócios
+

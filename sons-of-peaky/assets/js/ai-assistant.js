@@ -252,7 +252,7 @@ Responda de forma útil, contextual e representando perfeitamente o espírito SO
     addMessage(content, sender) {
         if (!this.messagesContainer) return null;
         
-        const messageId = `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        const messageId = `msg-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
         const messageElement = document.createElement('div');
         messageElement.id = messageId;
         messageElement.className = sender === 'user' ? 'user-message' : 'ai-message';

@@ -811,13 +811,13 @@
         <!-- História -->
         <section id="historia" class="py-12 md:py-16 lg:py-20 bg-gradient-to-b from-black via-gray-900 to-black">
             <div class="container mx-auto px-4 space-y-6">
-                <div class="section-toggle bg-gray-800 border border-gray-700 rounded-xl p-6 cursor-pointer hover:border-amber-500 transition-all duration-300 shadow-lg" onclick="toggleSection('historia-content', 'historia-icon')" onkeydown="if(event.key==='Enter'||event.key===' ')toggleSection('historia-content', 'historia-icon')" role="button" tabindex="0">
+                <button class="section-toggle bg-gray-800 border border-gray-700 rounded-xl p-6 cursor-pointer hover:border-amber-500 transition-all duration-300 shadow-lg w-full text-left" onclick="toggleSection('historia-content', 'historia-icon')" aria-expanded="false" aria-controls="historia-content">
                     <div class="flex items-center justify-between">
                         <h2 class="section-title text-3xl md:text-4xl lg:text-5xl">Como Tudo Começou</h2>
                         <i id="historia-icon" class="fas fa-chevron-down text-amber-500 text-2xl transition-transform duration-300"></i>
                     </div>
                     <p class="text-gray-300 mt-3 text-lg">A origem da Irmandade SOP - de uma ideia simples ao movimento que é hoje</p>
-                </div>
+                </button>
                 
                 <div id="historia-content" class="section-content"
                      style="max-height: 0; overflow: hidden; transition: max-height 0.5s ease-in-out;">
@@ -993,13 +993,13 @@
         <!-- Irmandade -->
         <section id="irmandade" class="py-12 md:py-16 lg:py-20">
             <div class="container mx-auto px-4 space-y-6">
-                <div class="section-toggle bg-gray-800 border border-gray-700 rounded-xl p-6 cursor-pointer hover:border-amber-500 transition-all duration-300 shadow-lg" onclick="toggleSection('irmandade-content', 'irmandade-icon')" onkeydown="if(event.key==='Enter'||event.key===' ')toggleSection('irmandade-content', 'irmandade-icon')" role="button" tabindex="0">
+                <button class="section-toggle bg-gray-800 border border-gray-700 rounded-xl p-6 cursor-pointer hover:border-amber-500 transition-all duration-300 shadow-lg w-full text-left" onclick="toggleSection('irmandade-content', 'irmandade-icon')" aria-expanded="false" aria-controls="irmandade-content">
                     <div class="flex items-center justify-between">
                         <h2 class="section-title text-3xl md:text-4xl lg:text-5xl">O Caminho para a Irmandade</h2>
                         <i id="irmandade-icon" class="fas fa-chevron-down text-amber-500 text-2xl transition-transform duration-300"></i>
                     </div>
                     <p class="text-gray-300 mt-3 text-lg">Como se tornar parte da família SOP - requisitos e processo</p>
-                </div>
+                </button>
                 
                 <div id="irmandade-content" class="section-content"
                      style="max-height: 0; overflow: hidden; transition: max-height 0.5s ease-in-out;">
@@ -1098,13 +1098,13 @@
         <!-- Missão & Visão -->
         <section id="missao" class="py-12 md:py-16 lg:py-20 bg-gradient-to-b from-gray-900 to-black">
             <div class="container mx-auto px-4 space-y-6">
-                <div class="section-toggle bg-gray-800 border border-gray-700 rounded-xl p-6 cursor-pointer hover:border-amber-500 transition-all duration-300 shadow-lg" onclick="toggleSection('missao-content', 'missao-icon')" onkeydown="if(event.key==='Enter'||event.key===' ')toggleSection('missao-content', 'missao-icon')" role="button" tabindex="0">
+                <button class="section-toggle bg-gray-800 border border-gray-700 rounded-xl p-6 cursor-pointer hover:border-amber-500 transition-all duration-300 shadow-lg w-full text-left" onclick="toggleSection('missao-content', 'missao-icon')" aria-expanded="false" aria-controls="missao-content">
                     <div class="flex items-center justify-between">
                         <h2 class="section-title text-3xl md:text-4xl lg:text-5xl">Missão, Visão, Valores e Cultura</h2>
                         <i id="missao-icon" class="fas fa-chevron-down text-amber-500 text-2xl transition-transform duration-300"></i>
                     </div>
                     <p class="text-gray-300 mt-3 text-lg">Os pilares fundamentais que guiam a Irmandade SOP</p>
-                </div>
+                </button>
                 
                 <div id="missao-content" class="section-content"
                      style="max-height: 0; overflow: hidden; transition: max-height 0.5s ease-in-out;">
@@ -1199,13 +1199,13 @@
         <!-- Estatutos -->
             <section id="estatutos" class="py-16 md:py-24">
                 <div class="container space-y-6">
-                    <div class="section-toggle bg-gray-800 border border-gray-700 rounded-xl p-6 cursor-pointer hover:border-amber-500 transition-all duration-300 shadow-lg" onclick="toggleSection('estatutos-content', 'estatutos-icon')" onkeydown="if(event.key==='Enter'||event.key===' ')toggleSection('estatutos-content', 'estatutos-icon')" role="button" tabindex="0">
+                    <button class="section-toggle bg-gray-800 border border-gray-700 rounded-xl p-6 cursor-pointer hover:border-amber-500 transition-all duration-300 shadow-lg w-full text-left" onclick="toggleSection('estatutos-content', 'estatutos-icon')" aria-expanded="false" aria-controls="estatutos-content">
                         <div class="flex items-center justify-between">
                             <h2 class="section-title">Estatutos</h2>
                             <i id="estatutos-icon" class="fas fa-chevron-down text-amber-500 text-2xl transition-transform duration-300"></i>
                         </div>
                         <p class="text-gray-300 mt-3 text-lg">Regras, direitos e deveres dos membros e frequentadores</p>
-                    </div>
+                    </button>
                     
                     <div id="estatutos-content" class="section-content"
                          style="max-height: 0; overflow: hidden; transition: max-height 0.5s ease-in-out;">
@@ -2100,13 +2100,13 @@
         <!-- Agenda -->
         <section id="agenda" class="py-12 md:py-16 lg:py-20 bg-gradient-to-b from-gray-900 to-black">
             <div class="container mx-auto px-4 space-y-6">
-                <div class="section-toggle bg-gray-800 border border-gray-700 rounded-xl p-6 cursor-pointer hover:border-amber-500 transition-all duration-300 shadow-lg" onclick="toggleSection('agenda-content', 'agenda-icon')" onkeydown="if(event.key==='Enter'||event.key===' ')toggleSection('agenda-content', 'agenda-icon')" role="button" tabindex="0">
+                <button class="section-toggle bg-gray-800 border border-gray-700 rounded-xl p-6 cursor-pointer hover:border-amber-500 transition-all duration-300 shadow-lg w-full text-left" onclick="toggleSection('agenda-content', 'agenda-icon')" aria-expanded="false" aria-controls="agenda-content">
                     <div class="flex items-center justify-between">
                         <h2 class="section-title text-3xl md:text-4xl lg:text-5xl">Agenda de Eventos</h2>
                         <i id="agenda-icon" class="fas fa-chevron-down text-amber-500 text-2xl transition-transform duration-300"></i>
                     </div>
                     <p class="text-gray-300 mt-3 text-lg">Próximos eventos e encontros da Irmandade</p>
-                </div>
+                </button>
                 
                 <div id="agenda-content" class="section-content"
                      style="max-height: 0; overflow: hidden; transition: max-height 0.5s ease-in-out;">
@@ -2226,13 +2226,13 @@
         <!-- Ferramentas -->
         <section id="ferramentas" class="py-12 md:py-16 lg:py-20 bg-gradient-to-b from-black to-gray-900">
             <div class="container mx-auto px-4 space-y-6">
-                <div class="section-toggle bg-gray-800 border border-gray-700 rounded-xl p-6 cursor-pointer hover:border-amber-500 transition-all duration-300 shadow-lg" onclick="toggleSection('ferramentas-content', 'ferramentas-icon')" onkeydown="if(event.key==='Enter'||event.key===' ')toggleSection('ferramentas-content', 'ferramentas-icon')" role="button" tabindex="0">
+                <button class="section-toggle bg-gray-800 border border-gray-700 rounded-xl p-6 cursor-pointer hover:border-amber-500 transition-all duration-300 shadow-lg w-full text-left" onclick="toggleSection('ferramentas-content', 'ferramentas-icon')" aria-expanded="false" aria-controls="ferramentas-content">
                     <div class="flex items-center justify-between">
                         <h2 class="section-title text-3xl md:text-4xl lg:text-5xl">Ferramentas da Irmandade</h2>
                         <i id="ferramentas-icon" class="fas fa-chevron-down text-amber-500 text-2xl transition-transform duration-300"></i>
                     </div>
                     <p class="text-gray-300 mt-3 text-lg">Ferramentas exclusivas para planejamento e criação de conteúdo</p>
-                </div>
+                </button>
                 
                 <div id="ferramentas-content" class="section-content"
                      style="max-height: 0; overflow: hidden; transition: max-height 0.5s ease-in-out;">
@@ -2746,14 +2746,15 @@ Exemplos:
                 }, 300);
             }, 1500);
 
-        // Service Worker
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(registration => console.log('SW registered'))
-                    .catch(error => console.log('SW registration failed'));
-            });
-        }
+            // Service Worker
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/sw.js')
+                        .then(registration => console.log('SW registered'))
+                        .catch(error => console.log('SW registration failed'));
+                });
+            }
+        });
     </script>
     
     <script src="app.js" defer></script>

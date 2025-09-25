@@ -393,7 +393,9 @@ Que as estradas nos levem e nos tragam em segurança!
         if (attendees.length === 0) {
             list.innerHTML = '<span class="text-gray-400 text-sm">Nenhum confirmado ainda.</span>';
         } else {
-            list.innerHTML = `<span class="text-amber-400 font-bold">${attendees.length} confirmado(s):</span> <span class="text-gray-300">${attendees.map(n => `<span>${n}</span>`).join(', ')}</span>`;
+            // Criar lista de participantes de forma mais legível
+            const attendeesSpans = attendees.map(n => `<span>${n}</span>`).join(', ');
+            list.innerHTML = `<span class="text-amber-400 font-bold">${attendees.length} confirmado(s):</span> <span class="text-gray-300">${attendeesSpans}</span>`;
         }
     }
 

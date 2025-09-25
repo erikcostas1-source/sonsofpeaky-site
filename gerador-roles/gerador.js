@@ -424,7 +424,9 @@ async function generateRole(formData) {
         return results;
         
     } catch (error) {
-        // Se a API falhar, mostra erro específico
+        console.error('❌ Erro na geração via IA:', error);
+        // Notificar usuário e re-throw com mensagem mais clara
+        showNotification('❌ Erro na geração do roteiro. Verifique sua conexão.', 'error');
         throw new Error('Não foi possível gerar o rolê via IA. Verifique sua conexão com a internet e tente novamente.');
     }
 }
@@ -1356,7 +1358,7 @@ function generateFallbackDestinos(formData, tipo) {
             distancia_anterior: `${distanciaDestino} km`,
             tempo_permanencia: dest.tempo_permanencia,
             horario_chegada: horarioChegada,
-            descricao: `${dest.nome} - Local específico com entrada ${dest.custo_entrada > 0 ? `R$ ${dest.custo_entrada}` : 'gratuita'}.`,
+            descricao: `${dest.nome} - Local específico com entrada ${dest.custo_entrada > 0 ? 'R$ ' + dest.custo_entrada : 'gratuita'}.`,
             custo_estimado: `R$ ${dest.custo_entrada}`,
             dicas_motociclista: dest.dicas_reais
         };
@@ -1638,6 +1640,58 @@ function markAllAsChecked() {
 }
 
 /**
+ * Função auxiliar para renderizar custos detalhados
+ */
+function renderCustosDetalhados(custos) {
+    if (!custos) return '';
+    
+    const itens = [];
+    if (custos.combustivel) {
+        itens.push(`<div class="cost-item"><span>⛽ Combustível</span><span class="font-bold">${custos.combustivel}</span></div>`);
+    }
+    if (custos.alimentacao) {
+        itens.push(`<div class="cost-item"><span>🍽️ Alimentação</span><span class="font-bold">${custos.alimentacao}</span></div>`);
+    }
+    if (custos.entradas) {
+        itens.push(`<div class="cost-item"><span>🎫 Entradas (Atrações Turísticas)</span><span class="font-bold">${custos.entradas}</span></div>`);
+    }
+    if (custos.outros) {
+        itens.push(`<div class="cost-item"><span>🔧 Outros (Pedágio, Estacionamento)</span><span class="font-bold">${custos.outros}</span></div>`);
+    }
+    
+    return `
+        <div class="cost-display mb-6">
+            <h4 class="text-lg font-bold text-green-400 mb-3">💰 Custos Detalhados</h4>
+            <div class="space-y-2">
+                ${itens.join('')}
+                <div class="cost-item border-t border-gray-600 pt-2 mt-3">
+                    <span class="text-lg">💎 TOTAL</span>
+                    <span class="font-bold text-lg text-gold-primary">${custos.total}</span>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * Função auxiliar para renderizar seção de votação
+ */
+function renderVotingSection(hasVoted, voteCount, isUserChoice, collaborativeId, index) {
+    if (hasVoted) {
+        const voteText = voteCount === 1 ? 'voto' : 'votos';
+        const userVoteIndicator = isUserChoice ? '<div class="text-gold-primary text-sm mt-1">✅ Seu voto</div>' : '';
+        return `
+            <div class="mb-4">
+                <span class="text-lg">📊 ${voteCount} ${voteText}</span>
+                ${userVoteIndicator}
+            </div>
+        `;
+    } else {
+        return `<button onclick="voteForRoteiro('${collaborativeId}', ${index})" class="bg-gold-primary hover:bg-gold-secondary text-black px-6 py-3 rounded-lg font-bold transition-colors w-full">🗳️ Votar Neste</button>`;
+    }
+}
+
+/**
  * Reset do checklist
  */
 function resetChecklist() {
@@ -1754,37 +1808,7 @@ function createAdvancedResultCard(roteiro, index) {
             `).join('')}
         </div>
         
-        ${roteiro.custos_detalhados ? `
-            <div class="cost-display mb-6">
-                <h4 class="text-lg font-bold text-green-400 mb-3">💰 Custos Detalhados</h4>
-                <div class="space-y-2">
-                    ${roteiro.custos_detalhados.combustivel ? `
-                    <div class="cost-item">
-                        <span>⛽ Combustível</span>
-                        <span class="font-bold">${roteiro.custos_detalhados.combustivel}</span>
-                    </div>` : ''}
-                    ${roteiro.custos_detalhados.alimentacao ? `
-                    <div class="cost-item">
-                        <span>🍽️ Alimentação</span>
-                        <span class="font-bold">${roteiro.custos_detalhados.alimentacao}</span>
-                    </div>` : ''}
-                    ${roteiro.custos_detalhados.entradas ? `
-                    <div class="cost-item">
-                        <span>🎫 Entradas (Atrações Turísticas)</span>
-                        <span class="font-bold">${roteiro.custos_detalhados.entradas}</span>
-                    </div>` : ''}
-                    ${roteiro.custos_detalhados.outros ? `
-                    <div class="cost-item">
-                        <span>🔧 Outros (Pedágio, Estacionamento)</span>
-                        <span class="font-bold">${roteiro.custos_detalhados.outros}</span>
-                    </div>` : ''}
-                    <div class="cost-item border-t border-gray-600 pt-2 mt-3">
-                        <span class="text-lg">💎 TOTAL</span>
-                        <span class="font-bold text-lg text-gold-primary">${roteiro.custos_detalhados.total}</span>
-                    </div>
-                </div>
-            </div>
-        ` : ''}
+        ${renderCustosDetalhados(roteiro.custos_detalhados)}
         
         ${roteiro.cronograma?.length > 0 ? `
             <div class="bg-blue-900 bg-opacity-30 p-4 rounded-lg mb-4">
@@ -2198,8 +2222,12 @@ function saveFormData() {
         const formData = getFormData();
         localStorage.setItem('gerador_form_data', JSON.stringify(formData));
     } catch (error) {
-        // Falha silenciosa - não é crítico para o funcionamento
-        console.log('⚠️ Não foi possível salvar dados do formulário (campos incompletos)');
+        console.error('Erro ao salvar dados do formulário:', error);
+        // Degradação graceful - formulário continua funcionando
+        if (error.name === 'QuotaExceededError') {
+            console.warn('LocalStorage cheio - limpando dados antigos');
+            localStorage.removeItem('gerador_form_data');
+        }
     }
 }
 
@@ -2398,7 +2426,7 @@ let generatedRoteiros = []; // Armazena os roteiros gerados
  */
 function generateCollaborativeLink(roteiros, formData) {
     const roteiroData = {
-        id: Date.now().toString(36) + Math.random().toString(36).substr(2),
+        id: Date.now().toString(36) + Math.random().toString(36).substring(2),
         roteiros: roteiros,
         formData: formData,
         criado: new Date().toISOString(),
@@ -2549,16 +2577,7 @@ function createVotingCard(roteiro, index, collaborativeId, votos) {
             <p class="text-gray-300 text-sm mb-6">${roteiro.resumo}</p>
             
             <div class="text-center">
-                ${hasVoted ? 
-                    `<div class="mb-4">
-                        <span class="text-lg">📊 ${voteCount} voto${voteCount !== 1 ? 's' : ''}</span>
-                        ${isUserChoice ? '<div class="text-gold-primary text-sm mt-1">✅ Seu voto</div>' : ''}
-                    </div>` 
-                    : 
-                    `<button onclick="voteForRoteiro('${collaborativeId}', ${index})" class="bg-gold-primary hover:bg-gold-secondary text-black px-6 py-3 rounded-lg font-bold transition-colors w-full">
-                        🗳️ Votar Neste
-                    </button>`
-                }
+                ${renderVotingSection(hasVoted, voteCount, isUserChoice, collaborativeId, index)}
             </div>
         </div>
     `;
@@ -2594,7 +2613,7 @@ function voteForRoteiro(collaborativeId, roteiroIndex) {
  * Gera ID único do usuário
  */
 function generateUserId() {
-    return Date.now().toString(36) + Math.random().toString(36).substr(2);
+    return Date.now().toString(36) + Math.random().toString(36).substring(2);
 }
 
 /**
@@ -2844,7 +2863,20 @@ function createSingleCalendarEvent(index) {
     
     const eventTitle = `🏍️ ${roteiro.titulo}`;
     const checklist = generateCalendarChecklist(roteiro);
-    const eventDescription = `${roteiro.resumo}\\n\\n📍 DESTINOS:\\n${roteiro.destinos.map(d => `• ${d.nome} - ${d.endereco}`).join('\\n')}\\n\\n📋 CHECKLIST:\\n${checklist}\\n\\n💰 Custo: ${roteiro.custo_total_estimado}\\n📏 Distância: ${roteiro.distancia_total}`;
+    // Criar descrição do evento de forma mais legível
+    const destinosList = roteiro.destinos.map(d => `• ${d.nome} - ${d.endereco}`).join('\\n');
+    const eventDescription = [
+        roteiro.resumo,
+        '',
+        '📍 DESTINOS:',
+        destinosList,
+        '',
+        '📋 CHECKLIST:',
+        checklist,
+        '',
+        `💰 Custo: ${roteiro.custo_total_estimado}`,
+        `📏 Distância: ${roteiro.distancia_total}`
+    ].join('\\n');
     
     const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventTitle)}&dates=${startDate.toISOString().replace(/[-:]/g, '').split('.')[0]}Z/${endDate.toISOString().replace(/[-:]/g, '').split('.')[0]}Z&details=${encodeURIComponent(eventDescription)}&location=${encodeURIComponent(formData.pontoPartida)}`;
     
@@ -2865,7 +2897,19 @@ function createMultipleCalendarEvents(index) {
     // Evento principal de partida
     const mainEventTitle = `🏍️ ${roteiro.titulo} - SAÍDA`;
     const checklist = generateCalendarChecklist(roteiro);
-    const mainEventDescription = `🚀 INÍCIO DO ROLÊ\\n\\n📋 CHECKLIST COMPLETO:\\n${checklist}\\n\\n🎯 ROTEIRO:\\n${roteiro.destinos.map(d => `• ${d.nome}`).join('\\n')}\\n\\n💰 Custo Total: ${roteiro.custo_total_estimado}`;
+    // Criar descrição do evento principal de forma mais legível
+    const roteiroList = roteiro.destinos.map(d => `• ${d.nome}`).join('\\n');
+    const mainEventDescription = [
+        '🚀 INÍCIO DO ROLÊ',
+        '',
+        '📋 CHECKLIST COMPLETO:',
+        checklist,
+        '',
+        '🎯 ROTEIRO:',
+        roteiroList,
+        '',
+        `💰 Custo Total: ${roteiro.custo_total_estimado}`
+    ].join('\\n');
     
     const mainEventEnd = new Date(currentTime.getTime() + 30 * 60000); // 30 min depois
     
@@ -2977,7 +3021,7 @@ function generateRoleLink(index) {
     const baseUrl = window.location.origin + window.location.pathname;
     
     // Salva o roteiro no localStorage com ID único
-    const roteiroId = Date.now().toString(36) + Math.random().toString(36).substr(2);
+    const roteiroId = Date.now().toString(36) + Math.random().toString(36).substring(2);
     localStorage.setItem(`role_${roteiroId}`, JSON.stringify({
         roteiro: roteiro,
         formData: getLastFormData(),
@@ -3310,7 +3354,12 @@ function loadSharedRoteiro() {
                     showNotification('❌ Link do rolê expirado (7 dias)', 'error');
                 }
             } catch (error) {
+                console.error('Erro ao processar rolê compartilhado:', error);
                 showNotification('❌ Erro ao carregar rolê compartilhado', 'error');
+                // Retry logic ou fallback
+                if (error.name === 'SyntaxError') {
+                    console.warn('Dados corrompidos detectados');
+                }
             }
         } else {
             showNotification('❌ Rolê compartilhado não encontrado', 'error');
