@@ -785,6 +785,114 @@
                         </div>
                     </div>
                     
+                    <!-- Reunião Estratégica -->
+                    <div class="bg-gradient-to-r from-orange-600/10 to-red-600/10 rounded-2xl p-8 border border-orange-500 mb-8">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <h3 class="text-2xl font-bold text-orange-400 mb-2">Reunião Estratégica</h3>
+                                <p class="text-gray-300">Evento especial • 25/09/2025</p>
+                            </div>
+                            <div class="text-4xl">
+                                📋
+                            </div>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <p class="flex items-center text-gray-300 mb-2">
+                                    <i class="fas fa-calendar-day mr-3 text-orange-400"></i>
+                                    25 de Setembro de 2025
+                                </p>
+                                <p class="flex items-center text-gray-300 mb-2">
+                                    <i class="fas fa-clock mr-3 text-orange-400"></i>
+                                    20:30h
+                                </p>
+                            </div>
+                            <div>
+                                <p class="flex items-center text-gray-300 mb-2">
+                                    <i class="fas fa-map-marker-alt mr-3 text-orange-400"></i>
+                                    Galpão da Irmandade
+                                </p>
+                                <p class="flex items-center text-gray-300">
+                                    <i class="fas fa-road mr-3 text-orange-400"></i>
+                                    Rua José Flavio, 420 - Travessa 1A, Penha
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <h4 class="text-lg font-semibold text-orange-400 mb-4 flex items-center">
+                                <i class="fas fa-list-ul mr-2"></i>
+                                Pauta da Reunião:
+                            </h4>
+                            <div class="grid md:grid-cols-2 gap-3 text-sm">
+                                <div class="space-y-2">
+                                    <p class="flex items-start text-gray-300">
+                                        <i class="fas fa-chevron-right mr-2 mt-1 text-orange-400 text-xs"></i>
+                                        Organização e limpeza da sede antes de sair
+                                    </p>
+                                    <p class="flex items-start text-gray-300">
+                                        <i class="fas fa-chevron-right mr-2 mt-1 text-orange-400 text-xs"></i>
+                                        Boas práticas de uso do espaço (descarga,...)
+                                    </p>
+                                    <p class="flex items-start text-gray-300">
+                                        <i class="fas fa-chevron-right mr-2 mt-1 text-orange-400 text-xs"></i>
+                                        Comprometimento com as manutenções da sede
+                                    </p>
+                                    <p class="flex items-start text-gray-300">
+                                        <i class="fas fa-chevron-right mr-2 mt-1 text-orange-400 text-xs"></i>
+                                        Opinião sobre visitas recorrentes e inclusão de membros pagantes
+                                    </p>
+                                    <p class="flex items-start text-gray-300">
+                                        <i class="fas fa-chevron-right mr-2 mt-1 text-orange-400 text-xs"></i>
+                                        Cuidados com artigos de decoração da sede (senso de dono)
+                                    </p>
+                                    <p class="flex items-start text-gray-300">
+                                        <i class="fas fa-chevron-right mr-2 mt-1 text-orange-400 text-xs"></i>
+                                        Pagamento quinzenal do bar
+                                    </p>
+                                    <p class="flex items-start text-gray-300">
+                                        <i class="fas fa-chevron-right mr-2 mt-1 text-orange-400 text-xs"></i>
+                                        Estoque do bar (definir estratégia)
+                                    </p>
+                                </div>
+                                <div class="space-y-2">
+                                    <p class="flex items-start text-gray-300">
+                                        <i class="fas fa-chevron-right mr-2 mt-1 text-orange-400 text-xs"></i>
+                                        Pagamento em dia da sede
+                                    </p>
+                                    <p class="flex items-start text-gray-300">
+                                        <i class="fas fa-chevron-right mr-2 mt-1 text-orange-400 text-xs"></i>
+                                        Estatuto do SOP
+                                    </p>
+                                    <p class="flex items-start text-gray-300">
+                                        <i class="fas fa-chevron-right mr-2 mt-1 text-orange-400 text-xs"></i>
+                                        Limpeza quinzenal ou mensal
+                                    </p>
+                                    <p class="flex items-start text-gray-300">
+                                        <i class="fas fa-chevron-right mr-2 mt-1 text-orange-400 text-xs"></i>
+                                        Divisão do custo das fichas da mesa para uso frequente
+                                    </p>
+                                    <p class="flex items-start text-gray-300">
+                                        <i class="fas fa-chevron-right mr-2 mt-1 text-orange-400 text-xs"></i>
+                                        Organização das vagas de estacionamento
+                                    </p>
+                                    <p class="flex items-start text-gray-300">
+                                        <i class="fas fa-chevron-right mr-2 mt-1 text-orange-400 text-xs"></i>
+                                        Compra de artigos e investimentos na sede
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <button class="bg-orange-600 hover:bg-orange-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors" onclick="confirmarPresencaReuniao()">
+                                <i class="fas fa-check mr-2"></i>
+                                Confirmar Presença na Reunião
+                            </button>
+                        </div>
+                    </div>
+                    
                     <!-- Próximos Eventos -->
                     <div class="bg-sop-gray rounded-2xl p-8 border border-gray-700">
                         <h3 class="text-2xl font-bold text-gray-300 mb-6 text-center">
@@ -1004,6 +1112,16 @@
             
             if (confirm(mensagem)) {
                 const whatsappUrl = `https://api.whatsapp.com/send?phone=5511999999999&text=✅ PRESENÇA CONFIRMADA%0A%0A📅 Data: ${dataFormatada}%0A🕐 Horário: 19:30h%0A📍 Local: Galpão da Irmandade%0A%0A🏍️ Sons of Peaky - A estrada nos chama, mas o galpão nos une!`;
+                window.open(whatsappUrl, '_blank');
+            }
+        }
+        
+        // Confirmar presença na reunião estratégica
+        function confirmarPresencaReuniao() {
+            const mensagem = `Confirmar presença para a Reunião Estratégica em 25/09/2025 às 20:30h no Galpão da Irmandade?`;
+            
+            if (confirm(mensagem)) {
+                const whatsappUrl = `https://api.whatsapp.com/send?phone=5511999999999&text=✅ PRESENÇA CONFIRMADA - REUNIÃO ESTRATÉGICA%0A%0A📅 Data: 25 de Setembro de 2025%0A🕐 Horário: 20:30h%0A📍 Local: Galpão da Irmandade%0A%0A📋 Pauta:%0A• Organização e limpeza da sede%0A• Boas práticas de uso do espaço%0A• Comprometimento com manutenções%0A• Visitas e membros pagantes%0A• Cuidados com decoração%0A• Pagamento quinzenal do bar%0A• Estoque do bar%0A• Pagamento da sede%0A• Estatuto do SOP%0A• Limpeza quinzenal/mensal%0A• Divisão custos fichas da mesa%0A• Organização estacionamento%0A• Compra de artigos e investimentos%0A%0A🏍️ Sons of Peaky - Reunião importante para o futuro da irmandade!`;
                 window.open(whatsappUrl, '_blank');
             }
         }
