@@ -1,11 +1,87 @@
 /**
  * Gerador de Rolês de Moto - JavaScript Principal
  * Sistema completo de geração de roteiros personalizados
+ * Version: 2.0.3 - 100% IA Generativa + Cache Busting
  */
 
-// Configuração da API
-const GOOGLE_API_KEY = 'AIzaSyB6MdY8jd1pxAw-K0LN3F3xF8Z5q5dFmJE';
-const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GOOGLE_API_KEY}`;
+console.log('🔧 Gerador.js carregado - Version 2.0.3 - 100% IA Generativa');
+
+/**
+ * Função utilitária para acessar elementos DOM com segurança
+ */
+function safeGetElement(id, required = false) {
+    const element = document.getElementById(id);
+    if (!element && required) {
+        console.error(`❌ Elemento obrigatório "${id}" não encontrado`);
+        throw new Error(`Elemento DOM "${id}" não encontrado`);
+    } else if (!element) {
+        console.warn(`⚠️ Elemento "${id}" não encontrado`);
+    }
+    return element;
+}
+
+/**
+ * Função utilitária para acessar elementos DOM com segurança (querySelector)
+ */
+function safeQuerySelector(selector, required = false) {
+    const element = document.querySelector(selector);
+    if (!element && required) {
+        console.error(`❌ Elemento obrigatório "${selector}" não encontrado`);
+        throw new Error(`Elemento DOM "${selector}" não encontrado`);
+    } else if (!element) {
+        console.warn(`⚠️ Elemento "${selector}" não encontrado`);
+    }
+    return element;
+}
+
+// Configuração da API - usando função serverless para segurança
+function getAPIConfig() {
+    console.log('🔍 getAPIConfig chamado - hostname:', window.location.hostname);
+    // Força modo desenvolvimento se configurado
+    const forceDevelopment = window.FORCE_DEVELOPMENT_MODE === true;
+    
+    // Detecta plataforma de hospedagem
+    const isGitHubPages = window.location.hostname.includes('github.io');
+    const isNetlify = window.location.hostname.includes('netlify.app') || window.location.hostname.includes('netlify.com');
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    
+    // Determina se é desenvolvimento
+    const isDevelopment = forceDevelopment || isLocalhost;
+    
+    if (isDevelopment) {
+        // Para desenvolvimento local, usa API direta com chave de desenvolvimento
+        const devKey = window.DEV_API_KEY || 'AIzaSyCiHRVozYYmHB-5W64QdJzn9dQYAyRl9Tk';
+        console.log('🏠 Modo desenvolvimento detectado - usando API direta');
+        
+        return {
+            apiUrl: `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${devKey}`,
+            useServerless: false
+        };
+    } else if (isNetlify) {
+        // Em Netlify, usa função serverless
+        console.log('🌐 Netlify detectado - usando função serverless');
+        return {
+            apiUrl: '/.netlify/functions/generate-role',
+            useServerless: true
+        };
+    } else if (isGitHubPages) {
+        // Em GitHub Pages, usa API direta (chave pública é aceitável para este projeto)
+        const prodKey = 'AIzaSyCiHRVozYYmHB-5W64QdJzn9dQYAyRl9Tk';
+        console.log('📖 GitHub Pages detectado - usando API direta');
+        return {
+            apiUrl: `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${prodKey}`,
+            useServerless: false
+        };
+    } else {
+        // Outros ambientes - usa API direta
+        const prodKey = 'AIzaSyCiHRVozYYmHB-5W64QdJzn9dQYAyRl9Tk';
+        console.log('🌐 Produção detectada - usando API direta');
+        return {
+            apiUrl: `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${prodKey}`,
+            useServerless: false
+        };
+    }
+}
 
 // Cache para melhor performance
 const cache = new Map();
@@ -31,53 +107,86 @@ document.addEventListener('DOMContentLoaded', function() {
 function initializeApp() {
     console.log('🚀 Gerador de Rolês iniciado');
     
-    // Define data atual
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('data-role').value = today;
-    
-    // Carrega destinos se disponível
-    if (typeof destinos !== 'undefined') {
-        console.log(`📍 ${destinos.length} destinos carregados`);
+    try {
+        // Verifica se é um link colaborativo
+        checkCollaborativeLink();
+        
+        // Define data atual - com verificação de elemento
+        const dataRoleInput = safeGetElement('data-role');
+        if (dataRoleInput) {
+            const today = new Date().toISOString().split('T')[0];
+            dataRoleInput.value = today;
+        }
+        
+        // Carrega destinos se disponível
+        if (window.destinos && window.destinos.length > 0) {
+            console.log(`📍 ${window.destinos.length} destinos carregados`);
+        } else if (window.DESTINOS_DATABASE) {
+            const totalDestinos = Object.values(window.DESTINOS_DATABASE).flat().length;
+            console.log(`📍 ${totalDestinos} destinos carregados via DESTINOS_DATABASE`);
+        } else {
+            console.warn('⚠️ Destinos não carregados - fallback será limitado');
+        }
+        
+        // Carrega roteiro compartilhado se houver
+        loadSharedRoteiro();
+        
+        // Inicializa PWA
+        initializePWA();
+        
+        // Analytics
+        trackPageView();
+        
+    } catch (error) {
+        console.error('❌ Erro na inicialização:', error);
+        // Continua a execução mesmo com erros
     }
-    
-    // Inicializa PWA
-    initializePWA();
-    
-    // Analytics
-    trackPageView();
 }
 
 /**
  * Configuração dos event listeners
  */
 function setupEventListeners() {
-    const form = document.getElementById('gerador-form');
-    if (form) {
-        form.addEventListener('submit', handleFormSubmit);
+    try {
+        const form = safeGetElement('gerador-form');
+        if (form) {
+            form.addEventListener('submit', handleFormSubmit);
+            
+            // Auto-save no formulário
+            const inputs = form.querySelectorAll('input, select, textarea');
+            inputs.forEach(input => {
+                input.addEventListener('change', saveFormData);
+                input.addEventListener('input', debounce(saveFormData, 1000));
+            });
+        }
+        
+        // Smooth scroll para resultados
+        window.addEventListener('scroll', handleScroll);
+        
+    } catch (error) {
+        console.error('❌ Erro ao configurar event listeners:', error);
     }
-    
-    // Auto-save no formulário
-    const inputs = form.querySelectorAll('input, select, textarea');
-    inputs.forEach(input => {
-        input.addEventListener('change', saveFormData);
-        input.addEventListener('input', debounce(saveFormData, 1000));
-    });
-    
-    // Smooth scroll para resultados
-    window.addEventListener('scroll', handleScroll);
 }
 
 /**
  * Configuração de validação do formulário
  */
 function setupFormValidation() {
-    const form = document.getElementById('gerador-form');
-    const inputs = form.querySelectorAll('input[required], select[required], textarea[required]');
-    
-    inputs.forEach(input => {
-        input.addEventListener('blur', validateField);
-        input.addEventListener('input', clearFieldError);
-    });
+    try {
+        const form = safeGetElement('gerador-form');
+        if (form) {
+            const inputs = form.querySelectorAll('input[required], select[required], textarea[required]');
+            
+            inputs.forEach(input => {
+                input.addEventListener('blur', validateField);
+                input.addEventListener('input', clearFieldError);
+            });
+            
+            console.log(`✅ Validação configurada para ${inputs.length} campos`);
+        }
+    } catch (error) {
+        console.error('❌ Erro ao configurar validação:', error);
+    }
 }
 
 /**
@@ -96,8 +205,11 @@ async function handleFormSubmit(event) {
         return;
     }
     
-    const formData = getFormData();
+    const formData = getFormData(true); // true = validação rigorosa para submissão
     console.log('📝 Dados do formulário:', formData);
+    
+    // Salva dados do formulário para compartilhamento
+    lastFormData = formData;
     
     try {
         isGenerating = true;
@@ -145,13 +257,33 @@ async function generateRole(formData) {
     const prompt = buildPrompt(formData);
     console.log('🧠 Prompt gerado:', prompt.substring(0, 200) + '...');
     
+    // Obter configuração da API (sem fallback)
+    const apiConfig = getAPIConfig();
+    console.log('🔧 Usando API:', apiConfig.apiUrl.substring(0, 100) + '...');
+    console.log('🔧 Configuração:', JSON.stringify(apiConfig, null, 2));
+    
     try {
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
+        let requestBody, response;
+        
+        if (apiConfig.useServerless) {
+            // Usando função serverless (produção)
+            requestBody = {
+                prompt: prompt
+            };
+            
+            console.log('📤 Using serverless function');
+            console.log('📡 URL:', apiConfig.apiUrl);
+            
+            response = await fetch(apiConfig.apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody)
+            });
+        } else {
+            // Usando API direta (desenvolvimento local)
+            requestBody = {
                 contents: [{
                     parts: [{
                         text: prompt
@@ -163,23 +295,107 @@ async function generateRole(formData) {
                     topP: 0.95,
                     maxOutputTokens: 2048,
                 }
-            })
-        });
-        
-        if (!response.ok) {
-            throw new Error(`Erro na API: ${response.status} - ${response.statusText}`);
+            };
+            
+            console.log('📤 Using direct API (development)');
+            console.log('📡 URL:', apiConfig.apiUrl);
+            
+            response = await fetch(apiConfig.apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody)
+            });
         }
         
-        const data = await response.json();
+        console.log('📨 Response received:', response.status, response.statusText);
+        console.log('📨 Response headers:', [...response.headers.entries()]);
         
-        if (!data.candidates || !data.candidates[0]?.content?.parts?.[0]?.text) {
-            throw new Error('Resposta inválida da IA');
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('❌ Erro HTTP:', errorText);
+            throw new Error(`Erro na API: ${response.status} - ${response.statusText}: ${errorText}`);
+        }
+        
+        const responseText = await response.text();
+        console.log('📄 Response text completo:', responseText);
+        
+        let data;
+        try {
+            data = JSON.parse(responseText);
+            console.log('📡 Resposta parseada da API:', JSON.stringify(data, null, 2));
+        } catch (parseError) {
+            console.error('❌ Erro ao parsear JSON:', parseError);
+            console.error('📄 Texto que não pôde ser parseado:', responseText);
+            throw new Error(`Erro ao parsear resposta da API: ${parseError.message}`);
+        }
+        
+        if (!data.candidates || !data.candidates[0]) {
+            console.error('❌ Estrutura de resposta inválida:', data);
+            throw new Error('Resposta inválida da IA: candidates não encontrado');
+        }
+        
+        if (!data.candidates[0].content || !data.candidates[0].content.parts || !data.candidates[0].content.parts[0]) {
+            console.error('❌ Estrutura de content inválida:', data.candidates[0]);
+            throw new Error('Resposta inválida da IA: content.parts não encontrado');
+        }
+        
+        if (!data.candidates[0].content.parts[0].text) {
+            console.error('❌ Texto não encontrado:', data.candidates[0].content.parts[0]);
+            throw new Error('Resposta inválida da IA: texto não encontrado');
         }
         
         const aiResponse = data.candidates[0].content.parts[0].text;
         console.log('🤖 Resposta da IA:', aiResponse.substring(0, 300) + '...');
         
-        const results = parseAIResponse(aiResponse, formData);
+        // Verificar se resposta foi truncada por MAX_TOKENS
+        const finishReason = data.candidates[0].finishReason;
+        let finalResponse = aiResponse;
+        
+        if (finishReason === 'MAX_TOKENS') {
+            console.warn('⚠️ Resposta truncada por MAX_TOKENS - tentando com prompt reduzido');
+            
+            try {
+                // Retry com prompt ultra-simplificado
+                const simplePrompt = `Crie 3 roteiros de moto brasileiros em JSON:
+{"sugestoes": [
+  {"tipo": "ECONÔMICA", "titulo": "Roteiro Econômico", "resumo": "Baixo custo", "distancia_total": "100km", "tempo_total": "4h", "custo_total_estimado": "R$150", "destinos": [{"nome": "Local1", "endereco": "End1", "descricao": "Desc1"}]},
+  {"tipo": "EQUILIBRADA", "titulo": "Roteiro Equilibrado", "resumo": "Balanceado", "distancia_total": "150km", "tempo_total": "6h", "custo_total_estimado": "R$300", "destinos": [{"nome": "Local2", "endereco": "End2", "descricao": "Desc2"}]},
+  {"tipo": "PREMIUM", "titulo": "Roteiro Premium", "resumo": "Completo", "distancia_total": "200km", "tempo_total": "8h", "custo_total_estimado": "R$500", "destinos": [{"nome": "Local3", "endereco": "End3", "descricao": "Desc3"}]}
+]}`;
+                
+                const retryRequestBody = {
+                    contents: [{
+                        parts: [{
+                            text: simplePrompt
+                        }]
+                    }]
+                };
+                
+                const retryResponse = await fetch(apiConfig.apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(retryRequestBody)
+                });
+                
+                if (retryResponse.ok) {
+                    const retryData = await retryResponse.json();
+                    const retryText = retryData.candidates?.[0]?.content?.parts?.[0]?.text;
+                    
+                    if (retryText && retryData.candidates?.[0]?.finishReason !== 'MAX_TOKENS') {
+                        console.log('✅ Retry bem-sucedido - resposta completa obtida');
+                        finalResponse = retryText;
+                    }
+                }
+            } catch (retryError) {
+                console.warn('⚠️ Retry falhou, usando resposta original truncada:', retryError);
+            }
+        }
+        
+        const results = parseAIResponse(finalResponse, formData);
         
         // Salva no cache
         cache.set(cacheKey, {
@@ -192,13 +408,58 @@ async function generateRole(formData) {
     } catch (error) {
         console.error('❌ Erro na chamada da API:', error);
         
-        // Fallback para destinos locais se a API falhar
-        if (typeof destinos !== 'undefined') {
-            console.log('🔄 Usando destinos locais como fallback');
-            return generateFallbackResults(formData);
+        // Tratamento específico para diferentes tipos de erro
+        if (error.message.includes('405') || error.message.includes('Method Not Allowed')) {
+            console.warn('⚠️ Erro 405: Tentativa de usar serverless no GitHub Pages');
+            // Força uso da API direta como fallback
+            try {
+                console.log('🔄 Tentando novamente com API direta...');
+                const directApiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyCiHRVozYYmHB-5W64QdJzn9dQYAyRl9Tk';
+                
+                const directRequestBody = {
+                    contents: [{
+                        parts: [{
+                            text: prompt
+                        }]
+                    }],
+                    generationConfig: {
+                        temperature: 0.8,
+                        topK: 40,
+                        topP: 0.95,
+                        maxOutputTokens: 2048,
+                    }
+                };
+                
+                const directResponse = await fetch(directApiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(directRequestBody)
+                });
+                
+                if (directResponse.ok) {
+                    const directData = await directResponse.json();
+                    if (directData.candidates?.[0]?.content?.parts?.[0]?.text) {
+                        const aiResponse = directData.candidates[0].content.parts[0].text;
+                        const results = parseAIResponse(aiResponse, formData);
+                        
+                        // Salva no cache
+                        cache.set(cacheKey, {
+                            data: results,
+                            timestamp: Date.now()
+                        });
+                        
+                        return results;
+                    }
+                }
+            } catch (fallbackError) {
+                console.error('❌ Fallback API também falhou:', fallbackError);
+            }
         }
         
-        throw error;
+        // Se a API falhar, mostra erro específico
+        throw new Error('Não foi possível gerar o rolê via IA. Verifique sua conexão com a internet e tente novamente.');
     }
 }
 
@@ -212,7 +473,10 @@ function buildPrompt(formData) {
         horarioSaida, 
         horarioVolta,
         orcamento, 
-        tipoMoto, 
+        quilometragemDesejada,
+        capacidadeTanque,
+        consumoMedio,
+        autonomia,
         perfilPilotagem,
         experienciaDesejada,
         nivelAventura,
@@ -220,85 +484,79 @@ function buildPrompt(formData) {
         preferencias
     } = formData;
     
-    const consumoMoto = getConsumoMoto(tipoMoto);
+    const consumoMoto = formData.consumoMedio || 22; // Usar consumo real informado pelo usuário
     const velocidadeMedia = getVelocidadeMedia(perfilPilotagem);
     
+    // Monta informações de quilometragem
+    const quilometragemInfo = quilometragemDesejada ? getQuilometragemRange(quilometragemDesejada) : 'Não especificada';
+    
+    // Monta informações de orçamento
+    const orcamentoInfo = orcamento ? `R$ ${orcamento}` : 'Não especificado (sem limite definido)';
+    
+    const tempoDisponivel = calcularTempoDisponivel(formData);
+    const maxDestinos = tempoDisponivel <= 4 ? 1 : tempoDisponivel <= 6 ? 2 : 3;
+    
     return `
-Você é um especialista em turismo rodoviário e motociclismo no Brasil. Crie um roteiro detalhado para um rolê de moto baseado nestas informações:
+Especialista em turismo rodoviário brasileiro. Crie 3 roteiros de moto baseado em:
 
-DADOS DO ROLÊ:
-- Ponto de partida: ${enderecoPartida}
-- Data: ${dataRole}
-- Horário de saída: ${horarioSaida}
-- Horário de volta: ${horarioVolta}
-- Orçamento total: R$ ${orcamento}
-- Tipo de moto: ${tipoMoto} (consumo: ${consumoMoto}km/l)
-- Perfil de pilotagem: ${perfilPilotagem} (velocidade média: ${velocidadeMedia}km/h)
-- Nível de aventura: ${nivelAventura}
-- Companhia: ${companhia}
-- Preferências: ${preferencias.join(', ') || 'Nenhuma específica'}
+🎯 EXPERIÊNCIA DESEJADA (PRIORIDADE MÁXIMA):
+"${experienciaDesejada}"
+→ OBRIGATÓRIO: Inclua destinos que atendam EXATAMENTE esta experiência
 
-EXPERIÊNCIA DESEJADA:
-${experienciaDesejada}
+DADOS TÉCNICOS:
+- Saída: ${enderecoPartida}  
+- Janela: ${horarioSaida} às ${horarioVolta} (${tempoDisponivel}h disponíveis)
+- Orçamento: ${orcamentoInfo}
+- Interesses: ${preferencias.join(', ') || 'Variados'}
 
-INSTRUÇÕES PARA O ROTEIRO:
-1. Sugira 2-3 destinos/paradas principais que atendam à experiência desejada
-2. Para cada destino, forneça:
-   - Nome completo e endereço exato
-   - Distância e tempo de viagem desde o ponto anterior
-   - Descrição detalhada do que fazer/ver
-   - Custo estimado por pessoa
-   - Dicas específicas para motociclistas
-   - Horário sugerido de chegada e permanência
+REGRAS CRÍTICAS:
+1. EXPERIÊNCIA EM PRIMEIRO LUGAR: Se pediu "café da manhã", inclua local específico para café
+2. TEMPO REALISTA: Máximo ${maxDestinos} ${maxDestinos === 1 ? 'destino' : 'destinos'} para ${tempoDisponivel}h disponíveis
+3. DESTINOS ESPECÍFICOS: Nomes reais + endereços completos
+4. DICAS REAIS: Específicas do local sugerido
 
-3. Calcule custos realistas:
-   - Combustível (preço atual ~R$ 5,50/litro)
-   - Alimentação (café da manhã, almoço, lanche)
-   - Eventuais taxas de entrada
-   - Estacionamento para moto
+CRIAR 3 ROTEIROS (${maxDestinos} ${maxDestinos === 1 ? 'destino' : 'destinos'} cada):
+1. ECONÔMICA: Atende experiência com menor custo
+2. EQUILIBRADA: Atende experiência com custo-benefício
+3. PREMIUM: Atende experiência sem limite de custo
 
-4. Considere a logística:
-   - Condições das estradas
-   - Locais para parar e descansar
-   - Postos de combustível no trajeto
-   - Segurança para motos
-
-5. Formate a resposta em JSON válido com esta estrutura:
+FORMATO JSON:
 {
-  "roteiro": {
-    "titulo": "Nome do Roteiro",
-    "resumo": "Descrição geral",
-    "distancia_total": "XXX km",
-    "tempo_total": "X horas",
-    "custo_total_estimado": "R$ XXX",
-    "nivel_dificuldade": "Fácil/Moderado/Difícil",
-    "destinos": [
-      {
-        "nome": "Nome do Local",
-        "endereco": "Endereço completo",
-        "distancia_anterior": "XX km",
-        "tempo_viagem": "XX min",
-        "horario_chegada": "HH:MM",
-        "tempo_permanencia": "XX min",
-        "descricao": "O que fazer/ver",
-        "custo_estimado": "R$ XX",
-        "dicas_motociclista": ["dica1", "dica2"],
-        "coordenadas": "lat,lng (se souber)"
+  "sugestoes": [
+    {
+      "tipo": "ECONÔMICA",
+      "titulo": "Nome Específico do Roteiro",
+      "resumo": "Descrição dos destinos reais",
+      "distancia_total": "XXX km",
+      "tempo_total": "X horas",
+      "custo_total_estimado": "R$ XXX",
+      "destinos": [
+        {
+          "nome": "Nome ESPECÍFICO do Local Real",
+          "endereco": "Endereço COMPLETO (rua, número, cidade, estado)",
+          "distancia_anterior": "XX km (do ponto anterior)",
+          "tempo_permanencia": "Xh",
+          "horario_chegada": "HH:MM",
+          "descricao": "O que fazer especificamente neste local",
+          "custo_estimado": "R$ XX (valor real de entrada/consumo)",
+          "dicas_motociclista": [
+            "Dica ESPECÍFICA sobre a estrada/acesso",
+            "Dica ESPECÍFICA sobre estacionamento",
+            "Dica ESPECÍFICA sobre o local"
+          ]
+        }
+      ],
+      "custos_detalhados": {
+        "combustivel": "R$ XX",
+        "alimentacao": "R$ XX",
+        "entradas": "R$ XX",
+        "outros": "R$ XX"
       }
-    ],
-    "custos_detalhados": {
-      "combustivel": "R$ XX",
-      "alimentacao": "R$ XX",
-      "entradas": "R$ XX",
-      "outros": "R$ XX",
-      "total": "R$ XXX"
-    },
-    "observacoes": ["observação1", "observação2"]
-  }
+    }
+  ]
 }
 
-IMPORTANTE: Retorne APENAS o JSON válido, sem texto adicional antes ou depois. Use destinos reais e existentes no Brasil.
-`;
+IMPORTANTE: Responda APENAS com JSON válido. Use locais reais do Brasil.`;
 }
 
 /**
@@ -315,11 +573,70 @@ function parseAIResponse(response, formData) {
         const jsonStr = jsonMatch[0];
         const data = JSON.parse(jsonStr);
         
-        if (!data.roteiro) {
-            throw new Error('Formato de resposta inválido');
+        if (!data.sugestoes || !Array.isArray(data.sugestoes) || data.sugestoes.length !== 3) {
+            throw new Error('Formato de resposta inválido - esperado 3 sugestões');
         }
         
-        return [data.roteiro];
+        // Validação e limpeza de dados para evitar null/undefined
+        const cleanedSugestoes = data.sugestoes.map((sugestao, index) => {
+            const tipos = ['ECONÔMICA', 'EQUILIBRADA', 'PREMIUM'];
+            return {
+                tipo: sugestao.tipo || tipos[index] || 'EQUILIBRADA',
+                titulo: sugestao.titulo || `Roteiro ${tipos[index] || 'Personalizado'}`,
+                resumo: sugestao.resumo || 'Roteiro gerado pela IA',
+                distancia_total: sugestao.distancia_total || '-- km',
+                tempo_total: sugestao.tempo_total || '-- horas',
+                custo_total_estimado: sugestao.custo_total_estimado || calculateFallbackCost(formData, tipos[index]),
+                nivel_dificuldade: sugestao.nivel_dificuldade || 'Moderado',
+                destinos: Array.isArray(sugestao.destinos) && sugestao.destinos.length > 0 ? 
+                    sugestao.destinos.map((d, destIndex) => ({
+                        nome: d?.nome || 'Destino',
+                        endereco: d?.endereco || 'Endereço não especificado',
+                        distancia_anterior: d?.distancia_anterior || d?.distancia || `${20 + (destIndex * 15)} km`,
+                        tempo_permanencia: d?.tempo_permanencia || d?.tempo_parada || '30 min',
+                        horario_chegada: d?.horario_chegada || `${8 + destIndex}:${(destIndex * 30) % 60}0`,
+                        descricao: d?.descricao || 'Local interessante',
+                        custo_estimado: d?.custo_estimado || 'R$ --',
+                        dicas_motociclista: d?.dicas_motociclista || [
+                            'Verificar condições da estrada',
+                            'Estacionar em local seguro',
+                            'Levar equipamentos de proteção'
+                        ]
+                    })) : generateFallbackDestinos(formData, tipos[index]),
+                custos_detalhados: sugestao.custos_detalhados || (() => {
+                    const combustivel = calculateCostByType(formData, tipos[index], 'combustivel');
+                    const alimentacao = calculateCostByType(formData, tipos[index], 'alimentacao');
+                    const entradas = calculateCostByType(formData, tipos[index], 'entradas');
+                    const outros = calculateCostByType(formData, tipos[index], 'outros');
+                    
+                    // Calcular total somando todos os custos
+                    const totalValue = 
+                        parseInt(combustivel.replace('R$ ', '')) +
+                        parseInt(alimentacao.replace('R$ ', '')) +
+                        parseInt(entradas.replace('R$ ', '')) +
+                        parseInt(outros.replace('R$ ', ''));
+                    
+                    return {
+                        combustivel,
+                        alimentacao,
+                        entradas,
+                        outros,
+                        total: `R$ ${totalValue}`
+                    };
+                })(),
+                observacoes: Array.isArray(sugestao.observacoes) ? sugestao.observacoes : 
+                    generateObservacoesPercurso(formData, tipos[index], sugestao.destinos),
+                dicas_importantes: Array.isArray(sugestao.dicas_importantes) ? sugestao.dicas_importantes : [
+                    'Verificar combustível',
+                    'Levar equipamentos de segurança',
+                    'Conferir previsão do tempo'
+                ],
+                horario_sugerido_saida: sugestao.horario_sugerido_saida || formData.horarioSaida || '08:00',
+                horario_estimado_volta: sugestao.horario_estimado_volta || formData.horarioVolta || '18:00'
+            };
+        });
+        
+        return cleanedSugestoes;
         
     } catch (error) {
         console.error('❌ Erro ao processar resposta da IA:', error);
@@ -331,61 +648,624 @@ function parseAIResponse(response, formData) {
 }
 
 /**
- * Parsing manual da resposta como fallback
+ * Calcula custos realistas por categoria baseado no tipo de roteiro
  */
-function parseResponseManually(response, formData) {
-    // Implementação simplificada para casos de erro
-    return [{
-        titulo: "Roteiro Personalizado",
-        resumo: "Roteiro criado baseado em suas preferências",
-        distancia_total: "150 km",
-        tempo_total: "8 horas",
-        custo_total_estimado: `R$ ${formData.orcamento}`,
-        nivel_dificuldade: formData.nivelAventura === 'tranquilo' ? 'Fácil' : 
-                          formData.nivelAventura === 'moderado' ? 'Moderado' : 'Difícil',
-        destinos: [
-            {
-                nome: "Destino Sugerido",
-                endereco: "Consulte GPS para melhor rota",
-                distancia_anterior: "75 km",
-                tempo_viagem: "90 min",
-                horario_chegada: "10:30",
-                tempo_permanencia: "180 min",
-                descricao: formData.experienciaDesejada || "Experiência única aguarda você",
-                custo_estimado: `R$ ${Math.floor(formData.orcamento * 0.7)}`,
-                dicas_motociclista: [
-                    "Verifique as condições da estrada",
-                    "Leve equipamentos de segurança",
-                    "Confirme horários de funcionamento"
-                ]
-            }
-        ],
-        custos_detalhados: {
-            combustivel: `R$ ${Math.floor(formData.orcamento * 0.3)}`,
-            alimentacao: `R$ ${Math.floor(formData.orcamento * 0.4)}`,
-            entradas: `R$ ${Math.floor(formData.orcamento * 0.2)}`,
-            outros: `R$ ${Math.floor(formData.orcamento * 0.1)}`,
-            total: `R$ ${formData.orcamento}`
+function calculateCostByType(formData, tipo, categoria) {
+    const tempoDisponivel = calcularTempoDisponivel(formData);
+    const distanciaEstimada = tipo === 'ECONÔMICA' ? 120 : tipo === 'EQUILIBRADA' ? 200 : 300;
+    
+    // Custos base realistas para 2024
+    const custosBase = {
+        'combustivel': {
+            'ECONÔMICA': Math.round(distanciaEstimada / 25 * 5.50), // 25km/l, R$5,50/l
+            'EQUILIBRADA': Math.round(distanciaEstimada / 22 * 5.50), // Motos maiores
+            'PREMIUM': Math.round(distanciaEstimada / 18 * 5.50) // Motos premium
         },
-        observacoes: [
-            "Roteiro gerado automaticamente",
-            "Confirme informações antes da viagem",
-            "Respeite limites de velocidade"
-        ]
-    }];
+        'alimentacao': {
+            'ECONÔMICA': tempoDisponivel >= 8 ? 60 : 35, // Lanchonete/padaria
+            'EQUILIBRADA': tempoDisponivel >= 8 ? 120 : 80, // Restaurante simples
+            'PREMIUM': tempoDisponivel >= 8 ? 250 : 150 // Restaurante premium
+        },
+        'entradas': {
+            'ECONÔMICA': 0, // Apenas locais gratuitos
+            'EQUILIBRADA': 25, // Algumas atrações pagas
+            'PREMIUM': 80 // Experiências premium
+        },
+        'outros': {
+            'ECONÔMICA': 20, // Estacionamento, pedágio
+            'EQUILIBRADA': 45, // + lembrancinha
+            'PREMIUM': 100 // Gorjetas, serviços extras
+        }
+    };
+    
+    const custo = custosBase[categoria]?.[tipo] || 30;
+    return `R$ ${custo}`;
 }
 
 /**
- * Gera resultados de fallback usando destinos locais
+ * Calcula custos de forma inteligente baseado no tipo de roteiro
+ */
+function calculateSmartCosts(formData, tipoRoteiro, index) {
+    const tempoDisponivel = calcularTempoDisponivel(formData);
+    const distanciaEstimada = index === 0 ? 120 : index === 1 ? 200 : 300;
+    
+    // Combustível - sempre presente, calculado pelos dados reais da moto
+    const consumoReal = formData.consumoMedio || 22; // km/l do usuário ou padrão
+    const precoCombustivel = 6.60; // R$ por litro (valor atual)
+    const litrosNecessarios = distanciaEstimada / consumoReal;
+    const combustivelCusto = Math.round(litrosNecessarios * precoCombustivel);
+    
+    // Alimentação - sempre presente, varia por tempo e tipo
+    const alimentacaoMultipliers = [0.7, 1.0, 1.8]; // Econômico, Equilibrado, Premium
+    const alimentacaoBase = tempoDisponivel >= 8 ? 80 : 40; // Almoço completo vs lanche
+    const alimentacaoCusto = Math.round(alimentacaoBase * alimentacaoMultipliers[index]);
+    
+    // Entradas - apenas se experiência inclui turismo/aventura
+    const experiencia = formData.experienciaDesejada || '';
+    const temTurismo = experiencia.includes('turismo') || experiencia.includes('paisagem') || experiencia.includes('aventura');
+    const entradasCusto = temTurismo ? [0, 25, 80][index] : 0;
+    
+    // Outros - baseado na distância e experiência
+    let outrosCusto = 0;
+    const isLongDistance = distanciaEstimada > 150;
+    if (isLongDistance) outrosCusto += 15; // Pedágio
+    if (index === 2) outrosCusto += 30; // Serviços premium
+    if (experiencia.includes('aventura')) outrosCusto += 20; // Equipamentos
+    
+    // Total
+    const total = combustivelCusto + alimentacaoCusto + entradasCusto + outrosCusto;
+    
+    return {
+        combustivel: `R$ ${combustivelCusto}`,
+        alimentacao: `R$ ${alimentacaoCusto}`,
+        entradas: entradasCusto > 0 ? `R$ ${entradasCusto}` : null,
+        outros: outrosCusto > 0 ? `R$ ${outrosCusto}` : null,
+        total: total
+    };
+}
+
+/**
+ * Gera cronograma horário inteligente para o roteiro
+ */
+function generateSmartTimeline(formData, destinos) {
+    const horarioSaida = formData.horarioSaida || '08:00';
+    const horarioVolta = formData.horarioVolta || '17:00';
+    
+    // Converter horários para minutos
+    const [saidaHoras, saidaMinutos] = horarioSaida.split(':').map(n => parseInt(n));
+    const [voltaHoras, voltaMinutos] = horarioVolta.split(':').map(n => parseInt(n));
+    
+    const saidaTotal = saidaHoras * 60 + saidaMinutos;
+    const voltaTotal = voltaHoras * 60 + voltaMinutos;
+    const tempoDisponivel = voltaTotal - saidaTotal; // em minutos
+    
+    if (!destinos || destinos.length === 0) return [];
+    
+    // Calcular tempo por destino (incluindo tempo de viagem e permanência)
+    const tempoViagem = Math.floor(tempoDisponivel * 0.4); // 40% do tempo viajando
+    const tempoPermanencia = tempoDisponivel - tempoViagem; // 60% permanecendo
+    const tempoPorDestino = Math.floor(tempoPermanencia / destinos.length);
+    
+    let cronograma = [];
+    let horarioAtual = saidaTotal;
+    
+    // Ponto de partida
+    cronograma.push({
+        horario: formatMinutesToTime(horarioAtual),
+        evento: `🏠 Saída do ponto de partida`,
+        endereco: formData.enderecoPartida || 'Ponto de partida',
+        tipo: 'saida'
+    });
+    
+    // Calcular paradas de combustível necessárias
+    const distanciaTotal = destinos.length > 0 ? `${120 + (destinos.length * 40)} km` : '120 km';
+    const paradasCombustivel = calculateFuelStops(formData, distanciaTotal);
+    
+    // Para cada destino
+    destinos.forEach((destino, index) => {
+        // Verificar se precisa de parada para combustível antes deste destino
+        const paradaCombustivel = paradasCombustivel.find(p => p.distancia_km === Math.round((120 + (index * 40))));
+        
+        if (paradaCombustivel) {
+            const tempoParadaCombustivel = 15; // 15 minutos para abastecer
+            horarioAtual += tempoParadaCombustivel;
+            
+            cronograma.push({
+                horario: formatMinutesToTime(horarioAtual),
+                evento: paradaCombustivel.nome,
+                endereco: paradaCombustivel.endereco,
+                descricao: `${paradaCombustivel.observacao} - ${paradaCombustivel.custo_abastecimento}`,
+                tempo_permanencia: '15min',
+                tipo: 'combustivel'
+            });
+        }
+        
+        // Tempo de viagem até o destino
+        const tempoViagem = Math.floor(30 + (index * 15)); // 30-60 min entre destinos
+        horarioAtual += tempoViagem;
+        
+        cronograma.push({
+            horario: formatMinutesToTime(horarioAtual),
+            evento: `🏍️ Chegada - ${destino.nome}`,
+            endereco: destino.endereco_completo || destino.nome,
+            descricao: destino.descricao,
+            tempo_permanencia: `${Math.floor(tempoPorDestino / 60)}h ${tempoPorDestino % 60}min`,
+            tipo: 'chegada'
+        });
+        
+        // Tempo de permanência no destino
+        horarioAtual += tempoPorDestino;
+        
+        if (index < destinos.length - 1) {
+            cronograma.push({
+                horario: formatMinutesToTime(horarioAtual),
+                evento: `🚀 Saída - ${destino.nome}`,
+                endereco: `Próximo destino: ${destinos[index + 1].nome}`,
+                tipo: 'saida_destino'
+            });
+        }
+    });
+    
+    // Viagem de volta
+    const tempoVoltaCasa = Math.floor(60 + Math.random() * 30); // 60-90 min
+    horarioAtual += tempoVoltaCasa;
+    
+    cronograma.push({
+        horario: formatMinutesToTime(Math.min(horarioAtual, voltaTotal)),
+        evento: `🏠 Chegada em casa`,
+        endereco: 'De volta ao lar, doce lar',
+        tipo: 'chegada_final'
+    });
+    
+    return cronograma;
+}
+
+/**
+ * Converte minutos para formato HH:MM
+ */
+function formatMinutesToTime(minutes) {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+}
+
+/**
+ * Calcula se são necessárias paradas para combustível e onde
+ */
+function calculateFuelStops(formData, distanciaTotal) {
+    if (!formData.autonomia || !distanciaTotal) return [];
+    
+    const autonomiaReal = formData.autonomia * 0.8; // Margem de segurança de 20%
+    const distanciaNum = parseFloat(distanciaTotal.replace(' km', ''));
+    
+    if (distanciaNum <= autonomiaReal) {
+        return []; // Não precisa parar para abastecer
+    }
+    
+    // Calcular quantas paradas são necessárias
+    const paradasNecessarias = Math.ceil(distanciaNum / autonomiaReal) - 1;
+    const distanciaEntreParadas = distanciaNum / (paradasNecessarias + 1);
+    
+    const postos = [
+        { nome: "Posto Ipiranga", endereco: "Rodovia Presidente Dutra, km 15", preco: 6.60 },
+        { nome: "Shell Select", endereco: "Via Anhanguera, km 25", preco: 6.65 },
+        { nome: "BR Mania", endereco: "Rodovia Fernão Dias, km 18", preco: 6.55 },
+        { nome: "Petrobras", endereco: "Rodovia Castelo Branco, km 22", preco: 6.58 }
+    ];
+    
+    const paradasCombustivel = [];
+    for (let i = 0; i < paradasNecessarias; i++) {
+        const posto = postos[i % postos.length];
+        const distanciaParada = Math.round(distanciaEntreParadas * (i + 1));
+        const litrosNecessarios = Math.round(formData.capacidadeTanque * 0.8); // Encher 80% do tanque
+        const custoAbastecimento = Math.round(litrosNecessarios * posto.preco);
+        
+        paradasCombustivel.push({
+            nome: `⛽ ${posto.nome}`,
+            endereco: posto.endereco,
+            distancia_km: distanciaParada,
+            tipo: 'combustivel',
+            litros_necessarios: litrosNecessarios,
+            custo_abastecimento: `R$ ${custoAbastecimento}`,
+            preco_litro: `R$ ${posto.preco.toFixed(2)}`,
+            observacao: `Parada obrigatória - Autonomia restante: ${Math.round(autonomiaReal - distanciaParada)} km`
+        });
+    }
+    
+    return paradasCombustivel;
+}
+
+/**
+ * Calcula custo estimado quando IA não fornece
+ */
+function calculateFallbackCost(formData, tipo) {
+    const baseOrcamento = formData.orcamento || 200;
+    const multipliers = {
+        'ECONÔMICA': 0.7,
+        'EQUILIBRADA': 1.0,
+        'PREMIUM': 1.4
+    };
+    const custo = Math.round(baseOrcamento * (multipliers[tipo] || 1.0));
+    return `R$ ${custo}`;
+}
+
+/**
+ * Retorna características distintivas por tipo de roteiro
+ */
+function getTypeCharacteristics(tipo) {
+    const characteristics = {
+        'ECONÔMICA': {
+            icon: '💰',
+            features: ['Menor custo', 'Postos baratos', 'Lanchonetes locais', 'Roteiro otimizado'],
+            color: 'text-green-400'
+        },
+        'EQUILIBRADA': {
+            icon: '⚖️',
+            features: ['Custo-benefício', 'Mix de experiências', 'Paradas estratégicas', 'Tempo ideal'],
+            color: 'text-blue-400'
+        },
+        'PREMIUM': {
+            icon: '👑',
+            features: ['Experiência completa', 'Restaurantes premium', 'Hospedagem', 'Máximo conforto'],
+            color: 'text-purple-400'
+        }
+    };
+    
+    const char = characteristics[tipo] || characteristics['EQUILIBRADA'];
+    
+    return `
+        <div class="bg-black bg-opacity-30 p-3 rounded-lg">
+            <div class="text-white font-semibold mb-2">${char.icon} Diferenciais:</div>
+            <div class="grid grid-cols-2 gap-1 text-xs">
+                ${char.features.map(feature => `
+                    <div class="flex items-center">
+                        <span class="w-2 h-2 bg-gold-primary rounded-full mr-2"></span>
+                        <span class="${char.color}">${feature}</span>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * Banco de destinos reais com endereços específicos e características
+ */
+const DESTINOS_REAIS = {
+    'ECONÔMICA': [
+        {
+            nome: 'Padaria Central de Atibaia',
+            endereco: 'Rua 13 de Maio, 45 - Centro, Atibaia - SP',
+            distancia_sp: 65,
+            custo_entrada: 25,
+            tempo_permanencia: '1h30',
+            experiencias: ['café da manhã', 'comida tradicional'],
+            dicas_reais: [
+                'Pão de açúcar famoso na região há 40 anos',
+                'Estacionamento para motos na lateral da padaria',
+                'Funciona das 6h às 12h - chegue cedo'
+            ]
+        },
+        {
+            nome: 'Mirante da Serra da Cantareira',
+            endereco: 'Estrada da Cantareira, km 12 - Horto Florestal, São Paulo - SP',
+            distancia_sp: 35,
+            custo_entrada: 0,
+            tempo_permanencia: '1h',
+            experiencias: ['estrada bonita', 'vista', 'natureza'],
+            dicas_reais: [
+                'Estrada sinuosa com curvas fechadas - reduzir velocidade',
+                'Estacionamento gratuito no Horto Florestal',
+                'Melhor vista pela manhã (menos neblina)'
+            ]
+        }
+    ],
+    'EQUILIBRADA': [
+        {
+            nome: 'Café da Fazenda - São Roque',
+            endereco: 'Estrada do Vinho, km 15 - Zona Rural, São Roque - SP',
+            distancia_sp: 85,
+            custo_entrada: 45,
+            tempo_permanencia: '2h',
+            experiencias: ['café da manhã', 'estrada bonita', 'natureza'],
+            dicas_reais: [
+                'Café colonial servido até 11h nos fins de semana',
+                'Estrada rural asfaltada com paisagem vinícola',
+                'Estacionamento coberto para motos disponível'
+            ]
+        },
+        {
+            nome: 'Pico do Itapeva - Campos do Jordão',
+            endereco: 'Estrada do Itapeva, s/n - Campos do Jordão, SP',
+            distancia_sp: 180,
+            custo_entrada: 15,
+            tempo_permanencia: '2h',
+            experiencias: ['estrada bonita', 'vista', 'aventura'],
+            dicas_reais: [
+                'Estrada de terra nos últimos 3km - moto trail ideal',
+                'Temperatura 10°C menor que na cidade',
+                'Melhor pôr do sol da região (17h no inverno)'
+            ]
+        }
+    ],
+    'PREMIUM': [
+        {
+            nome: 'Hotel Toriba - Brunch Premium',
+            endereco: 'Av. Ernesto Diederichsen, 2962 - Campos do Jordão, SP',
+            distancia_sp: 185,
+            custo_entrada: 180,
+            tempo_permanencia: '3h',
+            experiencias: ['café da manhã', 'luxo', 'vista'],
+            dicas_reais: [
+                'Brunch premium servido até 12h nos fins de semana',
+                'Valet parking gratuito para motos no hotel',
+                'Reserve com antecedência (alta procura)'
+            ]
+        },
+        {
+            nome: 'Estrada Romântica - Monte Verde',
+            endereco: 'MG-295, km 23 - Monte Verde, Camanducaia - MG',
+            distancia_sp: 145,
+            custo_entrada: 0,
+            tempo_permanencia: '2h',
+            experiencias: ['estrada bonita', 'vista', 'natureza'],
+            dicas_reais: [
+                'Uma das estradas mais bonitas da região sudeste',
+                'Mirantes naturais a cada 5km do percurso',
+                'Estrada asfaltada em excelente estado'
+            ]
+        }
+    ]
+};
+
+/**
+ * Calcula tempo disponível baseado nos horários
+ */
+function calcularTempoDisponivel(formData) {
+    const saida = parseHorario(formData.horarioSaida || '08:00');
+    const volta = parseHorario(formData.horarioVolta || '18:00');
+    
+    let tempoDisponivel = volta - saida;
+    if (tempoDisponivel < 0) tempoDisponivel += 24 * 60; // Caso passe da meia-noite
+    
+    return Math.floor(tempoDisponivel / 60); // Retorna em horas
+}
+
+/**
+ * Converte horário "HH:MM" para minutos desde 00:00
+ */
+function parseHorario(horario) {
+    const [horas, minutos] = horario.split(':').map(Number);
+    return horas * 60 + (minutos || 0);
+}
+
+/**
+ * Converte minutos para formato "HH:MM"
+ */
+function formatarHorario(minutos) {
+    const horas = Math.floor(minutos / 60) % 24;
+    const mins = minutos % 60;
+    return `${horas.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+}
+
+/**
+ * Calcula distância entre dois destinos
+ */
+function calcularDistanciaEntre(destinoA, destinoB) {
+    // Matriz simplificada de distâncias entre destinos conhecidos
+    const distancias = {
+        'Mirante da Serra da Cantareira': { 'Centro Histórico de Atibaia': 45 },
+        'Pico do Itapeva - Campos do Jordão': { 'Cachoeira dos Pretos - Joanópolis': 85 },
+        'Hotel Toriba - Campos do Jordão': { 'Restaurante Baden Baden - Campos do Jordão': 8 }
+    };
+    
+    return distancias[destinoA.nome]?.[destinoB.nome] || 30; // Fallback 30km
+}
+
+/**
+ * Gera observações específicas do percurso baseadas nos destinos reais
+ */
+function generateObservacoesPercurso(formData, tipo, destinos) {
+    const tempoDisponivel = calcularTempoDisponivel(formData);
+    const observacoes = [];
+    
+    // Observações baseadas no tipo de roteiro
+    if (tipo === 'ECONÔMICA') {
+        observacoes.push('Roteiro otimizado para menor gasto - priorizando locais gratuitos');
+        observacoes.push('Abastecimento em postos mais baratos do percurso');
+    } else if (tipo === 'EQUILIBRADA') {
+        observacoes.push('Roteiro balanceado entre custo e experiência');
+        observacoes.push('Mix de atrações gratuitas e pagas para melhor custo-benefício');
+    } else if (tipo === 'PREMIUM') {
+        observacoes.push('Roteiro premium com foco na experiência completa');
+        observacoes.push('Inclui paradas em estabelecimentos renomados');
+    }
+    
+    // Observações baseadas nos destinos específicos
+    if (destinos && Array.isArray(destinos)) {
+        const temSerra = destinos.some(d => 
+            d.nome?.toLowerCase().includes('serra') || 
+            d.nome?.toLowerCase().includes('campos') ||
+            d.nome?.toLowerCase().includes('cantareira')
+        );
+        
+        const temLitoral = destinos.some(d => 
+            d.endereco?.toLowerCase().includes('ubatuba') ||
+            d.endereco?.toLowerCase().includes('bertioga') ||
+            d.endereco?.toLowerCase().includes('ilhabela')
+        );
+        
+        if (temSerra) {
+            observacoes.push('Percurso serrano: levar agasalho (temperatura até 10°C menor)');
+            observacoes.push('Estradas sinuosas - reduzir velocidade em curvas fechadas');
+        }
+        
+        if (temLitoral) {
+            observacoes.push('Percurso litorâneo: atenção à maresia e protetor solar');
+        }
+        
+        // Observação sobre primeira parada
+        if (destinos[0]?.nome) {
+            observacoes.push(`Primeira parada: ${destinos[0].nome} - confirmar horário de funcionamento`);
+        }
+    }
+    
+    // Observação sobre tempo disponível
+    if (tempoDisponivel <= 6) {
+        observacoes.push('Roteiro compacto para aproveitar janela de 6h disponíveis');
+    } else if (tempoDisponivel >= 10) {
+        observacoes.push('Tempo amplo permite paradas extras para fotos e descanso');
+    }
+    
+    return observacoes.slice(0, 4); // Máximo 4 observações
+}
+
+/**
+ * Seleciona destinos baseados na experiência desejada
+ */
+function selecionarDestinosPorExperiencia(destinosDisponiveis, experienciaDesejada) {
+    if (!experienciaDesejada) return destinosDisponiveis;
+    
+    const experienciaLower = experienciaDesejada.toLowerCase();
+    const palavrasChave = ['café da manhã', 'estrada bonita', 'vista', 'natureza', 'aventura', 'comida'];
+    
+    // Priorizar destinos que atendem a experiência
+    const destinosPrioritarios = destinosDisponiveis.filter(dest => 
+        dest.experiencias?.some(exp => experienciaLower.includes(exp))
+    );
+    
+    // Se encontrou destinos específicos, usar eles primeiro
+    if (destinosPrioritarios.length > 0) {
+        return [...destinosPrioritarios, ...destinosDisponiveis.filter(d => !destinosPrioritarios.includes(d))];
+    }
+    
+    return destinosDisponiveis;
+}
+
+/**
+ * Gera destinos realistas quando IA não fornece
+ */
+function generateFallbackDestinos(formData, tipo) {
+    const destinosDisponiveis = DESTINOS_REAIS[tipo] || DESTINOS_REAIS['EQUILIBRADA'];
+    const destinosOrdenados = selecionarDestinosPorExperiencia(destinosDisponiveis, formData.experienciaDesejada);
+
+    // Validar janela de tempo disponível - mais restritivo
+    const tempoDisponivel = calcularTempoDisponivel(formData);
+    let quantidadeDestinos = destinosDisponiveis.length;
+    
+    // Ajustar quantidade baseado no tempo disponível (mais conservador)
+    if (tempoDisponivel <= 4) {
+        quantidadeDestinos = 1; // Apenas 1 destino para até 4h
+    } else if (tempoDisponivel <= 6) {
+        quantidadeDestinos = Math.min(2, quantidadeDestinos); // Máximo 2 destinos em 6h
+    } else if (tempoDisponivel <= 8) {
+        quantidadeDestinos = Math.min(3, quantidadeDestinos); // Máximo 3 destinos em 8h
+    }
+    
+    const destinosSelecionados = destinosOrdenados.slice(0, quantidadeDestinos);
+    let distanciaAcumulada = 0;
+    let horarioAtual = parseHorario(formData.horarioSaida || '08:00');
+
+    return destinosSelecionados.map((dest, index) => {
+        // Calcular distância real do ponto anterior
+        const distanciaDestino = index === 0 ? 
+            dest.distancia_sp : // Distância de SP para primeiro destino
+            calcularDistanciaEntre(destinosSelecionados[index-1], dest); // Entre destinos
+        
+        distanciaAcumulada += distanciaDestino;
+        
+        // Calcular tempo de viagem (60km/h média)
+        const tempoViagem = Math.ceil(distanciaDestino / 60 * 60); // em minutos
+        horarioAtual += tempoViagem;
+        
+        const horarioChegada = formatarHorario(horarioAtual);
+        
+        // Adicionar tempo de permanência para próximo cálculo
+        const tempoPermanencia = parseInt(dest.tempo_permanencia) * 60; // converter para minutos
+        horarioAtual += tempoPermanencia;
+
+        return {
+            nome: dest.nome,
+            endereco: dest.endereco,
+            distancia_anterior: `${distanciaDestino} km`,
+            tempo_permanencia: dest.tempo_permanencia,
+            horario_chegada: horarioChegada,
+            descricao: `${dest.nome} - Local específico com entrada ${dest.custo_entrada > 0 ? `R$ ${dest.custo_entrada}` : 'gratuita'}.`,
+            custo_estimado: `R$ ${dest.custo_entrada}`,
+            dicas_motociclista: dest.dicas_reais
+        };
+    });
+}
+
+/**
+ * Parsing manual da resposta como fallback - SEMPRE 3 SUGESTÕES
+ */
+function parseResponseManually(response, formData) {
+    console.log('🔄 Gerando 3 sugestões de fallback');
+    
+    const tipos = ['ECONÔMICA', 'EQUILIBRADA', 'PREMIUM'];
+    const nomes = ['Roteiro Econômico', 'Roteiro Equilibrado', 'Roteiro Premium'];
+    const resumos = [
+        'Roteiro focado em baixo custo com destinos gratuitos',
+        'Roteiro com balance entre custo e experiência', 
+        'Roteiro completo com experiências premium'
+    ];
+    
+    return tipos.map((tipo, index) => {
+        // Calcular custos detalhados inteligentemente
+        const custosCalculados = calculateSmartCosts(formData, tipo, index);
+        const { combustivel, alimentacao, entradas, outros, total: totalValue } = custosCalculados;
+
+        return {
+            tipo: tipo,
+            titulo: nomes[index],
+            resumo: resumos[index],
+            distancia_total: `${120 + (index * 40)} km`,
+            tempo_total: `${6 + index} horas`,
+            custo_total_estimado: calculateFallbackCost(formData, tipo),
+            nivel_dificuldade: ['Fácil', 'Moderado', 'Moderado'][index],
+            destinos: generateFallbackDestinos(formData, tipo),
+            custos_detalhados: {
+                combustivel,
+                alimentacao,
+                entradas: entradas || null,
+                outros: outros || null,
+                total: `R$ ${totalValue}`
+            },
+            observacoes: generateObservacoesPercurso(formData, tipo, generateFallbackDestinos(formData, tipo)),
+            cronograma: generateSmartTimeline(formData, generateFallbackDestinos(formData, tipo)),
+            dicas_importantes: [
+                'Verificar combustível antes da saída',
+                'Levar equipamentos de segurança',
+                'Conferir previsão do tempo'
+            ],
+            horario_sugerido_saida: formData.horarioSaida || '08:00',
+            horario_estimado_volta: formData.horarioVolta || '18:00'
+        };
+    });
+}
+
+/**
+ * FALLBACK DESABILITADO - Apenas IA generativa deve ser usada
+ * Esta função foi desabilitada conforme solicitação do usuário
  */
 function generateFallbackResults(formData) {
-    if (!destinos || destinos.length === 0) {
-        throw new Error('Nenhum destino disponível');
+    throw new Error('Fallback desabilitado - apenas IA generativa deve ser usada');
+    // Verificar se destinos está disponível no window
+    const destinosArray = window.destinos || window.DESTINOS_DATABASE || [];
+    if (!destinosArray || destinosArray.length === 0) {
+        throw new Error('Nenhum destino disponível - destinos.js não carregado');
     }
     
     // Filtra destinos por orçamento e preferências
-    const destinosFiltrados = destinos.filter(d => {
-        const custoEstimado = d.custoMedio || 100;
+    let destinosParaFiltrar = destinosArray;
+    if (!Array.isArray(destinosParaFiltrar)) {
+        // Se for o DESTINOS_DATABASE, converter para array
+        destinosParaFiltrar = Object.values(destinosParaFiltrar).flat();
+    }
+    
+    const destinosFiltrados = destinosParaFiltrar.filter(d => {
+        const custoEstimado = d.custoMedio || d.custos?.total || 100;
         return custoEstimado <= formData.orcamento;
     });
     
@@ -445,12 +1325,52 @@ function displayResults(results) {
         return;
     }
     
+    // Salva os roteiros globalmente para compartilhamento  
+    generatedRoteiros = results;
+    
+    // Limpa completamente o container
     container.innerHTML = '';
     
+    // Cria header de seleção
+    const header = document.createElement('div');
+    header.className = 'text-center mb-8';
+    header.innerHTML = `
+        <h2 class="text-3xl font-bold text-gold-primary mb-4">🎯 Escolha Sua Aventura</h2>
+        <p class="text-gray-300 text-lg">Gerou 3 sugestões personalizadas para você. Escolha a que mais combina com seu estilo!</p>
+        
+        <div class="mt-6">
+            <button onclick="shareForVoting()" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors shadow-lg">
+                🗳️ Compartilhar para Votação
+            </button>
+            <p class="text-gray-400 text-sm mt-2">Deixe seu grupo votar na melhor opção!</p>
+        </div>
+    `;
+    container.appendChild(header);
+    
+    // Cria container das sugestões
+    const suggestionsContainer = document.createElement('div');
+    suggestionsContainer.className = 'grid md:grid-cols-3 gap-6 mb-8';
+    suggestionsContainer.id = 'suggestions-grid';
+    
+    console.log(`🔍 DEBUG: Recebidas ${results.length} sugestões para exibir:`, results);
+    
     results.forEach((roteiro, index) => {
-        const resultCard = createResultCard(roteiro, index);
-        container.appendChild(resultCard);
+        console.log(`🔍 DEBUG: Criando card ${index + 1} para:`, roteiro.titulo);
+        const suggestionCard = createSuggestionCard(roteiro, index);
+        suggestionsContainer.appendChild(suggestionCard);
     });
+    
+    container.appendChild(suggestionsContainer);
+    
+    // Container para roteiro selecionado (inicialmente oculto)
+    const selectedContainer = document.createElement('div');
+    selectedContainer.id = 'selected-roteiro';
+    selectedContainer.className = 'hidden';
+    container.appendChild(selectedContainer);
+    
+    // Cria checklist de dicas
+    const checklistContainer = createChecklistSummary(results);
+    container.appendChild(checklistContainer);
     
     // Mostra seção de resultados
     resultsSection.classList.remove('hidden');
@@ -466,7 +1386,296 @@ function displayResults(results) {
 }
 
 /**
- * Cria um card de resultado
+ * Cria resumo checklist de todas as dicas
+ */
+function createChecklistSummary(roteiros) {
+    const checklistContainer = document.createElement('div');
+    checklistContainer.className = 'bg-gradient-to-r from-blue-900 to-purple-900 rounded-xl p-6 mb-8';
+    checklistContainer.innerHTML = `
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-2xl font-bold text-white">📋 Checklist do Role</h3>
+            <button onclick="toggleChecklist()" class="text-white hover:text-blue-300 transition-colors">
+                <i class="fas fa-chevron-down" id="checklist-arrow"></i>
+            </button>
+        </div>
+        <p class="text-blue-200 mb-4">Todas as dicas importantes para não esquecer nada!</p>
+        <div id="checklist-content" class="hidden">
+            ${generateFullChecklist(roteiros)}
+        </div>
+    `;
+    
+    return checklistContainer;
+}
+
+/**
+ * Gera checklist inteligente e útil para motociclistas
+ */
+function generateFullChecklist(roteiros) {
+    const formData = getLastFormData();
+    const isLongTrip = formData && formData.autonomia && formData.autonomia > 200;
+    const hasWeatherRisk = new Date(formData?.dataRole || Date.now()).getMonth() >= 10 || new Date(formData?.dataRole || Date.now()).getMonth() <= 3; // Inverno
+    
+    const checklistCategories = [
+        {
+            title: '🛡️ Equipamentos de Segurança',
+            items: [
+                'Capacete em perfeito estado e fechado corretamente',
+                'Jaqueta com proteções (cotovelo, ombro, costa)',
+                'Luvas de couro ou com proteção',
+                'Calça com proteções ou calça jeans reforçada',
+                'Bota ou calçado fechado e resistente',
+                'Refletivos ou colete de alta visibilidade'
+            ],
+            priority: 'critical'
+        },
+        {
+            title: '📋 Documentação e Identificação',
+            items: [
+                'CNH válida e dentro da validade',
+                'Documento da moto (CRLV) atualizado',
+                'RG ou documento com foto',
+                'Cartão do seguro (se tiver)',
+                'Comprovante de pagamento do IPVA',
+                'Telefone de emergência anotado'
+            ],
+            priority: 'critical'
+        },
+        {
+            title: '🔧 Manutenção e Verificações',
+            items: [
+                'Nível de óleo do motor',
+                'Pressão dos pneus (dianteiro e traseiro)',
+                'Estado dos pneus (desgaste e objetos)',
+                'Funcionamento dos freios',
+                'Corrente limpa e lubrificada',
+                'Luzes (farol, lanterna, setas, freio)',
+                'Buzina funcionando',
+                'Espelhos ajustados e limpos'
+            ],
+            priority: 'high'
+        },
+        {
+            title: '⛽ Combustível e Autonomia',
+            items: [
+                `Tanque cheio (${formData?.capacidadeTanque || 15}L)`,
+                `Autonomia verificada (~${Math.round(formData?.autonomia || 300)}km)`,
+                'Localização de postos no percurso',
+                'Dinheiro/cartão para combustível',
+                'Reserva de combustível considerando trânsito'
+            ],
+            priority: 'high'
+        },
+        {
+            title: '🌤️ Clima e Condições',
+            items: [
+                'Previsão do tempo checada',
+                hasWeatherRisk ? 'Capa de chuva ou jaqueta impermeável' : 'Protetor solar',
+                hasWeatherRisk ? 'Luvas extras para chuva' : 'Óculos de sol',
+                'Roupas adequadas para temperatura',
+                'Verificar condições das estradas'
+            ],
+            priority: 'medium'
+        },
+        {
+            title: '📱 Comunicação e Navegação',
+            items: [
+                'Celular carregado (100%)',
+                'Carregador portátil ou USB da moto',
+                'GPS ou app de navegação configurado',
+                'Suporte de celular na moto',
+                'Contatos de emergência salvos',
+                'App de motociclistas (Waze, etc.)'
+            ],
+            priority: 'medium'
+        },
+        {
+            title: '🎒 Kit de Emergência',
+            items: [
+                'Kit de primeiros socorros básico',
+                'Água (pelo menos 500ml)',
+                'Lanche energético',
+                'Dinheiro em espécie',
+                'Chaves reserva',
+                isLongTrip ? 'Kit básico de ferramentas' : null,
+                isLongTrip ? 'Corda ou elástico' : null,
+                'Sacos plásticos (proteção)'
+            ].filter(item => item !== null),
+            priority: 'medium'
+        }
+    ];
+
+    // Gerar HTML do checklist
+    let checklistHTML = '<div class="space-y-6">';
+    
+    checklistCategories.forEach(category => {
+        const priorityColors = {
+            'critical': 'border-red-500 bg-red-900 bg-opacity-20',
+            'high': 'border-orange-500 bg-orange-900 bg-opacity-20',
+            'medium': 'border-blue-500 bg-blue-900 bg-opacity-20'
+        };
+        
+        const priorityIcons = {
+            'critical': '🚨',
+            'high': '⚠️',
+            'medium': 'ℹ️'
+        };
+        
+        checklistHTML += `
+            <div class="border-l-4 ${priorityColors[category.priority]} p-4 rounded-lg">
+                <h4 class="font-bold text-white mb-3 flex items-center">
+                    ${priorityIcons[category.priority]} ${category.title}
+                </h4>
+                <div class="grid md:grid-cols-2 gap-2">
+                    ${category.items.map((item, index) => `
+                        <label class="flex items-start space-x-3 p-2 hover:bg-gray-700 rounded cursor-pointer">
+                            <input type="checkbox" class="mt-1 w-4 h-4 text-blue-600 rounded focus:ring-blue-500" 
+                                   id="check-${category.title.replace(/[^a-z0-9]/gi, '')}-${index}">
+                            <span class="text-gray-300 text-sm leading-relaxed">${item}</span>
+                        </label>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    });
+    
+    checklistHTML += `
+        <div class="text-center mt-6">
+            <button onclick="markAllAsChecked()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg mr-2">
+                ✅ Marcar Tudo OK
+            </button>
+            <button onclick="resetChecklist()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg">
+                🔄 Resetar Lista
+            </button>
+        </div>
+    </div>`;
+
+    return checklistHTML;
+}
+
+/**
+ * Marca todos os itens do checklist como verificados
+ */
+function markAllAsChecked() {
+    const checkboxes = document.querySelectorAll('#checklist-content input[type="checkbox"]');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = true;
+    });
+    showNotification('✅ Todos os itens marcados como OK!', 'success');
+}
+
+/**
+ * Reset do checklist
+ */
+function resetChecklist() {
+    const checkboxes = document.querySelectorAll('#checklist-content input[type="checkbox"]');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    showNotification('🔄 Lista resetada!', 'info');
+}
+
+/**
+ * Toggle do checklist
+ */
+function toggleChecklist() {
+    const content = document.getElementById('checklist-content');
+    const arrow = document.getElementById('checklist-arrow');
+    
+    if (content && arrow) {
+        content.classList.toggle('hidden');
+        arrow.classList.toggle('fa-chevron-down');
+        arrow.classList.toggle('fa-chevron-up');
+    }
+}
+
+/**
+ * Cria um card de sugestão (preview)
+ */
+function createSuggestionCard(roteiro, index) {
+    const card = document.createElement('div');
+    card.className = 'suggestion-card cursor-pointer transform transition-all duration-300 hover:scale-105';
+    card.onclick = () => selectRoteiro(index);
+    
+    // Validações defensivas para evitar null/undefined
+    const safeRoteiro = {
+        tipo: roteiro?.tipo || 'EQUILIBRADA',
+        titulo: roteiro?.titulo || 'Roteiro Personalizado',
+        resumo: roteiro?.resumo || 'Roteiro gerado pela IA',
+        custo_total_estimado: roteiro?.custo_total_estimado || 'R$ --',
+        distancia_total: roteiro?.distancia_total || '-- km',
+        tempo_total: roteiro?.tempo_total || '-- horas',
+        destinos: roteiro?.destinos || []
+    };
+    
+    // Cores por tipo
+    const typeColors = {
+        'ECONÔMICA': 'from-green-600 to-green-800 border-green-500',
+        'EQUILIBRADA': 'from-blue-600 to-blue-800 border-blue-500', 
+        'PREMIUM': 'from-purple-600 to-purple-800 border-purple-500'
+    };
+    
+    const typeIcons = {
+        'ECONÔMICA': '💚',
+        'EQUILIBRADA': '⚖️',
+        'PREMIUM': '👑'
+    };
+    
+    const colorClass = typeColors[safeRoteiro.tipo] || 'from-gray-600 to-gray-800 border-gray-500';
+    
+    card.innerHTML = `
+        <div class="bg-gradient-to-br ${colorClass} p-6 rounded-xl border-2 hover:border-opacity-100 border-opacity-50 transition-all">
+            <div class="text-center mb-4">
+                <div class="text-4xl mb-2">${typeIcons[safeRoteiro.tipo] || '🏍️'}</div>
+                <div class="bg-black bg-opacity-30 px-3 py-1 rounded-full text-sm font-bold text-white mb-2">
+                    ${safeRoteiro.tipo}
+                </div>
+                <h3 class="text-xl font-bold text-white mb-2">${safeRoteiro.titulo}</h3>
+                <p class="text-gray-200 text-sm">${safeRoteiro.resumo}</p>
+            </div>
+            
+            <div class="space-y-3 mb-6">
+                <div class="flex justify-between items-center bg-black bg-opacity-30 p-3 rounded-lg">
+                    <span class="text-white font-semibold">💰 Custo Total</span>
+                    <span class="text-white font-bold text-lg">${safeRoteiro.custo_total_estimado}</span>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-2 text-sm">
+                    <div class="bg-black bg-opacity-30 p-2 rounded text-center">
+                        <div class="text-white font-semibold">📍 ${safeRoteiro.distancia_total}</div>
+                        <div class="text-gray-300">Distância</div>
+                    </div>
+                    <div class="bg-black bg-opacity-30 p-2 rounded text-center">
+                        <div class="text-white font-semibold">⏱️ ${safeRoteiro.tempo_total}</div>
+                        <div class="text-gray-300">Tempo</div>
+                    </div>
+                </div>
+                
+                <div class="bg-black bg-opacity-30 p-3 rounded-lg">
+                    <div class="text-white font-semibold mb-2">📍 Principais Destinos:</div>
+                    <div class="space-y-1">
+                        ${safeRoteiro.destinos.length > 0 ? safeRoteiro.destinos.slice(0, 2).map(d => `
+                            <div class="text-gray-200 text-sm">• ${d?.nome || 'Destino'}</div>
+                        `).join('') : '<div class="text-gray-300 text-sm">• Destinos serão definidos</div>'}
+                        ${safeRoteiro.destinos.length > 2 ? `<div class="text-gray-300 text-xs">+ ${safeRoteiro.destinos.length - 2} destinos...</div>` : ''}
+                    </div>
+                </div>
+                
+                ${getTypeCharacteristics(safeRoteiro.tipo)}
+            </div>
+            
+            <div class="text-center">
+                <button class="bg-white text-black font-bold py-3 px-6 rounded-full hover:bg-gray-100 transition-colors w-full">
+                    ✨ Escolher Este Roteiro
+                </button>
+            </div>
+        </div>
+    `;
+    
+    return card;
+}
+
+/**
+ * Cria um card de resultado completo (expandido)
  */
 function createResultCard(roteiro, index) {
     const card = document.createElement('div');
@@ -527,11 +1736,21 @@ function createResultCard(roteiro, index) {
                     </div>
                     
                     ${destino.dicas_motociclista && destino.dicas_motociclista.length > 0 ? `
-                        <div class="mt-3">
-                            <h6 class="text-gold-primary font-semibold mb-2">🏍️ Dicas para Motociclistas:</h6>
-                            <ul class="text-sm text-gray-300 space-y-1">
-                                ${destino.dicas_motociclista.map(dica => `<li>• ${dica}</li>`).join('')}
-                            </ul>
+                        <div class="mt-4">
+                            <h6 class="text-gold-primary font-semibold mb-3">🏍️ Dicas Especializadas:</h6>
+                            <div class="space-y-2">
+                                ${destino.dicas_motociclista.map(dica => {
+                                    const icon = dica.toLowerCase().includes('estrada') ? '🛣️' :
+                                               dica.toLowerCase().includes('segurança') ? '🔒' :
+                                               dica.toLowerCase().includes('equipamento') ? '🛡️' :
+                                               dica.toLowerCase().includes('horário') ? '⏰' :
+                                               dica.toLowerCase().includes('emergência') ? '🚨' : '💡';
+                                    return `<div class="bg-gray-600 rounded-lg p-2">
+                                        <span class="text-lg mr-2">${icon}</span>
+                                        <span class="text-gray-200 text-sm">${dica}</span>
+                                    </div>`;
+                                }).join('')}
+                            </div>
                         </div>
                     ` : ''}
                 </div>
@@ -542,26 +1761,68 @@ function createResultCard(roteiro, index) {
             <div class="cost-display mb-6">
                 <h4 class="text-lg font-bold text-green-400 mb-3">💰 Custos Detalhados</h4>
                 <div class="space-y-2">
+                    ${roteiro.custos_detalhados.combustivel ? `
                     <div class="cost-item">
                         <span>⛽ Combustível</span>
                         <span class="font-bold">${roteiro.custos_detalhados.combustivel}</span>
-                    </div>
+                    </div>` : ''}
+                    ${roteiro.custos_detalhados.alimentacao ? `
                     <div class="cost-item">
                         <span>🍽️ Alimentação</span>
                         <span class="font-bold">${roteiro.custos_detalhados.alimentacao}</span>
-                    </div>
+                    </div>` : ''}
+                    ${roteiro.custos_detalhados.entradas ? `
                     <div class="cost-item">
-                        <span>🎫 Entradas</span>
+                        <span>🎫 Entradas (Atrações Turísticas)</span>
                         <span class="font-bold">${roteiro.custos_detalhados.entradas}</span>
-                    </div>
+                    </div>` : ''}
+                    ${roteiro.custos_detalhados.outros ? `
                     <div class="cost-item">
-                        <span>🔧 Outros</span>
+                        <span>🔧 Outros (Pedágio, Estacionamento)</span>
                         <span class="font-bold">${roteiro.custos_detalhados.outros}</span>
-                    </div>
-                    <div class="cost-item">
+                    </div>` : ''}
+                    <div class="cost-item border-t border-gray-600 pt-2 mt-3">
                         <span class="text-lg">💎 TOTAL</span>
                         <span class="font-bold text-lg text-gold-primary">${roteiro.custos_detalhados.total}</span>
                     </div>
+                </div>
+            </div>
+        ` : ''}
+        
+        ${roteiro.cronograma && roteiro.cronograma.length > 0 ? `
+            <div class="bg-blue-900 bg-opacity-30 p-4 rounded-lg mb-4">
+                <h4 class="text-lg font-bold text-blue-400 mb-3">⏰ Cronograma do Rolê</h4>
+                <div class="space-y-3">
+                    ${roteiro.cronograma.map(item => {
+                        const iconMap = {
+                            'saida': '🏠',
+                            'chegada': '🏍️',
+                            'saida_destino': '🚀',
+                            'chegada_final': '🏡',
+                            'combustivel': '⛽'
+                        };
+                        const bgColorMap = {
+                            'saida': 'bg-green-600',
+                            'chegada': 'bg-blue-600',
+                            'saida_destino': 'bg-orange-600',
+                            'chegada_final': 'bg-purple-600',
+                            'combustivel': 'bg-red-600'
+                        };
+                        return `
+                        <div class="flex items-start space-x-3 p-3 bg-gray-700 rounded-lg">
+                            <div class="flex-shrink-0">
+                                <div class="w-12 h-12 ${bgColorMap[item.tipo]} rounded-full flex items-center justify-center text-white font-bold">
+                                    ${item.horario}
+                                </div>
+                            </div>
+                            <div class="flex-grow">
+                                <div class="font-semibold text-white mb-1">${item.evento}</div>
+                                <div class="text-sm text-gray-300">${item.endereco}</div>
+                                ${item.descricao ? `<div class="text-xs text-gray-400 mt-1">${item.descricao}</div>` : ''}
+                                ${item.tempo_permanencia ? `<div class="text-xs text-blue-300 mt-1">⏱️ Tempo no local: ${item.tempo_permanencia}</div>` : ''}
+                            </div>
+                        </div>`;
+                    }).join('')}
                 </div>
             </div>
         ` : ''}
@@ -575,16 +1836,45 @@ function createResultCard(roteiro, index) {
             </div>
         ` : ''}
         
-        <div class="flex flex-wrap gap-3 mt-6 pt-4 border-t border-gray-700">
-            <button onclick="shareRoteiro(${index})" class="btn-primary text-sm px-4 py-2">
-                <i class="fas fa-share-alt mr-2"></i>Compartilhar
-            </button>
-            <button onclick="saveRoteiro(${index})" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm transition-colors">
-                <i class="fas fa-bookmark mr-2"></i>Salvar
-            </button>
-            <button onclick="exportToPDF(${index})" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm transition-colors">
-                <i class="fas fa-file-pdf mr-2"></i>PDF
-            </button>
+        <!-- Botões de Ação -->
+        <div class="mt-6 pt-4 border-t border-gray-700">
+            <!-- Compartilhamento Social -->
+            <div class="mb-4">
+                <h5 class="text-gold-primary font-semibold mb-3">📱 Compartilhar com o Grupo</h5>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="shareWhatsApp(${index})" class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-sm transition-colors">
+                        <i class="fab fa-whatsapp mr-2"></i>WhatsApp
+                    </button>
+                    <button onclick="shareInstagram(${index})" class="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-3 py-2 rounded-lg text-sm transition-colors">
+                        <i class="fab fa-instagram mr-2"></i>Instagram
+                    </button>
+                    <button onclick="shareLink(${index})" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm transition-colors">
+                        <i class="fas fa-link mr-2"></i>Link de Convite
+                    </button>
+                    <button onclick="generateQRCode(${index})" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-lg text-sm transition-colors">
+                        <i class="fas fa-qrcode mr-2"></i>QR Code
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Ferramentas -->
+            <div class="mb-4">
+                <h5 class="text-gold-primary font-semibold mb-3">🛠️ Ferramentas</h5>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="addToCalendar(${index})" class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm transition-colors">
+                        <i class="fas fa-calendar-plus mr-2"></i>Google Calendar
+                    </button>
+                    <button onclick="showMap(${index})" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm transition-colors">
+                        <i class="fas fa-map-marked-alt mr-2"></i>Ver no Mapa
+                    </button>
+                    <button onclick="saveRoteiro(${index})" class="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-2 rounded-lg text-sm transition-colors">
+                        <i class="fas fa-bookmark mr-2"></i>Salvar Favorito
+                    </button>
+                    <button onclick="downloadPDF(${index})" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-lg text-sm transition-colors">
+                        <i class="fas fa-file-pdf mr-2"></i>Download PDF
+                    </button>
+                </div>
+            </div>
         </div>
     `;
     
@@ -595,25 +1885,72 @@ function createResultCard(roteiro, index) {
  * Utilitários
  */
 function getFormData() {
-    const preferencias = [];
-    document.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => {
-        const label = cb.closest('label').textContent.trim();
-        preferencias.push(label);
-    });
-    
-    return {
-        enderecoPartida: document.getElementById('endereco-partida').value,
-        dataRole: document.getElementById('data-role').value,
-        horarioSaida: document.getElementById('horario-saida').value,
-        horarioVolta: document.getElementById('horario-volta').value,
-        orcamento: parseInt(document.getElementById('orcamento-role').value) || 200,
-        tipoMoto: document.getElementById('tipo-moto').value,
-        perfilPilotagem: document.getElementById('perfil-pilotagem').value,
-        experienciaDesejada: document.getElementById('experiencia-desejada').value,
-        nivelAventura: document.getElementById('nivel-aventura').value,
-        companhia: document.getElementById('companhia').value,
-        preferencias: preferencias
-    };
+    try {
+        const preferencias = [];
+        document.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => {
+            const label = cb.closest('label');
+            if (label) {
+                preferencias.push(label.textContent.trim());
+            }
+        });
+        
+        // Função helper para obter valor com fallback
+        const getFieldValue = (id, defaultValue = '') => {
+            const element = safeGetElement(id);
+            return element ? element.value : defaultValue;
+        };
+        
+        // Campos obrigatórios
+        const enderecoPartida = getFieldValue('endereco-partida');
+        const dataRole = getFieldValue('data-role');
+        const horarioSaida = getFieldValue('horario-saida');
+        const horarioVolta = getFieldValue('horario-volta');
+        const capacidadeTanque = getFieldValue('capacidade-tanque');
+        const consumoMedio = getFieldValue('consumo-medio');
+        const perfilPilotagem = getFieldValue('perfil-pilotagem');
+        const experienciaDesejada = getFieldValue('experiencia-desejada');
+        
+        // Validação para submissão (mais rigorosa)
+        const isForSubmission = arguments[0] === true;
+        const hasRequiredFields = enderecoPartida && dataRole && horarioSaida && horarioVolta && capacidadeTanque && consumoMedio && perfilPilotagem && experienciaDesejada;
+        
+        if (isForSubmission && !hasRequiredFields) {
+            throw new Error('Campos obrigatórios não preenchidos');
+        } else if (!hasRequiredFields) {
+            console.log('⚠️ Alguns campos obrigatórios ainda não foram preenchidos');
+        }
+        
+        // Campos opcionais
+        const orcamentoValue = getFieldValue('orcamento-role');
+        const quilometragemValue = getFieldValue('quilometragem-desejada');
+        
+        return {
+            // Obrigatórios
+            enderecoPartida,
+            dataRole,
+            horarioSaida,
+            horarioVolta,
+            capacidadeTanque: parseFloat(capacidadeTanque),
+            consumoMedio: parseFloat(consumoMedio),
+            perfilPilotagem,
+            experienciaDesejada,
+            
+            // Calculado baseado nos dados da moto
+            autonomia: capacidadeTanque && consumoMedio ? (parseFloat(capacidadeTanque) * parseFloat(consumoMedio)) : null,
+            
+            // Opcionais (com valores padrão)
+            orcamento: orcamentoValue ? parseInt(orcamentoValue) : null,
+            quilometragemDesejada: quilometragemValue || null,
+            nivelAventura: getFieldValue('nivel-aventura', 'moderado'),
+            companhia: getFieldValue('companhia', 'dupla'),
+            preferenciasExtras: getFieldValue('preferencias-extras'),
+            preferencias: preferencias
+        };
+        
+    } catch (error) {
+        console.error('❌ Erro ao coletar dados do formulário:', error);
+        throw new Error('Erro ao processar formulário. Verifique se todos os campos obrigatórios estão preenchidos.');
+    }
 }
 
 function getConsumoMoto(tipo) {
@@ -635,12 +1972,22 @@ function getVelocidadeMedia(perfil) {
     return velocidades[perfil] || 70;
 }
 
+function getQuilometragemRange(tipo) {
+    const ranges = {
+        'curto': '50-100 km (ideal para meio período)',
+        'medio': '100-200 km (dia completo relaxado)',
+        'longo': '200-300 km (dia de aventura)',
+        'muito-longo': '300+ km (épico de longa distância)'
+    };
+    return ranges[tipo] || 'Não especificada';
+}
+
 function validateForm() {
+    // Apenas campos OBRIGATÓRIOS para traçar a rota
     const requiredFields = [
         'endereco-partida', 'data-role', 'horario-saida', 
-        'horario-volta', 'orcamento-role', 'tipo-moto', 
-        'perfil-pilotagem', 'experiencia-desejada', 
-        'nivel-aventura', 'companhia'
+        'horario-volta', 'tipo-moto', 'perfil-pilotagem', 
+        'experiencia-desejada'
     ];
     
     return requiredFields.every(fieldId => {
@@ -705,10 +2052,23 @@ function clearFieldError(event) {
 function showLoading() {
     const loading = document.getElementById('loading-role');
     const resultsSection = document.getElementById('results-section');
+    const submitButton = document.querySelector('button[type="submit"]');
     
     if (loading && resultsSection) {
         loading.classList.remove('hidden');
         resultsSection.classList.remove('hidden');
+        
+        // Atualiza o botão
+        if (submitButton) {
+            submitButton.disabled = true;
+            submitButton.innerHTML = `
+                <div class="flex items-center justify-center">
+                    <div class="animate-spin w-5 h-5 border-3 border-white border-t-transparent rounded-full mr-3"></div>
+                    🤖 Gerando 3 Sugestões...
+                </div>
+            `;
+            submitButton.classList.add('opacity-75', 'cursor-not-allowed');
+        }
         
         // Scroll para loading
         setTimeout(() => {
@@ -717,13 +2077,28 @@ function showLoading() {
                 block: 'center' 
             });
         }, 100);
+        
+        // Mostra notificação
+        showNotification('🧠 IA analisando suas preferências...', 'info');
     }
 }
 
 function hideLoading() {
     const loading = document.getElementById('loading-role');
+    const submitButton = document.querySelector('button[type="submit"]');
+    
     if (loading) {
         loading.classList.add('hidden');
+    }
+    
+    // Restaura o botão
+    if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.innerHTML = `
+            <i class="fas fa-magic mr-2"></i>
+            🚀 Criar Rolê Perfeito
+        `;
+        submitButton.classList.remove('opacity-75', 'cursor-not-allowed');
     }
 }
 
@@ -732,6 +2107,10 @@ function hideResults() {
     if (resultsSection) {
         resultsSection.classList.add('hidden');
     }
+    
+    // Reset global variables
+    generatedRoteiros = [];
+    currentResults = [];
 }
 
 function showError(message) {
@@ -820,8 +2199,13 @@ function exportToPDF(index) {
 
 // Persistência de dados
 function saveFormData() {
-    const formData = getFormData();
-    localStorage.setItem('gerador_form_data', JSON.stringify(formData));
+    try {
+        const formData = getFormData();
+        localStorage.setItem('gerador_form_data', JSON.stringify(formData));
+    } catch (error) {
+        // Falha silenciosa - não é crítico para o funcionamento
+        console.log('⚠️ Não foi possível salvar dados do formulário (campos incompletos)');
+    }
 }
 
 function loadSavedData() {
@@ -888,6 +2272,945 @@ function initializePWA() {
         navigator.serviceWorker.register('sw.js').catch(err => {
             console.error('SW registration failed:', err);
         });
+    }
+}
+
+// ===============================
+// FUNÇÕES DE COMPARTILHAMENTO
+// ===============================
+
+let generatedRoteiros = []; // Armazena os roteiros gerados
+
+/**
+ * Gerar link único para votação colaborativa
+ */
+function generateCollaborativeLink(roteiros, formData) {
+    const roteiroData = {
+        id: Date.now().toString(36) + Math.random().toString(36).substr(2),
+        roteiros: roteiros,
+        formData: formData,
+        criado: new Date().toISOString(),
+        votos: {},
+        status: 'voting' // voting, decided
+    };
+    
+    // Salva na lista de roteiros colaborativos
+    const colaborativos = JSON.parse(localStorage.getItem('sop_roteiros_colaborativos') || '[]');
+    colaborativos.push(roteiroData);
+    localStorage.setItem('sop_roteiros_colaborativos', JSON.stringify(colaborativos));
+    
+    return `${window.location.origin}${window.location.pathname}?collaborative=${roteiroData.id}`;
+}
+
+/**
+ * Compartilhar para votação colaborativa
+ */
+function shareForVoting() {
+    if (!generatedRoteiros || generatedRoteiros.length === 0) return;
+    
+    const collaborativeLink = generateCollaborativeLink(generatedRoteiros, lastFormData);
+    
+    const texto = `🏍️ *Votação de Role - Sons of Peaky*\n\n` +
+        `Ajude a escolher o melhor roteiro entre 3 opções:\n\n` +
+        `📅 *Saída:* ${lastFormData.pontoPartida}\n` +
+        `🕐 *Horário:* ${lastFormData.horarioPreferido}\n` +
+        `🎯 *Experiência:* ${lastFormData.experienciaDesejada}\n\n` +
+        `🗳️ *Vote aqui:* ${collaborativeLink}\n\n` +
+        `#SonsOfPeaky #MotoRole`;
+    
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(texto)}`;
+    window.open(whatsappUrl, '_blank');
+    
+    // Copia o link também
+    navigator.clipboard.writeText(collaborativeLink).then(() => {
+        showNotification('🔗 Link de votação copiado e WhatsApp aberto!', 'success');
+    });
+    
+    trackEvent('share_collaborative_voting', { link: collaborativeLink });
+}
+
+/**
+ * Verifica se é um link colaborativo
+ */
+function checkCollaborativeLink() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const collaborativeId = urlParams.get('collaborative');
+    
+    if (collaborativeId) {
+        loadCollaborativeVoting(collaborativeId);
+    }
+}
+
+/**
+ * Carrega interface de votação colaborativa
+ */
+function loadCollaborativeVoting(collaborativeId) {
+    const colaborativos = JSON.parse(localStorage.getItem('sop_roteiros_colaborativos') || '[]');
+    const roteiroData = colaborativos.find(r => r.id === collaborativeId);
+    
+    if (!roteiroData) {
+        showNotification('❌ Link de votação não encontrado ou expirado!', 'error');
+        return;
+    }
+    
+    // Esconde o formulário e mostra interface de votação
+    const formContainer = document.querySelector('.form-container, form').parentElement;
+    if (formContainer) {
+        formContainer.style.display = 'none';
+    }
+    
+    // Cria interface de votação
+    const votingContainer = document.createElement('div');
+    votingContainer.className = 'container mx-auto px-4 py-8';
+    votingContainer.innerHTML = `
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gold-primary mb-4">🗳️ Votação de Role</h1>
+            <p class="text-gray-300 text-lg">Vote no melhor roteiro para o grupo!</p>
+            <div class="bg-gray-800 rounded-lg p-4 mt-4 inline-block">
+                <p class="text-sm text-gray-400">📅 Saída: ${roteiroData.formData.pontoPartida}</p>
+                <p class="text-sm text-gray-400">🕐 Horário: ${roteiroData.formData.horarioPreferido}</p>
+                <p class="text-sm text-gray-400">🎯 Experiência: ${roteiroData.formData.experienciaDesejada}</p>
+            </div>
+        </div>
+        
+        <div class="grid md:grid-cols-3 gap-6 mb-8" id="voting-suggestions">
+            ${roteiroData.roteiros.map((roteiro, index) => createVotingCard(roteiro, index, collaborativeId, roteiroData.votos)).join('')}
+        </div>
+        
+        <div class="text-center">
+            <div class="bg-gray-800 rounded-lg p-4 inline-block">
+                <h3 class="text-lg font-bold text-gold-primary mb-2">📊 Resultado da Votação</h3>
+                <div id="voting-results">
+                    ${generateVotingResults(roteiroData.votos, roteiroData.roteiros)}
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(votingContainer);
+}
+
+/**
+ * Cria card de votação
+ */
+function createVotingCard(roteiro, index, collaborativeId, votos) {
+    const voteCount = Object.values(votos).filter(v => v === index).length;
+    const hasVoted = localStorage.getItem(`voted_${collaborativeId}`) !== null;
+    const userVote = localStorage.getItem(`voted_${collaborativeId}`);
+    const isUserChoice = userVote == index;
+    
+    return `
+        <div class="bg-gray-800 rounded-xl p-6 hover:bg-gray-750 transition-colors ${isUserChoice ? 'ring-2 ring-gold-primary' : ''}">
+            <div class="text-center mb-4">
+                <div class="bg-gradient-to-r ${index === 0 ? 'from-green-600 to-green-700' : index === 1 ? 'from-blue-600 to-blue-700' : 'from-purple-600 to-purple-700'} text-white px-3 py-1 rounded-full text-sm font-bold inline-block">
+                    ${roteiro.tipo}
+                </div>
+            </div>
+            
+            <h3 class="text-xl font-bold text-white mb-3 text-center">${roteiro.titulo}</h3>
+            
+            <div class="space-y-2 mb-6">
+                <div class="flex justify-between">
+                    <span class="text-gray-400">💰 Custo:</span>
+                    <span class="text-gold-secondary font-semibold">${roteiro.custo_total_estimado}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-400">📍 Distância:</span>
+                    <span class="text-white">${roteiro.distancia_total}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-400">⏱️ Tempo:</span>
+                    <span class="text-white">${roteiro.tempo_total}</span>
+                </div>
+            </div>
+            
+            <p class="text-gray-300 text-sm mb-6">${roteiro.resumo}</p>
+            
+            <div class="text-center">
+                ${hasVoted ? 
+                    `<div class="mb-4">
+                        <span class="text-lg">📊 ${voteCount} voto${voteCount !== 1 ? 's' : ''}</span>
+                        ${isUserChoice ? '<div class="text-gold-primary text-sm mt-1">✅ Seu voto</div>' : ''}
+                    </div>` 
+                    : 
+                    `<button onclick="voteForRoteiro('${collaborativeId}', ${index})" class="bg-gold-primary hover:bg-gold-secondary text-black px-6 py-3 rounded-lg font-bold transition-colors w-full">
+                        🗳️ Votar Neste
+                    </button>`
+                }
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * Votar em roteiro
+ */
+function voteForRoteiro(collaborativeId, roteiroIndex) {
+    const userId = localStorage.getItem('sop_user_id') || generateUserId();
+    localStorage.setItem('sop_user_id', userId);
+    
+    // Carrega dados colaborativos
+    const colaborativos = JSON.parse(localStorage.getItem('sop_roteiros_colaborativos') || '[]');
+    const roteiroData = colaborativos.find(r => r.id === collaborativeId);
+    
+    if (!roteiroData) return;
+    
+    // Registra o voto
+    roteiroData.votos[userId] = roteiroIndex;
+    localStorage.setItem('sop_roteiros_colaborativos', JSON.stringify(colaborativos));
+    
+    // Marca que o usuário votou
+    localStorage.setItem(`voted_${collaborativeId}`, roteiroIndex);
+    
+    // Recarrega a interface
+    loadCollaborativeVoting(collaborativeId);
+    
+    showNotification('✅ Voto registrado com sucesso!', 'success');
+}
+
+/**
+ * Gera ID único do usuário
+ */
+function generateUserId() {
+    return Date.now().toString(36) + Math.random().toString(36).substr(2);
+}
+
+/**
+ * Gera resultados da votação
+ */
+function generateVotingResults(votos, roteiros) {
+    const results = [0, 1, 2].map(index => ({
+        index,
+        count: Object.values(votos).filter(v => v === index).length,
+        roteiro: roteiros[index]
+    }));
+    
+    results.sort((a, b) => b.count - a.count);
+    
+    const totalVotes = Object.keys(votos).length;
+    
+    if (totalVotes === 0) {
+        return '<p class="text-gray-400">Nenhum voto ainda</p>';
+    }
+    
+    return results.map((result, position) => {
+        const percentage = totalVotes > 0 ? (result.count / totalVotes * 100).toFixed(1) : 0;
+        const medal = position === 0 ? '🥇' : position === 1 ? '🥈' : '🥉';
+        
+        return `
+            <div class="flex justify-between items-center py-2 ${position === 0 ? 'text-gold-primary font-bold' : 'text-gray-300'}">
+                <span>${medal} ${result.roteiro.tipo}</span>
+                <span>${result.count} voto${result.count !== 1 ? 's' : ''} (${percentage}%)</span>
+            </div>
+        `;
+    }).join('');
+}
+
+/**
+ * Compartilhar no WhatsApp
+ */
+function shareWhatsApp(index) {
+    const roteiro = generatedRoteiros[index];
+    if (!roteiro) return;
+    
+    const message = `🏍️ *${roteiro.titulo}* 🏍️
+
+📅 *Detalhes do Rolê:*
+📍 Distância: ${roteiro.distancia_total}
+⏱️ Tempo: ${roteiro.tempo_total}
+💰 Custo: ${roteiro.custo_total_estimado}
+🎢 Dificuldade: ${roteiro.nivel_dificuldade}
+
+🗺️ *Destinos:*
+${roteiro.destinos.map((d, i) => `${i + 1}. ${d.nome}\n   📍 ${d.endereco}\n   💰 ${d.custo_estimado}`).join('\n\n')}
+
+🔗 *Quer participar?* Acesse: ${generateRoleLink(index)}
+
+_Gerado por Sons of Peaky - Gerador de Rolês IA_`;
+
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+    
+    trackEvent('share', { type: 'whatsapp', roteiro: roteiro.titulo });
+}
+
+/**
+ * Compartilhar no Instagram (gera card visual)
+ */
+function shareInstagram(index) {
+    const roteiro = generatedRoteiros[index];
+    if (!roteiro) return;
+    
+    generateInstagramCard(roteiro, index);
+}
+
+/**
+ * Gerar link de convite
+ */
+function shareLink(index) {
+    const link = generateRoleLink(index);
+    
+    if (navigator.share) {
+        navigator.share({
+            title: generatedRoteiros[index].titulo,
+            text: `Participe do nosso rolê de moto: ${generatedRoteiros[index].titulo}`,
+            url: link
+        });
+    } else {
+        navigator.clipboard.writeText(link).then(() => {
+            showNotification('Link copiado para a área de transferência!', 'success');
+        });
+    }
+    
+    trackEvent('share', { type: 'link', roteiro: generatedRoteiros[index].titulo });
+}
+
+/**
+ * Gerar QR Code
+ */
+function generateQRCode(index) {
+    const link = generateRoleLink(index);
+    const qrModal = document.createElement('div');
+    qrModal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+    qrModal.innerHTML = `
+        <div class="bg-gray-800 p-6 rounded-lg max-w-sm w-full mx-4">
+            <h3 class="text-xl font-bold text-white mb-4 text-center">📱 QR Code do Rolê</h3>
+            <div class="bg-white p-4 rounded-lg mb-4 flex justify-center">
+                <canvas id="qr-canvas" width="200" height="200"></canvas>
+            </div>
+            <p class="text-gray-300 text-sm text-center mb-4">Compartilhe este QR Code para que seus amigos acessem os detalhes do rolê</p>
+            <div class="flex gap-2">
+                <button onclick="downloadQR()" class="flex-1 bg-blue-600 text-white py-2 rounded">Download</button>
+                <button onclick="closeModal()" class="flex-1 bg-gray-600 text-white py-2 rounded">Fechar</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(qrModal);
+    generateQRCanvas(link, 'qr-canvas');
+    
+    window.closeModal = () => {
+        document.body.removeChild(qrModal);
+        delete window.closeModal;
+        delete window.downloadQR;
+    };
+    
+    window.downloadQR = () => {
+        const canvas = document.getElementById('qr-canvas');
+        const link = document.createElement('a');
+        link.download = `role-qr-${generatedRoteiros[index].titulo.replace(/[^a-zA-Z0-9]/g, '-')}.png`;
+        link.href = canvas.toDataURL();
+        link.click();
+    };
+}
+
+/**
+ * Adicionar ao Google Calendar
+ */
+function addToCalendar(index) {
+    const roteiro = generatedRoteiros[index];
+    if (!roteiro) return;
+    
+    // Precisamos dos dados do formulário original para pegar data/horários
+    const formData = getLastFormData();
+    if (!formData) {
+        showNotification('Dados do formulário não encontrados', 'error');
+        return;
+    }
+    
+    // Cria modal de confirmação para múltiplas entradas
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4';
+    modal.innerHTML = `
+        <div class="bg-gray-800 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-auto">
+            <div class="p-6 border-b border-gray-700">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold text-gold-primary">📅 Adicionar ao Google Calendar</h2>
+                    <button onclick="closeCalendarModal()" class="text-gray-400 hover:text-white text-xl">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="p-6">
+                <div class="mb-6">
+                    <h3 class="text-lg font-bold text-white mb-3">Escolha como adicionar:</h3>
+                    <div class="space-y-3">
+                        <button onclick="createSingleEvent(${index})" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg transition-colors text-left">
+                            <div class="font-bold">📍 Evento Único</div>
+                            <div class="text-sm text-blue-200">Um evento para todo o rolê (${formData.horarioSaida} - ${formData.horarioVolta})</div>
+                        </button>
+                        
+                        <button onclick="createMultipleEvents(${index})" class="w-full bg-purple-600 hover:bg-purple-700 text-white px-4 py-3 rounded-lg transition-colors text-left">
+                            <div class="font-bold">🎯 Paradas Separadas</div>
+                            <div class="text-sm text-purple-200">Uma entrada para cada destino com horários específicos</div>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-700 rounded-lg p-4">
+                    <h4 class="text-gold-primary font-bold mb-3">📋 Checklist será incluído:</h4>
+                    <div class="text-sm text-gray-300 space-y-1">
+                        ${generateCalendarChecklist(roteiro)}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Funções do modal
+    window.closeCalendarModal = () => {
+        document.body.removeChild(modal);
+        delete window.closeCalendarModal;
+        delete window.createSingleEvent;
+        delete window.createMultipleEvents;
+    };
+    
+    window.createSingleEvent = (idx) => {
+        createSingleCalendarEvent(idx);
+        closeCalendarModal();
+    };
+    
+    window.createMultipleEvents = (idx) => {
+        createMultipleCalendarEvents(idx);
+        closeCalendarModal();
+    };
+}
+
+/**
+ * Gera checklist para o calendário
+ */
+function generateCalendarChecklist(roteiro) {
+    const allTips = new Set();
+    
+    if (roteiro.destinos) {
+        roteiro.destinos.forEach(destino => {
+            if (destino.dicas_motociclista) {
+                destino.dicas_motociclista.forEach(dica => {
+                    const cleanTip = dica.replace(/^[^:]+:\s*/, '').trim();
+                    if (cleanTip.length > 10) {
+                        allTips.add(`• ${cleanTip}`);
+                    }
+                });
+            }
+        });
+    }
+    
+    return Array.from(allTips).slice(0, 5).join('\\n') + (allTips.size > 5 ? '\\n• E mais...' : '');
+}
+
+/**
+ * Cria evento único no Google Calendar
+ */
+function createSingleCalendarEvent(index) {
+    const roteiro = generatedRoteiros[index];
+    const formData = getLastFormData();
+    
+    const startDate = new Date(`${formData.dataRole}T${formData.horarioSaida}`);
+    const endDate = new Date(`${formData.dataRole}T${formData.horarioVolta}`);
+    
+    const eventTitle = `🏍️ ${roteiro.titulo}`;
+    const checklist = generateCalendarChecklist(roteiro);
+    const eventDescription = `${roteiro.resumo}\\n\\n📍 DESTINOS:\\n${roteiro.destinos.map(d => `• ${d.nome} - ${d.endereco}`).join('\\n')}\\n\\n📋 CHECKLIST:\\n${checklist}\\n\\n💰 Custo: ${roteiro.custo_total_estimado}\\n📏 Distância: ${roteiro.distancia_total}`;
+    
+    const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventTitle)}&dates=${startDate.toISOString().replace(/[-:]/g, '').split('.')[0]}Z/${endDate.toISOString().replace(/[-:]/g, '').split('.')[0]}Z&details=${encodeURIComponent(eventDescription)}&location=${encodeURIComponent(formData.pontoPartida)}`;
+    
+    window.open(googleCalendarUrl, '_blank');
+    showNotification('📅 Evento único criado no Google Calendar!', 'success');
+    trackEvent('calendar_export', { roteiro: roteiro.titulo, type: 'single' });
+}
+
+/**
+ * Cria múltiplos eventos no Google Calendar
+ */
+function createMultipleCalendarEvents(index) {
+    const roteiro = generatedRoteiros[index];
+    const formData = getLastFormData();
+    
+    let currentTime = new Date(`${formData.dataRole}T${formData.horarioSaida}`);
+    
+    // Evento principal de partida
+    const mainEventTitle = `🏍️ ${roteiro.titulo} - SAÍDA`;
+    const checklist = generateCalendarChecklist(roteiro);
+    const mainEventDescription = `🚀 INÍCIO DO ROLÊ\\n\\n📋 CHECKLIST COMPLETO:\\n${checklist}\\n\\n🎯 ROTEIRO:\\n${roteiro.destinos.map(d => `• ${d.nome}`).join('\\n')}\\n\\n💰 Custo Total: ${roteiro.custo_total_estimado}`;
+    
+    const mainEventEnd = new Date(currentTime.getTime() + 30 * 60000); // 30 min depois
+    
+    const mainUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(mainEventTitle)}&dates=${currentTime.toISOString().replace(/[-:]/g, '').split('.')[0]}Z/${mainEventEnd.toISOString().replace(/[-:]/g, '').split('.')[0]}Z&details=${encodeURIComponent(mainEventDescription)}&location=${encodeURIComponent(formData.pontoPartida)}`;
+    
+    window.open(mainUrl, '_blank');
+    
+    // Eventos para cada destino (com delay para não sobrecarregar)
+    roteiro.destinos.forEach((destino, idx) => {
+        setTimeout(() => {
+            if (destino.horario_chegada) {
+                const [hours, minutes] = destino.horario_chegada.split(':');
+                const eventStart = new Date(`${formData.dataRole}T${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`);
+                const eventEnd = new Date(eventStart.getTime() + (parseInt(destino.tempo_permanencia) || 60) * 60000);
+                
+                const eventTitle = `📍 ${destino.nome}`;
+                const destinoDicas = destino.dicas_motociclista ? destino.dicas_motociclista.map(d => `• ${d}`).join('\\n') : '';
+                const eventDescription = `${destino.descricao}\\n\\n⏱️ Tempo de permanência: ${destino.tempo_permanencia || '60'} min\\n\\n💰 Custo estimado: ${destino.custo_estimado}\\n\\n🏍️ DICAS ESPECÍFICAS:\\n${destinoDicas}`;
+                
+                const destUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventTitle)}&dates=${eventStart.toISOString().replace(/[-:]/g, '').split('.')[0]}Z/${eventEnd.toISOString().replace(/[-:]/g, '').split('.')[0]}Z&details=${encodeURIComponent(eventDescription)}&location=${encodeURIComponent(destino.endereco)}`;
+                
+                window.open(destUrl, '_blank');
+            }
+        }, idx * 1000); // Delay de 1s entre cada abertura
+    });
+    
+    showNotification(`📅 ${roteiro.destinos.length + 1} eventos criados no Google Calendar!`, 'success');
+    trackEvent('calendar_export', { roteiro: roteiro.titulo, type: 'multiple', count: roteiro.destinos.length + 1 });
+}
+
+/**
+ * Mostrar no mapa
+ */
+function showMap(index) {
+    const roteiro = generatedRoteiros[index];
+    if (!roteiro) return;
+    
+    const mapModal = document.createElement('div');
+    mapModal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+    mapModal.innerHTML = `
+        <div class="bg-gray-800 p-6 rounded-lg max-w-4xl w-full mx-4 max-h-[90vh] overflow-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-white">🗺️ Mapa do Roteiro</h3>
+                <button onclick="closeMapModal()" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="space-y-3">
+                ${roteiro.destinos.map((destino, i) => `
+                    <div class="bg-gray-700 p-3 rounded flex items-center justify-between">
+                        <div>
+                            <strong class="text-white">${i + 1}. ${destino.nome}</strong>
+                            <p class="text-gray-400 text-sm">${destino.endereco}</p>
+                        </div>
+                        <button onclick="openGoogleMaps('${destino.endereco}')" class="bg-blue-600 text-white px-3 py-1 rounded text-sm">
+                            Abrir no Maps
+                        </button>
+                    </div>
+                `).join('')}
+            </div>
+            <div class="mt-4 text-center">
+                <button onclick="openFullRoute(${index})" class="bg-green-600 text-white px-6 py-2 rounded">
+                    🗺️ Ver Rota Completa no Google Maps
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(mapModal);
+    
+    window.closeMapModal = () => {
+        document.body.removeChild(mapModal);
+        delete window.closeMapModal;
+        delete window.openGoogleMaps;
+        delete window.openFullRoute;
+    };
+    
+    window.openGoogleMaps = (endereco) => {
+        window.open(`https://www.google.com/maps/search/${encodeURIComponent(endereco)}`, '_blank');
+    };
+    
+    window.openFullRoute = (roteiroIndex) => {
+        const formData = getLastFormData();
+        const roteiro = generatedRoteiros[roteiroIndex];
+        
+        const origem = encodeURIComponent(formData.enderecoPartida);
+        const destinos = roteiro.destinos.map(d => encodeURIComponent(d.endereco)).join('/');
+        
+        const mapsUrl = `https://www.google.com/maps/dir/${origem}/${destinos}`;
+        window.open(mapsUrl, '_blank');
+    };
+}
+
+/**
+ * Download PDF
+ */
+function downloadPDF(index) {
+    const roteiro = generatedRoteiros[index];
+    if (!roteiro) return;
+    
+    // Para implementação futura - usar jsPDF ou similar
+    showNotification('Funcionalidade de PDF em desenvolvimento', 'info');
+    trackEvent('pdf_download', { roteiro: roteiro.titulo });
+}
+
+// Funções auxiliares para compartilhamento
+function generateRoleLink(index) {
+    const roteiro = generatedRoteiros[index];
+    const baseUrl = window.location.origin + window.location.pathname;
+    
+    // Salva o roteiro no localStorage com ID único
+    const roteiroId = Date.now().toString(36) + Math.random().toString(36).substr(2);
+    localStorage.setItem(`role_${roteiroId}`, JSON.stringify({
+        roteiro: roteiro,
+        formData: getLastFormData(),
+        timestamp: Date.now()
+    }));
+    
+    return `${baseUrl}?role=${roteiroId}`;
+}
+
+function generateQRCanvas(text, canvasId) {
+    // Implementação básica de QR Code - para produção usar biblioteca como qrcode.js
+    const canvas = document.getElementById(canvasId);
+    const ctx = canvas.getContext('2d');
+    
+    // Placeholder - desenha um quadrado com texto
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, 200, 200);
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(20, 20, 160, 160);
+    ctx.fillStyle = '#000';
+    ctx.font = '12px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('QR CODE', 100, 100);
+    ctx.fillText('(Em desenvolvimento)', 100, 120);
+}
+
+function generateInstagramCard(roteiro, index) {
+    // Cria card visual para Instagram
+    const canvas = document.createElement('canvas');
+    canvas.width = 1080;
+    canvas.height = 1080;
+    const ctx = canvas.getContext('2d');
+    
+    // Background gradient
+    const gradient = ctx.createLinearGradient(0, 0, 0, 1080);
+    gradient.addColorStop(0, '#000000');
+    gradient.addColorStop(1, '#1a1a1a');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 1080, 1080);
+    
+    // Título
+    ctx.fillStyle = '#ffd700';
+    ctx.font = 'bold 48px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(roteiro.titulo, 540, 200);
+    
+    // Informações
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '32px Arial';
+    ctx.fillText(`💰 ${roteiro.custo_total_estimado}`, 540, 300);
+    ctx.fillText(`📍 ${roteiro.distancia_total}`, 540, 350);
+    ctx.fillText(`⏱️ ${roteiro.tempo_total}`, 540, 400);
+    
+    // QR Code placeholder
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(390, 500, 300, 300);
+    ctx.fillStyle = '#000000';
+    ctx.font = '24px Arial';
+    ctx.fillText('Sons of Peaky', 540, 650);
+    ctx.fillText('Gerador de Rolês', 540, 680);
+    
+    // Download
+    const link = document.createElement('a');
+    link.download = `instagram-${roteiro.titulo.replace(/[^a-zA-Z0-9]/g, '-')}.png`;
+    link.href = canvas.toDataURL();
+    link.click();
+    
+    showNotification('Card do Instagram baixado!', 'success');
+}
+
+let lastFormData = null;
+function getLastFormData() {
+    return lastFormData;
+}
+
+/**
+ * Seleciona um roteiro e expande com opções de compartilhamento
+ */
+function selectRoteiro(index) {
+    const roteiro = generatedRoteiros[index];
+    if (!roteiro) return;
+    
+    // Esconde as sugestões com animação
+    const suggestionsGrid = document.getElementById('suggestions-grid');
+    suggestionsGrid.style.transform = 'translateY(-20px)';
+    suggestionsGrid.style.opacity = '0';
+    
+    setTimeout(() => {
+        suggestionsGrid.classList.add('hidden');
+        
+        // Mostra o roteiro expandido
+        const selectedContainer = document.getElementById('selected-roteiro');
+        selectedContainer.classList.remove('hidden');
+        
+        // Formatar dados do passeio
+        const formData = lastFormData || {};
+        const dataFormatada = formData.dataRole ? new Date(formData.dataRole).toLocaleDateString('pt-BR', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        }) : 'Data não informada';
+        
+        selectedContainer.innerHTML = `
+            <div class="text-center mb-6">
+                <h2 class="text-3xl font-bold text-gold-primary mb-2">🎉 Roteiro Selecionado!</h2>
+                <p class="text-gray-300 mb-4">Agora você pode compartilhar com seus amigos e organizar o grupo</p>
+                
+                <!-- Dados do Passeio -->
+                <div class="bg-card rounded-lg p-4 mb-4 text-left max-w-2xl mx-auto">
+                    <h3 class="text-lg font-semibold text-gold-primary mb-3 text-center">📋 Dados do Passeio</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                        <div class="flex items-center">
+                            <span class="text-gold-primary mr-2">📅</span>
+                            <span class="text-gray-300">Data: <strong class="text-white">${dataFormatada}</strong></span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-gold-primary mr-2">🕐</span>
+                            <span class="text-gray-300">Saída: <strong class="text-white">${formData.horarioSaida || 'Não informado'}</strong></span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-gold-primary mr-2">🕕</span>
+                            <span class="text-gray-300">Retorno: <strong class="text-white">${formData.horarioVolta || 'Não informado'}</strong></span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-gold-primary mr-2">🏍️</span>
+                            <span class="text-gray-300">Moto: <strong class="text-white">${formData.capacidadeTanque || 0}L | ${formData.consumoMedio || 0}km/L</strong></span>
+                        </div>
+                        ${formData.autonomia ? `
+                        <div class="flex items-center">
+                            <span class="text-gold-primary mr-2">📏</span>
+                            <span class="text-gray-300">Autonomia: <strong class="text-white">${Math.round(formData.autonomia)}km</strong></span>
+                        </div>` : ''}
+                        <div class="flex items-center md:col-span-2">
+                            <span class="text-gold-primary mr-2">📍</span>
+                            <span class="text-gray-300">Ponto de Saída: <strong class="text-white">${formData.enderecoPartida || 'Não informado'}</strong></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <button onclick="showSuggestions()" class="text-blue-400 underline mt-2 hover:text-blue-300">
+                    ← Voltar para as opções
+                </button>
+            </div>
+        `;
+        
+        const expandedCard = createResultCard(roteiro, index);
+        expandedCard.classList.add('animate-fade-in');
+        selectedContainer.appendChild(expandedCard);
+        
+        // Scroll suave para o card expandido
+        setTimeout(() => {
+            selectedContainer.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start' 
+            });
+        }, 100);
+        
+    }, 300);
+    
+    trackEvent('roteiro_selected', { 
+        tipo: roteiro.tipo, 
+        titulo: roteiro.titulo 
+    });
+}
+
+/**
+ * Volta para as sugestões
+ */
+function showSuggestions() {
+    const suggestionsGrid = document.getElementById('suggestions-grid');
+    const selectedContainer = document.getElementById('selected-roteiro');
+    
+    // Esconde roteiro expandido
+    selectedContainer.classList.add('hidden');
+    
+    // Mostra sugestões novamente
+    suggestionsGrid.classList.remove('hidden');
+    suggestionsGrid.style.transform = 'translateY(0)';
+    suggestionsGrid.style.opacity = '1';
+    
+    // Scroll suave para as sugestões
+    setTimeout(() => {
+        suggestionsGrid.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start' 
+        });
+    }, 100);
+}
+
+/**
+ * Salvar roteiro nos favoritos
+ */
+function saveRoteiro(index) {
+    const roteiro = generatedRoteiros[index];
+    if (!roteiro) return;
+    
+    const favoritos = JSON.parse(localStorage.getItem('sop_roteiros_favoritos') || '[]');
+    
+    // Verifica se já existe
+    const jaExiste = favoritos.some(fav => fav.roteiro.titulo === roteiro.titulo);
+    if (jaExiste) {
+        showNotification(`⚠️ "${roteiro.titulo}" já está nos favoritos!`, 'warning');
+        return;
+    }
+    
+    const roteiroFavorito = {
+        id: Date.now().toString(36),
+        roteiro: roteiro,
+        formData: lastFormData,
+        dataSalvo: new Date().toISOString(),
+        titulo: roteiro.titulo
+    };
+    
+    favoritos.push(roteiroFavorito);
+    localStorage.setItem('sop_roteiros_favoritos', JSON.stringify(favoritos));
+    
+    showNotification(`✅ "${roteiro.titulo}" salvo nos favoritos! Clique em "Favoritos" no menu para ver.`, 'success');
+    trackEvent('save_favorite', { roteiro: roteiro.titulo });
+}
+
+/**
+ * Mostrar modal de favoritos
+ */
+function showFavoritos() {
+    const favoritos = JSON.parse(localStorage.getItem('sop_roteiros_favoritos') || '[]');
+    
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4';
+    modal.innerHTML = `
+        <div class="bg-gray-800 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-auto">
+            <div class="p-6 border-b border-gray-700">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold text-gold-primary">❤️ Seus Rolês Favoritos</h2>
+                    <button onclick="closeFavoritosModal()" class="text-gray-400 hover:text-white text-xl">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <p class="text-gray-400 mt-2">${favoritos.length} rolês salvos</p>
+            </div>
+            
+            <div class="p-6">
+                ${favoritos.length === 0 ? `
+                    <div class="text-center py-12">
+                        <div class="text-6xl mb-4">💔</div>
+                        <h3 class="text-xl text-gray-400 mb-2">Nenhum rolê salvo ainda</h3>
+                        <p class="text-gray-500">Gere um rolê e clique em "Salvar Favorito" para começar sua coleção!</p>
+                    </div>
+                ` : `
+                    <div class="grid gap-4">
+                        ${favoritos.map((fav, index) => `
+                            <div class="bg-gray-700 rounded-lg p-4 hover:bg-gray-650 transition-colors">
+                                <div class="flex justify-between items-start mb-3">
+                                    <div>
+                                        <h3 class="text-lg font-bold text-white">${fav.roteiro.titulo}</h3>
+                                        <p class="text-gray-400 text-sm">${fav.roteiro.tipo || 'Roteiro'} • Salvo em ${new Date(fav.dataSalvo).toLocaleDateString('pt-BR')}</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-gold-primary font-bold">${fav.roteiro.custo_total_estimado}</div>
+                                        <div class="text-gray-400 text-sm">${fav.roteiro.distancia_total}</div>
+                                    </div>
+                                </div>
+                                
+                                <p class="text-gray-300 text-sm mb-3">${fav.roteiro.resumo}</p>
+                                
+                                <div class="flex gap-2">
+                                    <button onclick="reuseRoteiro('${fav.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm">
+                                        🔄 Reutilizar
+                                    </button>
+                                    <button onclick="shareRoteiroFavorito('${fav.id}')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm">
+                                        📱 Compartilhar
+                                    </button>
+                                    <button onclick="deleteFavorito('${fav.id}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm">
+                                        🗑️ Excluir
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `}
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Funções do modal
+    window.closeFavoritosModal = () => {
+        document.body.removeChild(modal);
+        delete window.closeFavoritosModal;
+        delete window.reuseRoteiro;
+        delete window.shareRoteiroFavorito;
+        delete window.deleteFavorito;
+    };
+    
+    window.reuseRoteiro = (id) => {
+        const favoritos = JSON.parse(localStorage.getItem('sop_roteiros_favoritos') || '[]');
+        const favorito = favoritos.find(f => f.id === id);
+        if (favorito) {
+            // Preenche o formulário com os dados salvos
+            if (favorito.formData) {
+                Object.keys(favorito.formData).forEach(key => {
+                    const element = document.getElementById(key.replace(/([A-Z])/g, '-$1').toLowerCase());
+                    if (element) {
+                        element.value = favorito.formData[key];
+                    }
+                });
+            }
+            closeFavoritosModal();
+            showNotification('📝 Formulário preenchido com dados do favorito!', 'success');
+        }
+    };
+    
+    window.shareRoteiroFavorito = (id) => {
+        const favoritos = JSON.parse(localStorage.getItem('sop_roteiros_favoritos') || '[]');
+        const favorito = favoritos.find(f => f.id === id);
+        if (favorito) {
+            generatedRoteiros = [favorito.roteiro];
+            shareWhatsApp(0);
+        }
+    };
+    
+    window.deleteFavorito = (id) => {
+        const favoritos = JSON.parse(localStorage.getItem('sop_roteiros_favoritos') || '[]');
+        const updatedFavoritos = favoritos.filter(f => f.id !== id);
+        localStorage.setItem('sop_roteiros_favoritos', JSON.stringify(updatedFavoritos));
+        closeFavoritosModal();
+        showFavoritos(); // Reabre com lista atualizada
+        showNotification('🗑️ Favorito excluído!', 'success');
+    };
+}
+
+/**
+ * Carregar roteiro compartilhado via URL
+ */
+function loadSharedRoteiro() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const roleId = urlParams.get('role');
+    
+    if (roleId) {
+        const sharedData = localStorage.getItem(`role_${roleId}`);
+        if (sharedData) {
+            try {
+                const data = JSON.parse(sharedData);
+                
+                // Verifica se não é muito antigo (7 dias)
+                if (Date.now() - data.timestamp < 7 * 24 * 60 * 60 * 1000) {
+                    generatedRoteiros = [data.roteiro];
+                    lastFormData = data.formData;
+                    displayResults([data.roteiro]);
+                    
+                    showNotification('🔗 Rolê compartilhado carregado!', 'info');
+                    
+                    // Remove o parâmetro da URL
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                } else {
+                    showNotification('❌ Link do rolê expirado (7 dias)', 'error');
+                }
+            } catch (error) {
+                showNotification('❌ Erro ao carregar rolê compartilhado', 'error');
+            }
+        } else {
+            showNotification('❌ Rolê compartilhado não encontrado', 'error');
+        }
     }
 }
 

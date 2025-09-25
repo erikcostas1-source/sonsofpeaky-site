@@ -183,35 +183,90 @@
 </head>
 <body class="bg-gray-50">
     <!-- Header -->
-    <header class="bg-white border-b border-gray-200 px-6 py-4">
-        <div class="max-w-7xl mx-auto flex items-center justify-between">
-            <div class="flex items-center space-x-4">
-                <button id="backBtn" class="p-2 hover:bg-gray-100 rounded-lg">
-                    <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                    </svg>
+    <header class="bg-white border-b border-gray-200">
+        <!-- Navigation -->
+        <nav class="px-6 py-4 border-b border-gray-100">
+            <div class="max-w-7xl mx-auto flex items-center justify-between">
+                <div class="flex items-center space-x-6">
+                    <a href="index.html" class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-motorcycle text-white text-sm"></i>
+                        </div>
+                        <span class="font-bold text-xl text-gray-900">Gerador de Rolês</span>
+                    </a>
+                    
+                    <!-- Desktop Menu -->
+                    <div class="hidden md:flex items-center space-x-4">
+                        <a href="gerador-index.html" class="text-gray-600 hover:text-blue-600 transition-colors">
+                            <i class="fas fa-route mr-1"></i>Gerador
+                        </a>
+                        <a href="analytics.html" class="text-blue-600 font-semibold">
+                            <i class="fas fa-chart-bar mr-1"></i>Analytics
+                        </a>
+                        <a href="settings.html" class="text-gray-600 hover:text-blue-600 transition-colors">
+                            <i class="fas fa-cog mr-1"></i>Configurações
+                        </a>
+                        <a href="payment.html" class="text-gray-600 hover:text-blue-600 transition-colors">
+                            <i class="fas fa-crown mr-1"></i>Planos
+                        </a>
+                        <a href="admin.html" class="text-gray-600 hover:text-blue-600 transition-colors">
+                            <i class="fas fa-shield-alt mr-1"></i>Admin
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-btn" class="md:hidden text-gray-600">
+                    <i class="fas fa-bars"></i>
                 </button>
+            </div>
+            
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="hidden md:hidden mt-4 pb-4 border-t border-gray-100 pt-4">
+                <div class="space-y-2">
+                    <a href="gerador-index.html" class="block text-gray-600 hover:text-blue-600 transition-colors py-2">
+                        <i class="fas fa-route mr-2"></i>Gerador
+                    </a>
+                    <a href="analytics.html" class="block text-blue-600 font-semibold py-2">
+                        <i class="fas fa-chart-bar mr-2"></i>Analytics
+                    </a>
+                    <a href="settings.html" class="block text-gray-600 hover:text-blue-600 transition-colors py-2">
+                        <i class="fas fa-cog mr-2"></i>Configurações
+                    </a>
+                    <a href="payment.html" class="block text-gray-600 hover:text-blue-600 transition-colors py-2">
+                        <i class="fas fa-crown mr-2"></i>Planos
+                    </a>
+                    <a href="admin.html" class="block text-gray-600 hover:text-blue-600 transition-colors py-2">
+                        <i class="fas fa-shield-alt mr-2"></i>Admin
+                    </a>
+                </div>
+            </div>
+        </nav>
+        
+        <!-- Page Header -->
+        <div class="px-6 py-4">
+            <div class="max-w-7xl mx-auto flex items-center justify-between">
                 <div>
                     <h1 class="text-2xl font-bold text-gray-900">Analytics</h1>
                     <p class="text-gray-600">Métricas e insights da plataforma</p>
                 </div>
-            </div>
-            
-            <div class="flex items-center space-x-4">
-                <!-- Date Range Picker -->
-                <div class="flex items-center space-x-2">
-                    <input type="date" id="startDate" class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
-                    <span class="text-gray-500">até</span>
-                    <input type="date" id="endDate" class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
-                </div>
                 
-                <!-- Export Button -->
-                <button id="exportBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                    <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                    </svg>
-                    Exportar
-                </button>
+                <div class="flex items-center space-x-4">
+                    <!-- Date Range Picker -->
+                    <div class="flex items-center space-x-2">
+                        <input type="date" id="startDate" class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                        <span class="text-gray-500">até</span>
+                        <input type="date" id="endDate" class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                    </div>
+                    
+                    <!-- Export Button -->
+                    <button id="exportBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                        <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        Exportar
+                    </button>
+                </div>
             </div>
         </div>
     </header>
@@ -615,5 +670,17 @@
     <script src="database.js"></script>
     <script src="auth.js"></script>
     <script src="analytics.js"></script>
+    
+    <script>
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        if (mobileMenuBtn && mobileMenu) {
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+    </script>
 </body>
 </html>

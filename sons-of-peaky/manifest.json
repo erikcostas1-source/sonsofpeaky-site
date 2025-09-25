@@ -1,0 +1,54 @@
+{
+  "name": "Gerador de Rolês de Moto",
+  "short_name": "Gerador Rolês",
+  "description": "IA que cria roteiros personalizados para motociclistas. Descubra destinos únicos, calcule custos e planeje a aventura perfeita.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#ffd700",
+  "orientation": "portrait-primary",
+  "scope": "./",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "categories": ["travel", "lifestyle", "productivity"],
+  "icons": [
+    {
+      "src": "assets/img/moto-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "assets/img/moto-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "assets/img/screenshot.jpg",
+      "sizes": "1280x720",
+      "type": "image/jpeg",
+      "label": "Gerador de Rolês de Moto em ação"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Novo Rolê",
+      "short_name": "Novo",
+      "description": "Criar um novo roteiro de moto",
+      "url": "./#gerador-form",
+      "icons": [
+        {
+          "src": "assets/img/moto-icon-96.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "protocol_handlers": [],
+  "handle_links": "preferred"
+}

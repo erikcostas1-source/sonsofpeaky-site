@@ -1,19 +1,24 @@
-// Configuração do Gerador de Rolês
+// 💼 Gerador de Rolês - Configuração da Plataforma Comercial
+// Config completo para sistema de negócios com IA
+
 window.GERADOR_CONFIG = {
-    // API do Google Gemini
+    // API Google Gemini (chave independente)
     textUrl: "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=AIzaSyB6MdY8jd1pxAw-K0LN3F3xF8Z5q5dFmJE",
+    apiKey: "AIzaSyB6MdY8jd1pxAw-K0LN3F3xF8Z5q5dFmJE",
     
-    // Configurações gerais
+    // Informações da plataforma
     app: {
-        name: "Gerador de Rolês de Moto",
-        version: "1.0.0",
-        description: "IA que cria roteiros personalizados para motociclistas",
+        name: "Gerador de Rolês",
+        tagline: "Transformando aventuras em negócios",
+        version: "2.0.0",
+        description: "Plataforma IA para geração de roteiros motociclísticos comerciais",
         author: "Gerador de Rolês Team",
         contact: "contato@gerador-roles.com",
-        website: "https://gerador-roles.com"
+        website: "https://gerador-roles.com",
+        support: "suporte@gerador-roles.com"
     },
     
-    // Configurações da IA
+    // Configurações da IA comercial
     ai: {
         temperature: 0.8,
         topK: 40,
