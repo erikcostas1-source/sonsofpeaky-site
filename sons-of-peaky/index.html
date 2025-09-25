@@ -309,8 +309,8 @@
                 padding: 12px !important;
             }
             
-            /* IA Chat toggle */
-            #ai-chat-toggle {
+            /* Chat removido */
+            .placeholder {
                 min-height: 48px !important;
                 padding: 12px 20px !important;
                 font-size: 16px !important;
@@ -561,12 +561,7 @@
             animation: pulse 2s infinite !important;
         }
         
-        /* AI CHAT CONTAINER */
-        #ai-chat-container {
-            background-color: var(--bg-secondary) !important;
-            border: 2px solid var(--bg-tertiary) !important;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.8) !important;
-        }
+
         
         /* SEÇÕES DESTACADAS */
         .section-title {
@@ -642,13 +637,7 @@
                 <a href="#estatutos" class="nav-link hover:text-amber-500 transition-colors duration-200 relative" aria-label="Ir para seção Estatutos">Estatutos</a>
                 <a href="#caminho" class="nav-link hover:text-amber-500 transition-colors duration-200 relative" aria-label="Ir para seção Caminho para a Irmandade">Caminho</a>
                 <a href="#agenda" class="nav-link hover:text-amber-500 transition-colors duration-200 relative" aria-label="Ir para seção Agenda">Agenda</a>
-                <a href="../gerador-roles/index.html" class="nav-link hover:text-amber-500 transition-colors duration-200 relative bg-gradient-to-r from-blue-600 to-purple-600 text-white px-3 py-1 rounded-lg" aria-label="Acessar Gerador de Rolês Premium" target="_blank">🚀 Gerador IA</a>
-                <a href="#ferramentas" class="nav-link hover:text-amber-500 transition-colors duration-200 relative" aria-label="Ir para seção Ferramentas">Ferramentas</a>
-                <a href="#bar" class="nav-link hover:text-amber-500 transition-colors duration-200 relative" aria-label="Ir para seção Preços do Bar">Bar</a>
                 <a href="#redes" class="nav-link hover:text-amber-500 transition-colors duration-200 relative" aria-label="Ir para seção Redes Sociais">Redes</a>
-                <button id="ai-chat-toggle" class="bg-amber-600 hover:bg-amber-500 text-black px-4 py-2 rounded-full font-bold transition-colors ml-4" aria-label="Abrir IA Assistant">
-                    <i class="fas fa-robot mr-2"></i>IA Assistant
-                </button>
             </nav>
 
             <!-- Mobile menu -->
@@ -663,66 +652,13 @@
                         <i class="fas fa-road mr-2 text-amber-500"></i>Caminho
                     </a>
                     <a href="#agenda" class="nav-link text-white hover:text-amber-500 transition-colors duration-200 py-2 border-b border-gray-700" aria-label="Ir para seção Agenda">Agenda</a>
-                    <a href="../gerador-roles/index.html" class="nav-link bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 transition-all duration-200 py-3 px-4 rounded-lg border border-gray-600" aria-label="Acessar Gerador de Rolês Premium" target="_blank">
-                        <i class="fas fa-robot mr-2"></i>🚀 Gerador IA Premium
-                    </a>
-                    <a href="#ferramentas" class="nav-link text-white hover:text-amber-500 transition-colors duration-200 py-2 border-b border-gray-700" aria-label="Ir para seção Ferramentas">Ferramentas</a>
-                    <a href="#bar" class="nav-link text-white hover:text-amber-500 transition-colors duration-200 py-2 border-b border-gray-700" aria-label="Ir para seção Preços do Bar">Bar</a>
                     <a href="#redes" class="nav-link text-white hover:text-amber-500 transition-colors duration-200 py-2 border-b border-gray-700" aria-label="Ir para seção Redes Sociais">Redes</a>
-                    <button id="ai-chat-toggle-mobile" class="w-full bg-amber-600 hover:bg-amber-500 text-black px-4 py-2 rounded-full font-bold transition-colors mt-4" aria-label="Abrir IA Assistant">
-                        <i class="fas fa-robot mr-2"></i>IA Assistant
-                    </button>
                 </div>
             </nav>
         </div>
     </header>
 
-    <!-- AI Chat Interface -->
-    <div id="ai-chat-container" class="fixed bottom-4 right-4 z-50 transform translate-y-full opacity-0 transition-all duration-300">
-        <div class="bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl w-80 max-h-96 flex flex-col">
-            <div class="bg-amber-600 text-black p-4 rounded-t-2xl flex items-center justify-between">
-                <div class="flex items-center space-x-2">
-                    <i class="fas fa-robot text-xl"></i>
-                    <span class="font-bold">IA Assistant SOP</span>
-                </div>
-                <button id="ai-chat-close" class="text-black hover:text-gray-700" aria-label="Fechar IA Assistant">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div id="ai-chat-messages" class="flex-1 p-4 overflow-y-auto space-y-3 min-h-40 max-h-64">
-                <div class="ai-message bg-gray-800 p-3 rounded-lg">
-                    <div class="flex items-center space-x-2 mb-2">
-                        <i class="fas fa-robot text-amber-500"></i>
-                        <span class="font-bold text-amber-500">SOP Assistant</span>
-                    </div>
-                    <p class="text-sm">Olá! Sou o assistente da Sons of Peaky. Como posso te ajudar hoje?</p>
-                </div>
-            </div>
-            
-            <div class="p-4 border-t border-gray-700">
-                <div class="flex space-x-2">
-                    <input type="text" id="ai-chat-input" placeholder="Digite sua mensagem..." 
-                           class="flex-1 bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-amber-500">
-                    <button id="ai-chat-send" class="bg-amber-600 hover:bg-amber-500 text-black px-4 py-2 rounded-lg transition-colors" aria-label="Enviar mensagem">
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
-                </div>
-                
-                <div class="mt-3 flex flex-wrap gap-2">
-                    <button class="ai-quick-action bg-gray-800 hover:bg-gray-700 text-xs px-3 py-1 rounded-full border border-gray-600" data-action="gerar-role">
-                        🛣️ Gerar Rolê
-                    </button>
-                    <button class="ai-quick-action bg-gray-800 hover:bg-gray-700 text-xs px-3 py-1 rounded-full border border-gray-600" data-action="info-irmandade">
-                        👥 Sobre a Irmandade
-                    </button>
-                    <button class="ai-quick-action bg-gray-800 hover:bg-gray-700 text-xs px-3 py-1 rounded-full border border-gray-600" data-action="proximos-eventos">
-                        📅 Próximos Eventos
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+
 
     <!-- Modal de confirmação -->
     <dialog id="modal" class="modal-overlay" aria-labelledby="modal-title">
@@ -750,55 +686,55 @@
                     <div class="absolute inset-0 w-32 h-32 mx-auto bg-gradient-to-r from-amber-400 to-orange-500 rounded-full opacity-20 blur-2xl animate-pulse"></div>
                 </div>
                 
-                <!-- Título Principal com Foco no Gerador -->
+                <!-- Título Principal Sons of Peaky -->
                 <h1 class="hero-title text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-                    O Primeiro Gerador IA de<br>
+                    Sons of Peaky<br>
                     <span class="text-transparent bg-gradient-to-r from-amber-400 via-orange-500 to-red-600 bg-clip-text">
-                        Rolês de Moto do Brasil
+                        Irmandade Motociclista
                     </span>
                 </h1>
                 
-                <!-- Proposta de Valor -->
+                <!-- Manifesto da Irmandade -->
                 <p class="text-xl md:text-2xl text-gray-200 mb-8 max-w-4xl mx-auto leading-relaxed">
-                    <strong class="text-amber-400">Mais de 10.000 destinos</strong> catalogados. 
-                    <strong class="text-amber-400">IA Gemini avançada</strong>. 
-                    <strong class="text-amber-400">Cálculos precisos</strong> de custo e rota.
+                    <strong class="text-amber-400">Irmandade fundada em 2021</strong>. 
+                    <strong class="text-amber-400">Valores autênticos</strong>. 
+                    <strong class="text-amber-400">Família motociclista</strong>.
                     <br>
                     <span class="text-lg text-gray-300 mt-2 block">
-                        🏍️ Descubra experiências únicas • 💰 Economize tempo e dinheiro • 🎯 Rolês personalizados
+                        🏍️ A estrada nos chama • 🏠 Mas o galpão nos une • 🔥 Irmandade verdadeira
                     </span>
                 </p>
                 
-                <!-- Social Proof Instantâneo -->
+                <!-- Informações da Irmandade -->
                 <div class="flex flex-wrap justify-center items-center gap-8 mb-10 text-gray-300">
                     <div class="flex items-center gap-2">
-                        <span class="text-2xl">⭐</span>
-                        <span><strong class="text-amber-400">4.9/5</strong> (1,247 avaliações)</span>
-                    </div>
-                    <div class="flex items-center gap-2">
                         <span class="text-2xl">🏍️</span>
-                        <span><strong class="text-amber-400">15,000+</strong> rolês gerados</span>
+                        <span><strong class="text-amber-400">2021</strong> Fundação</span>
                     </div>
                     <div class="flex items-center gap-2">
-                        <span class="text-2xl">👥</span>
-                        <span><strong class="text-amber-400">3,500+</strong> motociclistas</span>
+                        <span class="text-2xl">👑</span>
+                        <span><strong class="text-amber-400">Alta Cúpula</strong> & Membros</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-2xl">🏠</span>
+                        <span><strong class="text-amber-400">Galpão</strong> da Irmandade</span>
                     </div>
                 </div>
                 
-                <!-- CTAs com Teste Gratuito -->
+                <!-- CTAs da Irmandade -->
                 <div class="flex flex-col sm:flex-row justify-center gap-6 mb-12">
-                    <a href="#ferramentas" class="group px-10 py-5 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 hover:from-amber-400 hover:via-orange-400 hover:to-red-400 text-white font-bold rounded-xl transition-all duration-300 text-xl shadow-2xl hover:shadow-amber-500/25 transform hover:scale-105 relative overflow-hidden">
+                    <a href="#caminho" class="group px-10 py-5 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 hover:from-amber-400 hover:via-orange-400 hover:to-red-400 text-white font-bold rounded-xl transition-all duration-300 text-xl shadow-2xl hover:shadow-amber-500/25 transform hover:scale-105 relative overflow-hidden">
                         <span class="relative z-10 flex items-center justify-center gap-3">
-                            <span class="text-2xl">🚀</span>
-                            GERAR ROLÊ GRÁTIS AGORA
+                            <span class="text-2xl">🏍️</span>
+                            CONHEÇA A IRMANDADE
                         </span>
                         <div class="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                     </a>
                     
-                    <button id="hero-ai-chat" class="px-8 py-5 bg-gray-800/80 hover:bg-gray-700/80 border-2 border-amber-500/50 hover:border-amber-400 text-gray-100 font-bold rounded-xl transition-all duration-300 text-lg backdrop-blur-sm">
-                        <i class="fas fa-robot mr-2 text-amber-400"></i>
-                        Ver Como Funciona
-                    </button>
+                    <a href="#agenda" class="px-8 py-5 bg-gray-800/80 hover:bg-gray-700/80 border-2 border-amber-500/50 hover:border-amber-400 text-gray-100 font-bold rounded-xl transition-all duration-300 text-lg backdrop-blur-sm">
+                        <i class="fas fa-calendar mr-2 text-amber-400"></i>
+                        Próximas Quintas 19:30h
+                    </a>
                 </div>
                 
                 <!-- Trust Indicators -->
@@ -2689,7 +2625,7 @@ Exemplos:
                 <!-- Fechar -->
                 <button onclick="fecharCapturaRapida()" 
                         class="absolute top-4 right-4 text-white/70 hover:text-white" aria-label="Fechar captura rápida">
-                    <i class="fas fa-times"></i>
+body                    <i class="fas fa-times"></i>
                 </button>
             </div>
         </div>
