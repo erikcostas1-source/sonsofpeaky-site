@@ -173,6 +173,56 @@
                 font-size: 2.5rem;
             }
         }
+        
+        /* Wanted Cards Styles */
+        .wanted-card {
+            position: relative;
+            font-family: 'Courier New', monospace;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(139, 69, 19, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .wanted-card:hover {
+            transform: scale(1.05) rotate(2deg);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+        }
+        
+        .wanted-card::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            background: repeating-linear-gradient(
+                45deg,
+                #8B4513,
+                #8B4513 10px,
+                #A0522D 10px,
+                #A0522D 20px
+            );
+            z-index: -1;
+            border-radius: 12px;
+        }
+        
+        .wanted-header {
+            background: linear-gradient(135deg, #8B4513, #A0522D);
+            border-bottom: 3px solid #654321;
+            font-family: 'Impact', sans-serif;
+            letter-spacing: 2px;
+        }
+        
+        .wanted-card h4 {
+            font-family: 'Impact', sans-serif;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        @media (max-width: 1024px) {
+            .wanted-card:hover {
+                transform: scale(1.02);
+            }
+        }
     </style>
 </head>
 <body>
@@ -195,6 +245,7 @@
                 <div class="hidden md:flex items-center space-x-6">
                     <a href="#historia" class="nav-link">História</a>
                     <a href="#irmandade" class="nav-link">Irmandade</a>
+                    <a href="#alta-cupula" class="nav-link">Alta Cúpula</a>
                     <a href="#missao" class="nav-link">Missão</a>
                     <a href="#estatutos" class="nav-link">Estatutos</a>
                     <a href="#agenda" class="nav-link">Agenda</a>
@@ -219,6 +270,7 @@
                     <div class="space-y-4">
                         <a href="#historia" class="block nav-link text-lg">História</a>
                         <a href="#irmandade" class="block nav-link text-lg">Irmandade</a>
+                        <a href="#alta-cupula" class="block nav-link text-lg">Alta Cúpula</a>
                         <a href="#missao" class="block nav-link text-lg">Missão</a>
                         <a href="#estatutos" class="block nav-link text-lg">Estatutos</a>
                         <a href="#agenda" class="block nav-link text-lg">Agenda</a>
@@ -426,6 +478,182 @@
                     <p class="text-gray-300 text-lg">
                         O convite para ser membro é feito pela Alta Cúpula após demonstrar alinhamento com nossos valores.
                     </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Mural Alta Cúpula Section -->
+        <section id="alta-cupula" class="py-20 bg-black">
+            <div class="container mx-auto px-4">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl md:text-5xl font-bold mb-6">
+                        <span class="text-gradient-gold">Mural</span> da Alta Cúpula
+                    </h2>
+                    <p class="text-xl text-gray-300">
+                        Os líderes que comandam a irmandade
+                    </p>
+                </div>
+                
+                <!-- Cards de Procurado -->
+                <div class="max-w-6xl mx-auto">
+                    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        
+                        <!-- Erik -->
+                        <div class="wanted-card bg-gradient-to-b from-amber-100 to-amber-200 text-black rounded-lg overflow-hidden border-4 border-amber-800 shadow-2xl transform hover:scale-105 transition-transform">
+                            <div class="wanted-header bg-amber-800 text-amber-100 text-center py-3">
+                                <h3 class="text-xl font-bold tracking-wider">PROCURADO</h3>
+                                <div class="text-sm">VIVO OU MORTO</div>
+                            </div>
+                            
+                            <div class="p-6">
+                                <!-- Placeholder para foto -->
+                                <div class="w-full h-48 bg-gray-300 rounded border-2 border-amber-800 mb-4 flex items-center justify-center">
+                                    <div class="text-center text-gray-600">
+                                        <i class="fas fa-user text-4xl mb-2"></i>
+                                        <div class="text-sm">Foto do Erik</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="text-center mb-4">
+                                    <h4 class="text-2xl font-bold text-amber-800 mb-1">ERIK</h4>
+                                    <div class="text-sm font-semibold text-amber-700">Fundador & Presidente</div>
+                                </div>
+                                
+                                <div class="space-y-2 text-sm">
+                                    <div><strong>Alcunha:</strong> O Visionário</div>
+                                    <div><strong>Delitos:</strong> Fundar a irmandade, Liderar com exemplo</div>
+                                    <div><strong>Características:</strong> Sonhador, Organizador</div>
+                                    <div><strong>Última localização:</strong> Galpão da Irmandade</div>
+                                </div>
+                                
+                                <div class="text-center mt-4 pt-4 border-t-2 border-amber-800">
+                                    <div class="text-xs">RECOMPENSA</div>
+                                    <div class="text-lg font-bold text-amber-800">$$$</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Brutos -->
+                        <div class="wanted-card bg-gradient-to-b from-amber-100 to-amber-200 text-black rounded-lg overflow-hidden border-4 border-amber-800 shadow-2xl transform hover:scale-105 transition-transform">
+                            <div class="wanted-header bg-amber-800 text-amber-100 text-center py-3">
+                                <h3 class="text-xl font-bold tracking-wider">PROCURADO</h3>
+                                <div class="text-sm">VIVO OU MORTO</div>
+                            </div>
+                            
+                            <div class="p-6">
+                                <!-- Placeholder para foto -->
+                                <div class="w-full h-48 bg-gray-300 rounded border-2 border-amber-800 mb-4 flex items-center justify-center">
+                                    <div class="text-center text-gray-600">
+                                        <i class="fas fa-user text-4xl mb-2"></i>
+                                        <div class="text-sm">Foto do Brutos</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="text-center mb-4">
+                                    <h4 class="text-2xl font-bold text-amber-800 mb-1">BRUTOS</h4>
+                                    <div class="text-sm font-semibold text-amber-700">Co-fundador & Vice-Presidente</div>
+                                </div>
+                                
+                                <div class="space-y-2 text-sm">
+                                    <div><strong>Alcunha:</strong> O Braço Direito</div>
+                                    <div><strong>Delitos:</strong> Co-fundar a irmandade, Manter a ordem</div>
+                                    <div><strong>Características:</strong> Leal, Protetor</div>
+                                    <div><strong>Última localização:</strong> Nas estradas</div>
+                                </div>
+                                
+                                <div class="text-center mt-4 pt-4 border-t-2 border-amber-800">
+                                    <div class="text-xs">RECOMPENSA</div>
+                                    <div class="text-lg font-bold text-amber-800">$$$</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Lambão -->
+                        <div class="wanted-card bg-gradient-to-b from-amber-100 to-amber-200 text-black rounded-lg overflow-hidden border-4 border-amber-800 shadow-2xl transform hover:scale-105 transition-transform">
+                            <div class="wanted-header bg-amber-800 text-amber-100 text-center py-3">
+                                <h3 class="text-xl font-bold tracking-wider">PROCURADO</h3>
+                                <div class="text-sm">VIVO OU MORTO</div>
+                            </div>
+                            
+                            <div class="p-6">
+                                <!-- Placeholder para foto -->
+                                <div class="w-full h-48 bg-gray-300 rounded border-2 border-amber-800 mb-4 flex items-center justify-center">
+                                    <div class="text-center text-gray-600">
+                                        <i class="fas fa-user text-4xl mb-2"></i>
+                                        <div class="text-sm">Foto do Lambão</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="text-center mb-4">
+                                    <h4 class="text-2xl font-bold text-amber-800 mb-1">LAMBÃO</h4>
+                                    <div class="text-sm font-semibold text-amber-700">Co-fundador & Tesoureiro</div>
+                                </div>
+                                
+                                <div class="space-y-2 text-sm">
+                                    <div><strong>Alcunha:</strong> O Financeiro</div>
+                                    <div><strong>Delitos:</strong> Co-fundar a irmandade, Controlar as finanças</div>
+                                    <div><strong>Características:</strong> Estratégico, Confiável</div>
+                                    <div><strong>Última localização:</strong> Contando moedas</div>
+                                </div>
+                                
+                                <div class="text-center mt-4 pt-4 border-t-2 border-amber-800">
+                                    <div class="text-xs">RECOMPENSA</div>
+                                    <div class="text-lg font-bold text-amber-800">$$$</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Kazulo -->
+                        <div class="wanted-card bg-gradient-to-b from-amber-100 to-amber-200 text-black rounded-lg overflow-hidden border-4 border-amber-800 shadow-2xl transform hover:scale-105 transition-transform">
+                            <div class="wanted-header bg-amber-800 text-amber-100 text-center py-3">
+                                <h3 class="text-xl font-bold tracking-wider">PROCURADO</h3>
+                                <div class="text-sm">VIVO OU MORTO</div>
+                            </div>
+                            
+                            <div class="p-6">
+                                <!-- Placeholder para foto -->
+                                <div class="w-full h-48 bg-gray-300 rounded border-2 border-amber-800 mb-4 flex items-center justify-center">
+                                    <div class="text-center text-gray-600">
+                                        <i class="fas fa-user text-4xl mb-2"></i>
+                                        <div class="text-sm">Foto do Kazulo</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="text-center mb-4">
+                                    <h4 class="text-2xl font-bold text-amber-800 mb-1">KAZULO</h4>
+                                    <div class="text-sm font-semibold text-amber-700">Co-fundador & Secretário</div>
+                                </div>
+                                
+                                <div class="space-y-2 text-sm">
+                                    <div><strong>Alcunha:</strong> O Guardião</div>
+                                    <div><strong>Delitos:</strong> Co-fundar a irmandade, Guardar segredos</div>
+                                    <div><strong>Características:</strong> Discreto, Observador</div>
+                                    <div><strong>Última localização:</strong> Nas sombras</div>
+                                </div>
+                                
+                                <div class="text-center mt-4 pt-4 border-t-2 border-amber-800">
+                                    <div class="text-xs">RECOMPENSA</div>
+                                    <div class="text-lg font-bold text-amber-800">$$$</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    
+                    <!-- Aviso final -->
+                    <div class="text-center mt-12">
+                        <div class="bg-red-900 text-red-100 rounded-lg p-6 border-2 border-red-700 max-w-2xl mx-auto">
+                            <h3 class="text-xl font-bold mb-2 flex items-center justify-center">
+                                <i class="fas fa-exclamation-triangle mr-2"></i>
+                                ATENÇÃO
+                            </h3>
+                            <p class="text-sm">
+                                Estes homens são considerados extremamente perigosos devido à sua paixão pelas duas rodas 
+                                e capacidade de formar laços inquebráveis de irmandade. 
+                                <strong>Aproxime-se apenas se estiver preparado para fazer parte da família.</strong>
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
