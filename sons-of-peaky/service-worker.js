@@ -139,8 +139,7 @@ self.addEventListener('notificationclick', (event) => {
         // Check if app is already open
         let matchingClient = null;
 
-        for (let i = 0; i < windowClients.length; i++) {
-            const windowClient = windowClients[i];
+        for (const windowClient of windowClients) {
             if (windowClient.url.includes(self.location.origin)) {
                 matchingClient = windowClient;
                 break;
@@ -198,6 +197,12 @@ async function syncNotifications() {
 self.addEventListener('message', (event) => {
     console.log('Service Worker recebeu mensagem:', event.data);
     
+    // Validate message origin for security
+    if (!event.origin?.includes(self.location.origin)) {
+        console.warn('Mensagem de origem não confiável ignorada:', event.origin);
+        return;
+    }
+    
     if (event.data && event.data.type === 'SKIP_WAITING') {
         self.skipWaiting();
     }
@@ -246,6 +251,12 @@ async function syncContent() {
 
 // Handle app updates
 self.addEventListener('message', (event) => {
+    // Validate message origin for security
+    if (!event.origin?.includes(self.location.origin)) {
+        console.warn('Mensagem de origem não confiável ignorada:', event.origin);
+        return;
+    }
+    
     if (event.data && event.data.type === 'CHECK_UPDATE') {
         event.ports[0].postMessage({
             hasUpdate: false // Implement update checking logic

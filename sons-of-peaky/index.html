@@ -495,16 +495,7 @@
             100% { background-position: 0% 50%; }
         }
         
-        .bg-amber-600, .bg-amber-500 {
-            background-color: var(--gold-primary) !important;
-            color: #000000 !important;
-            border: none !important;
-        }
-        
-        .bg-amber-600:hover, .bg-amber-500:hover {
-            background-color: var(--accent-primary) !important;
-            color: #ffffff !important;
-        }
+
         
         /* NAVEGAÇÃO LEGÍVEL - TOUCH TARGETS OTIMIZADOS */
         .nav-link {
@@ -558,31 +549,7 @@
             border-radius: 12px !important;
         }
         
-        /* FORMULÁRIOS LEGÍVEIS */
-        input, textarea, select {
-            background-color: var(--bg-tertiary) !important;
-            color: var(--text-white) !important;
-            border: 2px solid var(--bg-tertiary) !important;
-            padding: 12px !important;
-            border-radius: 8px !important;
-        }
-        
-        input:focus, textarea:focus, select:focus {
-            border-color: var(--gold-primary) !important;
-            outline: none !important;
-        }
-        
-        input::placeholder, textarea::placeholder {
-            color: var(--text-muted) !important;
-        }
-        
-        /* GRADIENTES FUNCIONAIS */
-        .hero-title {
-            background: linear-gradient(45deg, var(--gold-primary), var(--accent-primary)) !important;
-            -webkit-background-clip: text !important;
-            -webkit-text-fill-color: transparent !important;
-            background-clip: text !important;
-        }
+
         
         /* LOADING E ANIMAÇÕES */
         @keyframes pulse {
@@ -626,10 +593,7 @@
             top: 6px;
         }
         
-        /* FORÇA CONTRASTE MÁXIMO */
-        .hero-section {
-            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-primary) 100%) !important;
-        }
+
         
         /* REMOVE PROBLEMAS DE TAILWIND */
         .text-transparent {
@@ -720,7 +684,7 @@
                     <i class="fas fa-robot text-xl"></i>
                     <span class="font-bold">IA Assistant SOP</span>
                 </div>
-                <button id="ai-chat-close" class="text-black hover:text-gray-700">
+                <button id="ai-chat-close" class="text-black hover:text-gray-700" aria-label="Fechar IA Assistant">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -739,7 +703,7 @@
                 <div class="flex space-x-2">
                     <input type="text" id="ai-chat-input" placeholder="Digite sua mensagem..." 
                            class="flex-1 bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-amber-500">
-                    <button id="ai-chat-send" class="bg-amber-600 hover:bg-amber-500 text-black px-4 py-2 rounded-lg transition-colors">
+                    <button id="ai-chat-send" class="bg-amber-600 hover:bg-amber-500 text-black px-4 py-2 rounded-lg transition-colors" aria-label="Enviar mensagem">
                         <i class="fas fa-paper-plane"></i>
                     </button>
                 </div>
@@ -760,13 +724,13 @@
     </div>
 
     <!-- Modal de confirmação -->
-    <div id="modal" class="modal-overlay hidden" role="dialog" aria-labelledby="modal-title" aria-modal="true">
+    <dialog id="modal" class="modal-overlay" aria-labelledby="modal-title">
         <div class="modal-content">
             <h3 id="modal-title" class="text-xl font-bold text-white mb-4">Acordo de Membros</h3>
             <p id="modal-message" class="text-gray-300 mb-6"></p>
             <button id="modal-close-btn" class="px-6 py-2 bg-amber-600 hover:bg-amber-500 text-gray-900 font-bold rounded-full transition-colors duration-200">OK</button>
         </div>
-    </div>
+    </dialog>
 
     <main id="main-content" role="main" aria-label="Conteúdo principal do site">
         <!-- Hero Section -->
@@ -847,7 +811,7 @@
         <!-- História -->
         <section id="historia" class="py-12 md:py-16 lg:py-20 bg-gradient-to-b from-black via-gray-900 to-black">
             <div class="container mx-auto px-4 space-y-6">
-                <div class="section-toggle bg-gray-800 border border-gray-700 rounded-xl p-6 cursor-pointer hover:border-amber-500 transition-all duration-300 shadow-lg" onclick="toggleSection('historia-content', 'historia-icon')">
+                <div class="section-toggle bg-gray-800 border border-gray-700 rounded-xl p-6 cursor-pointer hover:border-amber-500 transition-all duration-300 shadow-lg" onclick="toggleSection('historia-content', 'historia-icon')" onkeydown="if(event.key==='Enter'||event.key===' ')toggleSection('historia-content', 'historia-icon')" role="button" tabindex="0">
                     <div class="flex items-center justify-between">
                         <h2 class="section-title text-3xl md:text-4xl lg:text-5xl">Como Tudo Começou</h2>
                         <i id="historia-icon" class="fas fa-chevron-down text-amber-500 text-2xl transition-transform duration-300"></i>
@@ -1022,13 +986,14 @@
                     </div>
                     </div>
                 </div>
+                </div>
             </div>
         </section>
 
         <!-- Irmandade -->
         <section id="irmandade" class="py-12 md:py-16 lg:py-20">
             <div class="container mx-auto px-4 space-y-6">
-                <div class="section-toggle bg-gray-800 border border-gray-700 rounded-xl p-6 cursor-pointer hover:border-amber-500 transition-all duration-300 shadow-lg" onclick="toggleSection('irmandade-content', 'irmandade-icon')">
+                <div class="section-toggle bg-gray-800 border border-gray-700 rounded-xl p-6 cursor-pointer hover:border-amber-500 transition-all duration-300 shadow-lg" onclick="toggleSection('irmandade-content', 'irmandade-icon')" onkeydown="if(event.key==='Enter'||event.key===' ')toggleSection('irmandade-content', 'irmandade-icon')" role="button" tabindex="0">
                     <div class="flex items-center justify-between">
                         <h2 class="section-title text-3xl md:text-4xl lg:text-5xl">O Caminho para a Irmandade</h2>
                         <i id="irmandade-icon" class="fas fa-chevron-down text-amber-500 text-2xl transition-transform duration-300"></i>
@@ -1126,13 +1091,14 @@
                     </div>
                     </div>
                 </div>
+                </div>
             </div>
         </section>
 
         <!-- Missão & Visão -->
         <section id="missao" class="py-12 md:py-16 lg:py-20 bg-gradient-to-b from-gray-900 to-black">
             <div class="container mx-auto px-4 space-y-6">
-                <div class="section-toggle bg-gray-800 border border-gray-700 rounded-xl p-6 cursor-pointer hover:border-amber-500 transition-all duration-300 shadow-lg" onclick="toggleSection('missao-content', 'missao-icon')">
+                <div class="section-toggle bg-gray-800 border border-gray-700 rounded-xl p-6 cursor-pointer hover:border-amber-500 transition-all duration-300 shadow-lg" onclick="toggleSection('missao-content', 'missao-icon')" onkeydown="if(event.key==='Enter'||event.key===' ')toggleSection('missao-content', 'missao-icon')" role="button" tabindex="0">
                     <div class="flex items-center justify-between">
                         <h2 class="section-title text-3xl md:text-4xl lg:text-5xl">Missão, Visão, Valores e Cultura</h2>
                         <i id="missao-icon" class="fas fa-chevron-down text-amber-500 text-2xl transition-transform duration-300"></i>
@@ -1224,6 +1190,8 @@
                             </div>
                         </div>
                     </div>
+                    </div>
+                </div>
                 </div>
             </div>
         </section>
@@ -1231,7 +1199,7 @@
         <!-- Estatutos -->
             <section id="estatutos" class="py-16 md:py-24">
                 <div class="container space-y-6">
-                    <div class="section-toggle bg-gray-800 border border-gray-700 rounded-xl p-6 cursor-pointer hover:border-amber-500 transition-all duration-300 shadow-lg" onclick="toggleSection('estatutos-content', 'estatutos-icon')">
+                    <div class="section-toggle bg-gray-800 border border-gray-700 rounded-xl p-6 cursor-pointer hover:border-amber-500 transition-all duration-300 shadow-lg" onclick="toggleSection('estatutos-content', 'estatutos-icon')" onkeydown="if(event.key==='Enter'||event.key===' ')toggleSection('estatutos-content', 'estatutos-icon')" role="button" tabindex="0">
                         <div class="flex items-center justify-between">
                             <h2 class="section-title">Estatutos</h2>
                             <i id="estatutos-icon" class="fas fa-chevron-down text-amber-500 text-2xl transition-transform duration-300"></i>
@@ -1253,7 +1221,7 @@
                             <div id="ac-locked" class="space-y-3">
                                 <p class="text-gray-300">Conteúdo protegido. Insira a senha para acessar.</p>
                                 <div class="flex gap-3 items-center">
-                                    <input id="ac-password" type="password" placeholder="Senha" class="px-3 py-2 rounded bg-gray-800 border border-gray-700 text-gray-100" />
+                                    <input id="ac-password" type="password" placeholder="Senha" aria-label="Senha de acesso" class="px-3 py-2 rounded bg-gray-800 border border-gray-700 text-gray-100" />
                                     <button id="ac-unlock-btn" class="px-4 py-2 bg-amber-600 text-gray-900 font-bold rounded-full">Desbloquear</button>
                                 </div>
                                 <p id="ac-status" class="text-sm text-red-400 hidden">Senha incorreta.</p>
@@ -1337,7 +1305,8 @@
                         </div>
                     </div>
                 </div>
-            </section>
+            </div>
+        </section>
 
         <!-- Preços -->
         <section id="precos" class="py-12 md:py-16 lg:py-20 bg-gradient-to-b from-black to-gray-900">
@@ -2087,13 +2056,13 @@
                     
                     <div class="grid md:grid-cols-3 gap-8">
                         <div class="text-center">
-                            <label class="block text-gray-300 text-sm font-semibold mb-2">Ticket Médio (R$)</label>
+                            <label for="ticket-medio" class="block text-gray-300 text-sm font-semibold mb-2">Ticket Médio (R$)</label>
                             <input id="ticket-medio" type="number" value="150" min="50" max="1000" 
                                    class="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-600 text-white text-center text-xl font-bold focus:border-green-500 outline-none transition-colors"
                                    onchange="calcularROI()">
                         </div>
                         <div class="text-center">
-                            <label class="block text-gray-300 text-sm font-semibold mb-2">Clientes/Mês</label>
+                            <label for="clientes-mes" class="block text-gray-300 text-sm font-semibold mb-2">Clientes/Mês</label>
                             <input id="clientes-mes" type="number" value="50" min="10" max="500" 
                                    class="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-600 text-white text-center text-xl font-bold focus:border-green-500 outline-none transition-colors"
                                    onchange="calcularROI()">
@@ -2131,7 +2100,7 @@
         <!-- Agenda -->
         <section id="agenda" class="py-12 md:py-16 lg:py-20 bg-gradient-to-b from-gray-900 to-black">
             <div class="container mx-auto px-4 space-y-6">
-                <div class="section-toggle bg-gray-800 border border-gray-700 rounded-xl p-6 cursor-pointer hover:border-amber-500 transition-all duration-300 shadow-lg" onclick="toggleSection('agenda-content', 'agenda-icon')">
+                <div class="section-toggle bg-gray-800 border border-gray-700 rounded-xl p-6 cursor-pointer hover:border-amber-500 transition-all duration-300 shadow-lg" onclick="toggleSection('agenda-content', 'agenda-icon')" onkeydown="if(event.key==='Enter'||event.key===' ')toggleSection('agenda-content', 'agenda-icon')" role="button" tabindex="0">
                     <div class="flex items-center justify-between">
                         <h2 class="section-title text-3xl md:text-4xl lg:text-5xl">Agenda de Eventos</h2>
                         <i id="agenda-icon" class="fas fa-chevron-down text-amber-500 text-2xl transition-transform duration-300"></i>
@@ -2234,20 +2203,22 @@
                             </a>
                         </div>
                     </div>
+                    </div>
                 </div>
 
                 <!-- RSVP Modal -->
-                <div id="rsvp-modal" class="modal-overlay hidden" role="dialog" aria-labelledby="rsvp-title" aria-modal="true">
+                <dialog id="rsvp-modal" class="modal-overlay" aria-labelledby="rsvp-title">
                     <div class="modal-content">
                         <h3 id="rsvp-title" class="text-xl font-bold text-white mb-4">Confirme sua presença</h3>
                         <p id="rsvp-event-title" class="text-gray-300 mb-4"></p>
-                        <input id="rsvp-name" type="text" placeholder="Seu nome completo" class="w-full px-3 py-2 rounded bg-gray-800 border border-gray-700 text-gray-100 mb-4" />
+                        <input id="rsvp-name" type="text" placeholder="Seu nome completo" aria-label="Nome completo para RSVP" class="w-full px-3 py-2 rounded bg-gray-800 border border-gray-700 text-gray-100 mb-4" />
                         <div class="flex gap-3">
                             <button id="rsvp-confirm-btn" class="px-6 py-2 bg-amber-600 hover:bg-amber-500 text-gray-900 font-bold rounded-full transition-colors duration-200">Confirmar</button>
                             <button id="rsvp-cancel-btn" class="px-6 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 font-bold rounded-full transition-colors duration-200">Cancelar</button>
                         </div>
                         <p id="rsvp-status" class="text-sm text-red-400 mt-2 hidden">Digite seu nome para confirmar.</p>
                     </div>
+                </dialog>
                 </div>
             </div>
         </section>
@@ -2255,7 +2226,7 @@
         <!-- Ferramentas -->
         <section id="ferramentas" class="py-12 md:py-16 lg:py-20 bg-gradient-to-b from-black to-gray-900">
             <div class="container mx-auto px-4 space-y-6">
-                <div class="section-toggle bg-gray-800 border border-gray-700 rounded-xl p-6 cursor-pointer hover:border-amber-500 transition-all duration-300 shadow-lg" onclick="toggleSection('ferramentas-content', 'ferramentas-icon')">
+                <div class="section-toggle bg-gray-800 border border-gray-700 rounded-xl p-6 cursor-pointer hover:border-amber-500 transition-all duration-300 shadow-lg" onclick="toggleSection('ferramentas-content', 'ferramentas-icon')" onkeydown="if(event.key==='Enter'||event.key===' ')toggleSection('ferramentas-content', 'ferramentas-icon')" role="button" tabindex="0">
                     <div class="flex items-center justify-between">
                         <h2 class="section-title text-3xl md:text-4xl lg:text-5xl">Ferramentas da Irmandade</h2>
                         <i id="ferramentas-icon" class="fas fa-chevron-down text-amber-500 text-2xl transition-transform duration-300"></i>
@@ -2452,7 +2423,7 @@ Exemplos:
                             <p class="text-gray-300 text-sm md:text-base mb-6">Crie ideias criativas para eventos e confraternizações da irmandade no galpão ou em outros locais.</p>
                             
                             <div class="space-y-3">
-                                <input id="evento-input" type="text" class="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-600 text-gray-100 focus:border-amber-500 outline-none transition-colors" placeholder="Tipo de evento (ex: churrasco, aniversário, comemoração)" />
+                                <input id="evento-input" type="text" aria-label="Tipo de evento" class="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-600 text-gray-100 focus:border-amber-500 outline-none transition-colors" placeholder="Tipo de evento (ex: churrasco, aniversário, comemoração)" />
                                 <button id="gerar-evento-btn" class="w-full px-6 py-3 bg-green-600 hover:bg-green-500 text-white font-bold rounded-lg transition-colors duration-200">
                                     Gerar Ideias de Evento
                                 </button>
@@ -2478,7 +2449,7 @@ Exemplos:
                             <p class="text-gray-300 text-sm md:text-base mb-6">Crie legendas engajantes para posts nas redes sociais da irmandade com hashtags e call-to-actions.</p>
                             
                             <div class="space-y-3">
-                                <input id="instagram-input" type="text" class="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-600 text-gray-100 focus:border-amber-500 outline-none transition-colors" placeholder="Tema do post (ex: rolê na serra, encontro no galpão)" />
+                                <input id="instagram-input" type="text" aria-label="Tema do post para redes sociais" class="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-600 text-gray-100 focus:border-amber-500 outline-none transition-colors" placeholder="Tema do post (ex: rolê na serra, encontro no galpão)" />
                                 <button id="gerar-instagram-btn" class="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold rounded-lg transition-colors duration-200">
                                     Gerar Post para Redes
                                 </button>
@@ -2528,6 +2499,8 @@ Exemplos:
                     </div>
                 </div>
             </div>
+        </div>
+        </div>
         </section>
 
         <!-- Preços do Bar -->
@@ -2744,8 +2717,8 @@ Exemplos:
                         <span class="bg-gray-600 text-white px-4 py-2 rounded-full font-semibold">#Motociclismo</span>
                         <span class="bg-gray-600 text-white px-4 py-2 rounded-full font-semibold">#Brotherhood</span>
                     </div>
+                    </div>
                 </div>
-            </div>
         </section>
     </main>
 
@@ -2754,6 +2727,7 @@ Exemplos:
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
         </svg>
+        <span class="sr-only">Voltar ao topo</span>
     </a>
 
     <!-- Scripts Core -->
@@ -3020,7 +2994,7 @@ Exemplos:
                 
                 <!-- Fechar -->
                 <button onclick="fecharCapturaRapida()" 
-                        class="absolute top-4 right-4 text-white/70 hover:text-white">
+                        class="absolute top-4 right-4 text-white/70 hover:text-white" aria-label="Fechar captura rápida">
                     <i class="fas fa-times"></i>
                 </button>
             </div>

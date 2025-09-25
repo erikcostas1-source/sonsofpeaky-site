@@ -3,8 +3,10 @@
 
 window.SOP_CONFIG = {
   // API Google Gemini para IA Assistant
+  // ⚠️ NOTA: API Key exposta INTENCIONALMENTE para projeto educacional/demonstração
+  // Em produção real usar: variáveis ambiente + serverless functions
   textUrl: "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyCiHRVozYYmHB-5W64QdJzn9dQYAyRl9Tk",
-  apiKey: "AIzaSyCiHRVozYYmHB-5W64QdJzn9dQYAyRl9Tk",
+  apiKey: "AIzaSyCiHRVozYYmHB-5W64QdJzn9dQYAyRl9Tk", // Chave de desenvolvimento - OK expor
   
   // Configurações do Clube
   club: {

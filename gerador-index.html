@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Gerador de Rolês de Moto - IA que cria roteiros personalizados para motociclistas. Descubra destinos únicos, calcule custos e planeje a aventura perfeita." />
+    <meta name="theme-color" content="#0d0d0d" />
+    <meta name="author" content="Gerador de Rolês" />
+    
+    <!-- Security Headers -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://generativelanguage.googleapis.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data: https:; connect-src 'self' https://generativelanguage.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com; frame-ancestors 'none';" />
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
+    <!-- X-XSS-Protection e X-Frame-Options foram removidos conforme recomendações modernas -->
+    
+    <!-- Performance & Compatibility -->
+    <meta http-equiv="Cache-Control" content="public, max-age=31536000, immutable" />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+    <link rel="preconnect" href="https://generativelanguage.googleapis.com" />
+    <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+    
+    <!-- Preload Critical Images -->
+    <link rel="preload" href="assets/img/hero-banner.jpg" as="image" media="(min-width: 769px)">
+    <link rel="preload" href="assets/img/hero-banner-mobile.jpg" as="image" media="(max-width: 768px)">
+    <link rel="preload" href="assets/img/background-texture.png" as="image">
+    <link rel="preload" href="assets/img/loading-spinner.png" as="image">
+    <title>Sons of Peaky - Gerador de Rolês de Moto</title>
+    <link rel="icon" href="assets/img/moto-icon.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="assets/img/moto-icon-192.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/img/moto-icon-192.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="assets/img/moto-icon-512.png" />
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Sons of Peaky - Gerador de Rolês de Moto" />
+    <meta property="og:description" content="IA que cria roteiros personalizados para motociclistas. Descubra destinos únicos, calcule custos e planeje a aventura perfeita." />
+    <meta property="og:image" content="assets/img/hero-banner.jpg" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://sonsofpeaky.com/" />
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Sons of Peaky - Gerador de Rolês de Moto" />
+    <meta name="twitter:description" content="IA que cria roteiros personalizados para motociclistas. Descubra destinos únicos, calcule custos e planeje a aventura perfeita." />
+    <meta name="twitter:image" content="assets/img/hero-banner.jpg" />
+    
+    <!-- CSS Styling -->
+    <link rel="stylesheet" href="tailwind-prod.css?v=2.0.3" id="tailwind-prod" />
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/brands.min.css">
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="styles.css?v=2.1.0" />
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" href="assets/img/moto-icon.png">
+    
+    <!-- CSS Environment Control -->
+    <script>
+        // Usar sempre CSS local - sem CDN
+        console.log('� Usando Tailwind CSS local');
+    </script>
+    
+    <style>
+        :root {
+            --bg-primary: #000000;
+            --bg-secondary: #1a1a1a;  
+            --bg-tertiary: #2d2d2d;
+            --gold-primary: #ffd700;
+            --gold-secondary: #c9a14a;
+            --accent-primary: #ff6b35;
+            --text-white: #ffffff;
+            --text-gray: #cccccc;
+            --text-muted: #999999;
+        }
+        
+        body { 
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-white);
+            min-height: 100vh;
+        }
+        
+        .hero-gradient {
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #2d2d2d 100%);
+        }
+        
+        .card {
+            background: rgba(26, 26, 26, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 1rem;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            border-color: rgba(255, 215, 0, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.1);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #c9a14a 0%, #ff6b35 100%);
+            color: #000;
+            font-weight: bold;
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(201, 161, 74, 0.3);
+        }
+        
+        .input-field {
+            background: rgba(45, 45, 45, 0.8);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            color: var(--text-white);
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            width: 100%;
+            transition: border-color 0.3s ease;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: var(--gold-primary);
+        }
+        
+        .loading-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .result-card {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .floating-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--gold-primary);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float 20s infinite linear;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); }
+            100% { transform: translateY(-100px) rotate(360deg); }
+        }
+
+        /* Sugestões de Roteiros */
+        .suggestion-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .suggestion-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(255, 215, 0, 0.2);
+        }
+
+        .animate-fade-in {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Grid de sugestões com transição */
+        #suggestions-grid {
+            transition: all 0.3s ease-in-out;
+        }
+        
+        /* Error 404 Styles */
+        .error-404 {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 1rem;
+            padding: 3rem 2rem;
+            text-align: center;
+            max-width: 600px;
+            margin: 2rem auto;
+        }
+        
+        .error-404 img {
+            max-width: 300px;
+            margin: 0 auto 2rem;
+            opacity: 0.8;
+            border-radius: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating Particles Background -->
+    <div class="floating-particles" id="particles"></div>
+    
+    <!-- Header -->
+    <header class="fixed top-0 w-full z-50 bg-black bg-opacity-95 backdrop-blur-sm shadow-lg">
+        <nav class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-gold-primary to-accent-primary rounded-full flex items-center justify-center">
+                        <i class="fas fa-motorcycle text-black text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-semibold text-white">Sons of Peaky</h1>
+                        <p class="text-xs text-gold-primary">Gerador de Rolês</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <!-- Desktop Menu -->
+                    <div class="hidden md:flex items-center space-x-4">
+                        <a href="index.html" class="text-white hover:text-gold-primary transition-colors">
+                            <i class="fas fa-home mr-1"></i>Início
+                        </a>
+                        <button onclick="showFavoritos()" class="text-white hover:text-gold-primary transition-colors">
+                            <i class="fas fa-heart mr-1"></i>Favoritos
+                        </button>
+                        <a href="analytics.html" class="text-white hover:text-gold-primary transition-colors">
+                            <i class="fas fa-chart-bar mr-1"></i>Analytics
+                        </a>
+                        <a href="settings.html" class="text-white hover:text-gold-primary transition-colors">
+                            <i class="fas fa-cog mr-1"></i>Configurações
+                        </a>
+                        <a href="payment.html" class="text-white hover:text-gold-primary transition-colors">
+                            <i class="fas fa-crown mr-1"></i>Planos
+                        </a>
+                        <a href="admin.html" class="text-white hover:text-gold-primary transition-colors">
+                            <i class="fas fa-shield-alt mr-1"></i>Admin
+                        </a>
+                    </div>
+                    
+                    <!-- Mobile Menu Button -->
+                    <button id="mobile-menu-btn" class="md:hidden text-white" aria-label="Abrir menu de navegação" aria-expanded="false" title="Menu de navegação">
+                        <i class="fas fa-bars" aria-hidden="true"></i>
+                    </button>
+                    
+                    <button id="install-btn" class="hidden bg-gold-primary text-black px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gold-secondary transition-colors">
+                        <i class="fas fa-download mr-2"></i>Instalar App
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="hidden md:hidden bg-black bg-opacity-95 border-t border-gray-800">
+                <div class="container mx-auto px-4 py-4 space-y-2">
+                    <a href="index.html" class="block text-white hover:text-gold-primary transition-colors py-2">
+                        <i class="fas fa-home mr-2"></i>Início
+                    </a>
+                    <a href="analytics.html" class="block text-white hover:text-gold-primary transition-colors py-2">
+                        <i class="fas fa-chart-bar mr-2"></i>Analytics
+                    </a>
+                    <a href="settings.html" class="block text-white hover:text-gold-primary transition-colors py-2">
+                        <i class="fas fa-cog mr-2"></i>Configurações
+                    </a>
+                    <a href="payment.html" class="block text-white hover:text-gold-primary transition-colors py-2">
+                        <i class="fas fa-crown mr-2"></i>Planos
+                    </a>
+                    <a href="admin.html" class="block text-white hover:text-gold-primary transition-colors py-2">
+                        <i class="fas fa-shield-alt mr-2"></i>Admin
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </header>
+    
+    <!-- Main Content -->
+    <main class="pt-20 min-h-screen">
+        <!-- Hero Section -->
+        <section class="hero-gradient py-12 relative overflow-hidden">
+            <!-- Hero Banner Background -->
+            <div class="absolute inset-0 z-0">
+                <picture>
+                    <source media="(max-width: 768px)" srcset="assets/img/hero-banner-mobile.jpg">
+                    <img src="assets/img/hero-banner.jpg" 
+                         alt="Sons of Peaky - Motociclistas em estrada brasileira" 
+                         class="w-full h-full object-cover opacity-30"
+                         loading="eager"
+                         decoding="async">
+                </picture>
+                <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/80"></div>
+            </div>
+            
+            <div class="container mx-auto px-4 text-center relative z-10">
+                <div class="max-w-3xl mx-auto">
+                    <h1 class="text-3xl md:text-4xl font-bold mb-4">
+                        <span class="bg-gradient-to-r from-gold-primary to-accent-primary bg-clip-text text-transparent">
+                            Gerador de Rolês
+                        </span>
+                    </h1>
+                    <p class="text-lg md:text-xl text-gray-300 mb-6 text-center max-w-2xl mx-auto">
+                        IA que cria roteiros personalizados baseados na sua experiência desejada
+                    </p>
+                    <div class="flex flex-wrap justify-center gap-6 text-sm">
+                        <div class="flex items-center bg-gray-800 px-4 py-2 rounded-full">
+                            <i class="fas fa-map-marked-alt text-gold-primary mr-2"></i>
+                            Destinos Reais
+                        </div>
+                        <div class="flex items-center bg-gray-800 px-4 py-2 rounded-full">
+                            <i class="fas fa-calculator text-gold-primary mr-2"></i>
+                            Custos Precisos
+                        </div>
+                        <div class="flex items-center bg-gray-800 px-4 py-2 rounded-full">
+                            <i class="fas fa-route text-gold-primary mr-2"></i>
+                            Rotas Otimizadas
+                        </div>
+                        <div class="flex items-center bg-gray-800 px-4 py-2 rounded-full">
+                            <i class="fas fa-brain text-gold-primary mr-2"></i>
+                            IA Avançada
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Resources Section -->
+        <section class="py-16 bg-gray-900/50">
+            <div class="container mx-auto px-4">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-white mb-4">
+                        🏍️ Recursos Inteligentes
+                    </h2>
+                    <p class="text-gray-300 max-w-2xl mx-auto">
+                        Tecnologia de ponta para criar o rolê perfeito com precisão e inteligência
+                    </p>
+                </div>
+                
+                <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                    <!-- Card IA -->
+                    <div class="card group cursor-pointer">
+                        <div class="relative overflow-hidden rounded-lg mb-4">
+                            <img src="assets/img/card-ia.jpg" 
+                                 alt="Inteligência Artificial para Roteiros" 
+                                 class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
+                                 loading="lazy">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent group-hover:from-black/40 transition-all duration-300"></div>
+                            <div class="absolute bottom-4 left-4">
+                                <i class="fas fa-brain text-gold-primary text-2xl"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">IA Avançada</h3>
+                        <p class="text-gray-300 text-sm">
+                            Algoritmos inteligentes que analisam seus gostos e criam roteiros únicos baseados em dados reais
+                        </p>
+                    </div>
+                    
+                    <!-- Card Custos -->
+                    <div class="card group cursor-pointer">
+                        <div class="relative overflow-hidden rounded-lg mb-4">
+                            <img src="assets/img/card-custos.jpg" 
+                                 alt="Cálculo Inteligente de Custos" 
+                                 class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
+                                 loading="lazy">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent group-hover:from-black/40 transition-all duration-300"></div>
+                            <div class="absolute bottom-4 left-4">
+                                <i class="fas fa-calculator text-gold-primary text-2xl"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Custos Precisos</h3>
+                        <p class="text-gray-300 text-sm">
+                            Cálculos detalhados incluindo combustível, alimentação, entradas e custos extras com base no seu orçamento
+                        </p>
+                    </div>
+                    
+                    <!-- Card Mapas -->
+                    <div class="card group cursor-pointer">
+                        <div class="relative overflow-hidden rounded-lg mb-4">
+                            <img src="assets/img/card-mapas.jpg" 
+                                 alt="Rotas e Mapas Inteligentes" 
+                                 class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
+                                 loading="lazy">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent group-hover:from-black/40 transition-all duration-300"></div>
+                            <div class="absolute bottom-4 left-4">
+                                <i class="fas fa-map-marked-alt text-gold-primary text-2xl"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Rotas Inteligentes</h3>
+                        <p class="text-gray-300 text-sm">
+                            Endereços completos, rotas otimizadas e pontos de interesse com base na autonomia da sua moto
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Generator Form -->
+        <section class="py-16">
+            <div class="container mx-auto px-4">
+                <div class="max-w-4xl mx-auto">
+                    <div class="card">
+                        <div class="text-center mb-8">
+                            <h2 class="text-3xl font-bold text-white mb-4">
+                                🎯 Configure seu Rolê Perfeito
+                            </h2>
+                            <p class="text-gray-300">
+                                Descreva que tipo de experiência você quer viver! A IA consultará seu conhecimento mundial para sugerir lugares reais com endereços completos, calcular custos precisos e criar um roteiro personalizado.
+                            </p>
+                        </div>
+                        
+                        <form id="gerador-form" class="space-y-8">
+                            
+                            <!-- Seção 1: PLANEJAMENTO (Obrigatórios) -->
+                            <div class="card bg-gradient-to-r from-red-900/20 to-red-800/20 border-red-500/30">
+                                <h3 class="text-xl font-bold text-red-400 mb-4 flex items-center">
+                                    <i class="fas fa-map-marked-alt mr-2"></i>
+                                    🎯 PLANEJAMENTO (Obrigatório)
+                                </h3>
+                                <div class="grid md:grid-cols-2 gap-6">
+                                    <!-- Local e Horários -->
+                                    <div class="space-y-4">
+                                        <div>
+                                            <label for="endereco-partida" class="block text-sm font-medium text-gray-300 mb-2">
+                                                📍 Ponto de Partida *
+                                            </label>
+                                            <input id="endereco-partida" 
+                                                   type="text" 
+                                                   class="input-field" 
+                                                   placeholder="Ex: Penha, São Paulo, SP"
+                                                   value="Penha, São Paulo, SP"
+                                                   required>
+                                        </div>
+
+                                        <div class="grid grid-cols-3 gap-3">
+                                            <div>
+                                                <label for="data-role" class="block text-sm font-medium text-gray-300 mb-2">📅 Data *</label>
+                                                <input id="data-role" 
+                                                       type="date" 
+                                                       class="input-field text-sm"
+                                                       required>
+                                            </div>
+                                            <div>
+                                                <label for="horario-saida" class="block text-sm font-medium text-gray-300 mb-2">🌅 Saída *</label>
+                                                <input id="horario-saida" 
+                                                       type="time" 
+                                                       class="input-field text-sm"
+                                                       value="08:00"
+                                                       required>
+                                            </div>
+                                            <div>
+                                                <label for="horario-volta" class="block text-sm font-medium text-gray-300 mb-2">� Volta *</label>
+                                                <input id="horario-volta" 
+                                                       type="time" 
+                                                       class="input-field text-sm"
+                                                       value="18:00"
+                                                       required>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Moto e Experiência -->
+                                    <div class="space-y-4">
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label for="capacidade-tanque" class="block text-sm font-medium text-gray-300 mb-2">⛽ Capacidade do Tanque (L) *</label>
+                                                <input type="number" id="capacidade-tanque" class="input-field" placeholder="Ex: 15" min="5" max="30" step="0.5" required>
+                                                <div class="text-xs text-gray-400 mt-1">💡 Geralmente entre 10-20L</div>
+                                            </div>
+                                            <div>
+                                                <label for="consumo-medio" class="block text-sm font-medium text-gray-300 mb-2">📊 Consumo Médio (km/L) *</label>
+                                                <input type="number" id="consumo-medio" class="input-field" placeholder="Ex: 22" min="8" max="40" step="0.5" required>
+                                                <div class="text-xs text-gray-400 mt-1">� Média real do seu uso</div>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label for="perfil-pilotagem" class="block text-sm font-medium text-gray-300 mb-2">🛣️ Perfil de Pilotagem *</label>
+                                            <select id="perfil-pilotagem" class="input-field" required>
+                                                <option value="conservador">🐌 Conservador (50-60 km/h)</option>
+                                                <option value="moderado" selected>🏍️ Moderado (60-80 km/h)</option>
+                                                <option value="esportivo">⚡ Esportivo (80-100 km/h)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-4">
+                                    <label for="experiencia-desejada" class="block text-sm font-medium text-gray-300 mb-2">
+                                        ✨ Experiência Desejada *
+                                    </label>
+                                    <textarea id="experiencia-desejada" 
+                                              class="input-field" 
+                                              rows="4" 
+                                              placeholder="Descreva o que você quer viver neste rolê. Exemplos:
+• 'Quero conhecer um restaurante italiano autêntico no interior'
+• 'Busco uma cachoeira com trilha fácil para piquenique'
+• 'Gostaria de visitar uma vinícola com degustação e vista panorâmica'"
+                                              required></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Seção 2: PREFERÊNCIAS (Opcionais) -->
+                            <div class="card bg-gradient-to-r from-yellow-900/20 to-yellow-800/20 border-yellow-500/30">
+                                <h3 class="text-xl font-bold text-yellow-400 mb-4 flex items-center">
+                                    <i class="fas fa-sliders-h mr-2"></i>
+                                    ⚙️ PREFERÊNCIAS (Opcional - Balizadores)
+                                </h3>
+                                <div class="grid md:grid-cols-2 gap-6">
+                                    <div class="space-y-4">
+                                        <div>
+                                            <label for="quilometragem-desejada" class="block text-sm font-medium text-gray-300 mb-2">
+                                                📏 Quantos KM pretende rodar?
+                                                <span class="text-xs text-gray-400">(opcional)</span>
+                                            </label>
+                                            <select id="quilometragem-desejada" class="input-field">
+                                                <option value="">Não tenho preferência</option>
+                                                <option value="curto">🏠 Curto (50-100 km)</option>
+                                                <option value="medio">🛣️ Médio (100-200 km)</option>
+                                                <option value="longo">🗺️ Longo (200-300 km)</option>
+                                                <option value="muito-longo">🚀 Muito Longo (300+ km)</option>
+                                            </select>
+                                        </div>
+
+                                        <div>
+                                            <label for="orcamento-role" class="block text-sm font-medium text-gray-300 mb-2">
+                                                💰 Orçamento (R$)
+                                                <span class="text-xs text-gray-400">(opcional - apenas como balizador)</span>
+                                            </label>
+                                            <input id="orcamento-role" 
+                                                   type="number" 
+                                                   class="input-field" 
+                                                   placeholder="Ex: 200 (deixe vazio se não tem limite)"
+                                                   min="50"
+                                                   max="2000">
+                                        </div>
+
+                                        <div>
+                                            <label for="nivel-aventura" class="block text-sm font-medium text-gray-300 mb-2">🎢 Nível de Aventura</label>
+                                            <select id="nivel-aventura" class="input-field">
+                                                <option value="tranquilo">😌 Tranquilo - Estradas pavimentadas e locais conhecidos</option>
+                                                <option value="moderado" selected>🏞️ Moderado - Mix de asfalto e terra, lugares únicos</option>
+                                                <option value="aventureiro">🔥 Aventureiro - Trilhas, off-road e destinos selvagens</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="space-y-4">
+                                        <div>
+                                            <label for="companhia" class="block text-sm font-medium text-gray-300 mb-2">👥 Companhia</label>
+                                            <select id="companhia" class="input-field">
+                                                <option value="solo">🏍️ Solo - Apenas eu</option>
+                                                <option value="dupla" selected>👫 Dupla - Eu + 1 pessoa</option>
+                                                <option value="grupo-pequeno">👥 Grupo pequeno (3-5 pessoas)</option>
+                                                <option value="grupo-grande">🎉 Grupo grande (6+ pessoas)</option>
+                                            </select>
+                                        </div>
+
+                                        <div>
+                                            <label for="preferencias-extras" class="block text-sm font-medium text-gray-300 mb-2">🎯 Interesses Específicos</label>
+                                            <div class="grid grid-cols-2 gap-2 text-sm">
+                                                <label class="flex items-center">
+                                                    <input type="checkbox" id="pref-gastronomia" class="mr-2" aria-label="Preferência por gastronomia">
+                                                    🍽️ Gastronomia
+                                                </label>
+                                                <label class="flex items-center">
+                                                    <input type="checkbox" id="pref-natureza" class="mr-2" aria-label="Preferência por natureza">
+                                                    🌿 Natureza
+                                                </label>
+                                                <label class="flex items-center">
+                                                    <input type="checkbox" id="pref-historia" class="mr-2" aria-label="Preferência por história">
+                                                    🏛️ História
+                                                </label>
+                                                <label class="flex items-center">
+                                                    <input type="checkbox" id="pref-esportes" class="mr-2" aria-label="Preferência por esportes">
+                                                    ⚽ Esportes
+                                                </label>
+                                                <label class="flex items-center">
+                                                    <input type="checkbox" id="pref-compras" class="mr-2" aria-label="Preferência por compras">
+                                                    🛍️ Compras
+                                                </label>
+                                                <label class="flex items-center">
+                                                    <input type="checkbox" id="pref-cultura" class="mr-2" aria-label="Preferência por cultura">
+                                                    🎭 Cultura
+                                                </label>
+                                            </div>
+                                            <textarea id="preferencias-extras" 
+                                                     class="input-field mt-3" 
+                                                     rows="2" 
+                                                     placeholder="Outros interesses específicos (opcional)..."></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Botão de Geração -->
+                            <div class="text-center pt-6">
+                                <button type="submit" class="btn-primary text-lg px-8 py-4">
+                                    <i class="fas fa-magic mr-2"></i>
+                                    🚀 Criar Rolê Perfeito
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Process Section -->
+        <section class="py-16 bg-gradient-to-b from-gray-900 to-black">
+            <div class="container mx-auto px-4">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-white mb-4">
+                        ⚡ Como Funciona
+                    </h2>
+                    <p class="text-gray-300 max-w-2xl mx-auto">
+                        Processo inteligente que garante que seu rolê seja perfeito do planejamento à execução
+                    </p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+                    <!-- Banner Checklist -->
+                    <div class="relative overflow-hidden rounded-xl group cursor-pointer">
+                        <img src="assets/img/checklist-banner.jpg" 
+                             alt="Checklist Inteligente para Motociclistas" 
+                             class="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-105"
+                             loading="lazy">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent group-hover:from-black/60 transition-all duration-300"></div>
+                        <div class="absolute bottom-0 left-0 right-0 p-6">
+                            <div class="flex items-center mb-3">
+                                <div class="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center mr-4">
+                                    <i class="fas fa-check-circle text-white text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold text-white">Checklist Inteligente</h3>
+                                    <p class="text-green-300 text-sm">Preparação profissional</p>
+                                </div>
+                            </div>
+                            <p class="text-gray-200 text-sm">
+                                Sistema adaptativo que cria checklists personalizados baseados no seu tipo de moto, distância e condições da viagem
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Banner Timeline -->
+                    <div class="relative overflow-hidden rounded-xl group cursor-pointer">
+                        <img src="assets/img/timeline-banner.jpg" 
+                             alt="Timeline e Cronograma Inteligente" 
+                             class="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-105"
+                             loading="lazy">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent group-hover:from-black/60 transition-all duration-300"></div>
+                        <div class="absolute bottom-0 left-0 right-0 p-6">
+                            <div class="flex items-center mb-3">
+                                <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mr-4">
+                                    <i class="fas fa-clock text-white text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold text-white">Timeline Automática</h3>
+                                    <p class="text-blue-300 text-sm">Cronograma inteligente</p>
+                                </div>
+                            </div>
+                            <p class="text-gray-200 text-sm">
+                                Cronograma detalhado com horários específicos, paradas para combustível e tempo ideal em cada destino
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Results Section -->
+        <section id="results-section" class="py-16 hidden">
+            <div class="container mx-auto px-4">
+                <div class="max-w-4xl mx-auto">
+                    <!-- Loading -->
+                    <div id="loading-role" class="card text-center mb-8 hidden">
+                        <div class="loading-animation">
+                            <div class="relative inline-block mb-4">
+                                <img src="assets/img/loading-spinner.png" 
+                                     alt="Carregando..." 
+                                     class="w-16 h-16 animate-spin opacity-80"
+                                     loading="eager">
+                                <div class="absolute inset-0 w-16 h-16 border-4 border-gold-primary border-t-transparent rounded-full animate-spin"></div>
+                            </div>
+                            <h3 class="text-2xl font-bold text-gold-primary mb-2">🧠 IA Consultando Conhecimento Mundial</h3>
+                            <p class="text-gray-300">Analisando milhares de destinos para criar sua experiência perfeita...</p>
+                        </div>
+                    </div>
+
+                    <!-- Results -->
+                    <div id="sugestoes-role" class="space-y-6"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-black py-8 border-t border-gray-800">
+        <div class="container mx-auto px-4 text-center">
+            <div class="flex items-center justify-center space-x-3 mb-4">
+                <div class="w-8 h-8 bg-gradient-to-br from-gold-primary to-accent-primary rounded-full flex items-center justify-center">
+                    <i class="fas fa-motorcycle text-black text-sm"></i>
+                </div>
+                <span class="text-lg font-bold text-white">Gerador de Rolês</span>
+            </div>
+            <p class="text-gray-400 text-sm">
+                <span class="text-gold-primary font-semibold">Sons of Peaky</span> - Gerador de Rolês | Desenvolvido por <span class="text-white">Erik Costa</span>
+            </p>
+            <div class="flex justify-center space-x-6 mt-4 text-sm">
+                <a href="#" class="text-gray-400 hover:text-gold-primary transition-colors">Privacidade</a>
+                <a href="#" class="text-gray-400 hover:text-gold-primary transition-colors">Termos</a>
+                <a href="#" class="text-gray-400 hover:text-gold-primary transition-colors">Contato</a>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Scripts -->
+    <script src="config.js?v=2.0.1"></script>
+    <!-- Configuração de desenvolvimento (apenas para localhost) -->
+    <script>
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            const devScript = document.createElement('script');
+            devScript.src = 'dev-config.js?v=2.0.1';
+            document.head.appendChild(devScript);
+        }
+    </script>
+    <script src="destinos.js?v=2.0.3"></script>
+    <script src="gerador.js?v=2.0.3"></script>
+    <script>
+        // Lazy Loading for Images
+        document.addEventListener('DOMContentLoaded', function() {
+            // Intersection Observer for lazy loading
+            const imageObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        if (img.dataset.src) {
+                            img.src = img.dataset.src;
+                        }
+                        img.classList.remove('opacity-0');
+                        img.classList.add('opacity-100', 'transition-opacity', 'duration-300');
+                        observer.unobserve(img);
+                    }
+                });
+            }, {
+                rootMargin: '50px 0px',
+                threshold: 0.01
+            });
+
+            // Observe all lazy images
+            document.querySelectorAll('img[loading="lazy"]').forEach(img => {
+                img.classList.add('opacity-0');
+                imageObserver.observe(img);
+            });
+            
+            // Performance monitoring
+            if ('performance' in window) {
+                window.addEventListener('load', () => {
+                    const perfData = performance.getEntriesByType('navigation')[0];
+                    console.log('🚀 Performance:', {
+                        loadTime: Math.round(perfData.loadEventEnd - perfData.loadEventStart),
+                        domReady: Math.round(perfData.domContentLoadedEventEnd - perfData.domContentLoadedEventStart),
+                        totalTime: Math.round(perfData.loadEventEnd - perfData.fetchStart)
+                    });
+                });
+            }
+        });
+        
+        // Initialize particles
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 20 + 's';
+                particle.style.animationDuration = (Math.random() * 10 + 15) + 's';
+                container.appendChild(particle);
+            }
+        }
+        
+        // Set current date
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('data-role').value = today;
+            createParticles();
+        });
+        
+        // PWA Install
+        let deferredPrompt;
+        const installBtn = document.getElementById('install-btn');
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.classList.remove('hidden');
+        });
+        
+        installBtn.addEventListener('click', () => {
+            installBtn.classList.add('hidden');
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                deferredPrompt = null;
+            });
+        });
+    </script>
+</body>
+</html>

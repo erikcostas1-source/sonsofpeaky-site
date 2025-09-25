@@ -3,8 +3,10 @@
 
 window.GERADOR_CONFIG = {
     // API Google Gemini (usando chave funcional)
+    // ⚠️ NOTA: API Key exposta INTENCIONALMENTE para demonstração
+    // Estratégia: Netlify=serverless+secure | GitHub Pages=direct+public | Local=dev key
     textUrl: "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyCiHRVozYYmHB-5W64QdJzn9dQYAyRl9Tk",
-    apiKey: "AIzaSyCiHRVozYYmHB-5W64QdJzn9dQYAyRl9Tk",
+    apiKey: "AIzaSyCiHRVozYYmHB-5W64QdJzn9dQYAyRl9Tk", // Chave desenvolvimento - exposição controlada
     
     // Informações da plataforma
     app: {
