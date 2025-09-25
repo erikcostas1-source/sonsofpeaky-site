@@ -3,10 +3,21 @@
 
 window.SOP_CONFIG = {
   // API Google Gemini para IA Assistant
-  // ⚠️ NOTA: API Key exposta INTENCIONALMENTE para projeto educacional/demonstração
-  // Em produção real usar: variáveis ambiente + serverless functions
-  textUrl: "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyCiHRVozYYmHB-5W64QdJzn9dQYAyRl9Tk",
-  apiKey: "AIzaSyCiHRVozYYmHB-5W64QdJzn9dQYAyRl9Tk", // Chave de desenvolvimento - OK expor
+  // 🔒 SEGURANÇA: API Key agora carregada de forma segura
+  // Usar variáveis de ambiente ou configuração externa
+  textUrl: "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
+  apiKey: null, // Será carregada dinamicamente de fonte segura
+  
+  // Método para configurar API key de forma segura
+  setApiKey: function(key) {
+    this.apiKey = key;
+    this.textUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
+  },
+  
+  // Método para verificar se API key está configurada
+  isApiKeyConfigured: function() {
+    return this.apiKey !== null && this.apiKey !== undefined && this.apiKey.trim() !== '';
+  },
   
   // Configurações do Clube
   club: {

@@ -6,5 +6,6 @@ window.SOP_CONFIG = {
   imageUrl: "https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=AIzaSyCiHRVozYYmHB-5W64QdJzn9dQYAyRl9Tk",
   apiKey: "AIzaSyCiHRVozYYmHB-5W64QdJzn9dQYAyRl9Tk",
   version: "1.5.0",
-  environment: "production"
+  environment: "production",
+  altaCupulaPassword: "cangaiba" // Senha para a seção da Alta Cúpula
 };

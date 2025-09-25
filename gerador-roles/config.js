@@ -62,6 +62,14 @@ window.GERADOR_CONFIG = {
         theme_color: "#ffd700",
         background_color: "#000000",
         display: "standalone"
+    },
+
+    // Configurações de APIs de terceiros
+    thirdParty: {
+        unsplash: {
+            apiUrl: "https://api.unsplash.com/search/photos",
+            apiKey: "BZMh9zjzjTw8tj1wY-J7RIjGCZqoGNyCdk5wE6MTGSI" // ❗ Chave Unsplash configurada
+        }
     }
 };
 

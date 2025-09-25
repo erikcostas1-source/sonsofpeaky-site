@@ -9,7 +9,7 @@
     
     <!-- Security Headers -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data: https:; connect-src 'self'; font-src 'self' https://cdnjs.cloudflare.com; frame-ancestors 'none';" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data: https:; connect-src 'self'; font-src 'self' https://cdnjs.cloudflare.com;" />
     <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
     <meta http-equiv="Cache-Control" content="public, max-age=3600" />
     
@@ -2731,10 +2731,11 @@ Exemplos:
     </a>
 
     <!-- Scripts Core -->
-    <script src="config.js"></script>
+    <script src="config.js?v=2.0.3"></script>
+    <script src="../shared/js/ai-assistant.js?v=2.0.3"></script>
     
     <!-- Sons of Peaky Features Script -->
-    <script>
+    <script defer>
         // Loading screen
         document.addEventListener('DOMContentLoaded', function() {
             const loadingScreen = document.getElementById('loading-screen');
@@ -2744,136 +2745,6 @@ Exemplos:
                     loadingScreen.style.display = 'none';
                 }, 300);
             }, 1500);
-            
-            // Initialize AI Chat functionality
-            initializeAIChat();
-            
-            // Gerador moved to separate project
-            console.log('Sons of Peaky loaded successfully');
-        });
-
-        // AI Chat functionality
-        function initializeAIChat() {
-            const aiChatToggle = document.getElementById('ai-chat-toggle');
-            const aiChatToggleMobile = document.getElementById('ai-chat-toggle-mobile');
-            const aiChatContainer = document.getElementById('ai-chat-container');
-            const aiChatClose = document.getElementById('ai-chat-close');
-            const aiChatSend = document.getElementById('ai-chat-send');
-            const aiChatInput = document.getElementById('ai-chat-input');
-            const heroAiBtn = document.getElementById('hero-ai-btn');
-            
-            // Toggle chat visibility
-            function toggleChat() {
-                aiChatContainer.classList.toggle('show');
-                if (aiChatContainer.classList.contains('show')) {
-                    aiChatContainer.style.transform = 'translateY(0)';
-                    aiChatContainer.style.opacity = '1';
-                } else {
-                    aiChatContainer.style.transform = 'translateY(100%)';
-                    aiChatContainer.style.opacity = '0';
-                }
-            }
-            
-            // Event listeners
-            if (aiChatToggle) aiChatToggle.addEventListener('click', toggleChat);
-            if (aiChatToggleMobile) aiChatToggleMobile.addEventListener('click', toggleChat);
-            if (heroAiBtn) heroAiBtn.addEventListener('click', toggleChat);
-            if (aiChatClose) aiChatClose.addEventListener('click', toggleChat);
-            
-            // Send message functionality
-            function sendMessage() {
-                const message = aiChatInput.value.trim();
-                if (message) {
-                    addMessage('user', message);
-                    aiChatInput.value = '';
-                    
-                    // Simulate AI response
-                    setTimeout(() => {
-                        addMessage('ai', 'Obrigado pela mensagem! Estou aqui para ajudar com qualquer dúvida sobre a Sons of Peaky.');
-                    }, 1000);
-                }
-            }
-            
-            // Add message to chat
-            function addMessage(type, text) {
-                const messagesContainer = document.getElementById('ai-chat-messages');
-                const messageDiv = document.createElement('div');
-                messageDiv.className = `${type}-message bg-gray-800 p-3 rounded-lg`;
-                
-                if (type === 'ai') {
-                    messageDiv.innerHTML = `
-                        <div class="flex items-center space-x-2 mb-2">
-                            <i class="fas fa-robot text-amber-500"></i>
-                            <span class="font-bold text-amber-500">SOP Assistant</span>
-                        </div>
-                        <p class="text-sm">${text}</p>
-                    `;
-                } else {
-                    messageDiv.innerHTML = `
-                        <div class="flex items-center space-x-2 mb-2">
-                            <i class="fas fa-user text-blue-500"></i>
-                            <span class="font-bold text-blue-500">Você</span>
-                        </div>
-                        <p class="text-sm">${text}</p>
-                    `;
-                }
-                
-                messagesContainer.appendChild(messageDiv);
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
-            }
-            
-            // Send button and enter key
-            if (aiChatSend) aiChatSend.addEventListener('click', sendMessage);
-            if (aiChatInput) {
-                aiChatInput.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        sendMessage();
-                    }
-                });
-            }
-            
-            // Quick actions
-            document.querySelectorAll('.ai-quick-action').forEach(button => {
-                button.addEventListener('click', function() {
-                    const action = this.dataset.action;
-                    let message = '';
-                    
-                    switch(action) {
-                        case 'gerar-role':
-                            message = 'Como posso gerar um rolê personalizado?';
-                            break;
-                        case 'info-irmandade':
-                            message = 'Conte-me mais sobre a irmandade Sons of Peaky';
-                            break;
-                        case 'proximos-eventos':
-                            message = 'Quais são os próximos eventos da irmandade?';
-                            break;
-                    }
-                    
-                    if (message) {
-                        addMessage('user', message);
-                        setTimeout(() => {
-                            let response = '';
-                            switch(action) {
-                                case 'gerar-role':
-                                    response = 'Para gerar um rolê personalizado, vá até a seção Ferramentas e use nosso Gerador de Rolês IA! Ele criará sugestões baseadas no seu perfil e preferências.';
-                                    break;
-                                case 'info-irmandade':
-                                    response = 'A Sons of Peaky é uma irmandade de motociclistas fundada em 2021. Somos unidos pelos valores de respeito, lealdade e paixão pelas duas rodas. Nossa sede fica na Penha/SP.';
-                                    break;
-                                case 'proximos-eventos':
-                                    response = 'Confira nossa seção Agenda para ver os próximos eventos! Sempre temos rolês aos fins de semana e encontros especiais mensais.';
-                                    break;
-                            }
-                            addMessage('ai', response);
-                        }, 1000);
-                    }
-                });
-            });
-        }
-
-        // Gerador functionality moved to separate project at /gerador-roles/
-        // Site do clube focado em conteúdo institucional
 
         // Service Worker
         if ('serviceWorker' in navigator) {

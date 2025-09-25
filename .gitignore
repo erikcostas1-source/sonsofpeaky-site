@@ -10,6 +10,7 @@ node_modules/
 
 # Development config (local only)
 dev-config.js
+config.js
 
 # OS files
 Thumbs.db

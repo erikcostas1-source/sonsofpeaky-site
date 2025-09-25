@@ -9,7 +9,7 @@
     
     <!-- Security Headers -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://generativelanguage.googleapis.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data: https:; connect-src 'self' https://generativelanguage.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com; frame-ancestors 'none';" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; img-src 'self' data: https:; connect-src 'self' https://generativelanguage.googleapis.com https://api.unsplash.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com;" />
     <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
     <!-- X-XSS-Protection e X-Frame-Options foram removidos conforme recomendações modernas -->
     
@@ -44,7 +44,7 @@
     <meta name="twitter:image" content="assets/img/hero-banner.jpg" />
     
     <!-- CSS Styling -->
-    <link rel="stylesheet" href="tailwind-prod.css?v=2.0.3" id="tailwind-prod" />
+    <link rel="stylesheet" href="styles.css?v=2.0.3" id="tailwind-prod" />
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -55,9 +55,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/brands.min.css">
     
-    <!-- Custom Styles -->
-    <link rel="stylesheet" href="styles.css?v=2.1.0" />
-    
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
     
@@ -66,7 +63,7 @@
     
     <!-- CSS Environment Control -->
     <script>
-        // Usar sempre CSS local - sem CDN
+        // Usar sempre CSS local - sem CDN para produção
         console.log('� Usando Tailwind CSS local');
     </script>
     
@@ -254,20 +251,20 @@
                     <div class="hidden md:flex items-center space-x-4">
                         <a href="index.html" class="text-white hover:text-gold-primary transition-colors">
                             <i class="fas fa-home mr-1"></i>Início
-                        </a>
+                    </a>
                         <button onclick="showFavoritos()" class="text-white hover:text-gold-primary transition-colors">
                             <i class="fas fa-heart mr-1"></i>Favoritos
                         </button>
-                        <a href="analytics.html" class="text-white hover:text-gold-primary transition-colors">
+                    <a href="analytics.html" class="text-white hover:text-gold-primary transition-colors">
                             <i class="fas fa-chart-bar mr-1"></i>Analytics
                         </a>
-                        <a href="settings.html" class="text-white hover:text-gold-primary transition-colors">
+                    <a href="settings.html" class="text-white hover:text-gold-primary transition-colors">
                             <i class="fas fa-cog mr-1"></i>Configurações
                         </a>
-                        <a href="payment.html" class="text-white hover:text-gold-primary transition-colors">
+                    <a href="payment.html" class="text-white hover:text-gold-primary transition-colors">
                             <i class="fas fa-crown mr-1"></i>Planos
                         </a>
-                        <a href="admin.html" class="text-white hover:text-gold-primary transition-colors">
+                    <a href="admin.html" class="text-white hover:text-gold-primary transition-colors">
                             <i class="fas fa-shield-alt mr-1"></i>Admin
                         </a>
                     </div>
@@ -287,18 +284,18 @@
             <div id="mobile-menu" class="hidden md:hidden bg-black bg-opacity-95 border-t border-gray-800">
                 <div class="container mx-auto px-4 py-4 space-y-2">
                     <a href="index.html" class="block text-white hover:text-gold-primary transition-colors py-2">
-                        <i class="fas fa-home mr-2"></i>Início
+                        <i class="fas fa-home mr-2"></i>Início (Gerador)
                     </a>
-                    <a href="analytics.html" class="block text-white hover:text-gold-primary transition-colors py-2">
+                    <a href="../analytics.html" class="block text-white hover:text-gold-primary transition-colors py-2">
                         <i class="fas fa-chart-bar mr-2"></i>Analytics
                     </a>
-                    <a href="settings.html" class="block text-white hover:text-gold-primary transition-colors py-2">
+                    <a href="../settings.html" class="block text-white hover:text-gold-primary transition-colors py-2">
                         <i class="fas fa-cog mr-2"></i>Configurações
                     </a>
-                    <a href="payment.html" class="block text-white hover:text-gold-primary transition-colors py-2">
+                    <a href="../payment.html" class="block text-white hover:text-gold-primary transition-colors py-2">
                         <i class="fas fa-crown mr-2"></i>Planos
                     </a>
-                    <a href="admin.html" class="block text-white hover:text-gold-primary transition-colors py-2">
+                    <a href="../admin.html" class="block text-white hover:text-gold-primary transition-colors py-2">
                         <i class="fas fa-shield-alt mr-2"></i>Admin
                     </a>
                 </div>
@@ -590,27 +587,27 @@
                                             <label for="preferencias-extras" class="block text-sm font-medium text-gray-300 mb-2">🎯 Interesses Específicos</label>
                                             <div class="grid grid-cols-2 gap-2 text-sm">
                                                 <label class="flex items-center">
-                                                    <input type="checkbox" id="pref-gastronomia" class="mr-2" aria-label="Preferência por gastronomia">
+                                                    <input type="checkbox" id="pref-gastronomia" class="mr-2" aria-label="Preferência por Gastronomia">
                                                     🍽️ Gastronomia
                                                 </label>
                                                 <label class="flex items-center">
-                                                    <input type="checkbox" id="pref-natureza" class="mr-2" aria-label="Preferência por natureza">
+                                                    <input type="checkbox" id="pref-natureza" class="mr-2" aria-label="Preferência por Natureza">
                                                     🌿 Natureza
                                                 </label>
                                                 <label class="flex items-center">
-                                                    <input type="checkbox" id="pref-historia" class="mr-2" aria-label="Preferência por história">
+                                                    <input type="checkbox" id="pref-historia" class="mr-2" aria-label="Preferência por História">
                                                     🏛️ História
                                                 </label>
                                                 <label class="flex items-center">
-                                                    <input type="checkbox" id="pref-esportes" class="mr-2" aria-label="Preferência por esportes">
+                                                    <input type="checkbox" id="pref-esportes" class="mr-2" aria-label="Preferência por Esportes">
                                                     ⚽ Esportes
                                                 </label>
                                                 <label class="flex items-center">
-                                                    <input type="checkbox" id="pref-compras" class="mr-2" aria-label="Preferência por compras">
+                                                    <input type="checkbox" id="pref-compras" class="mr-2" aria-label="Preferência por Compras">
                                                     🛍️ Compras
                                                 </label>
                                                 <label class="flex items-center">
-                                                    <input type="checkbox" id="pref-cultura" class="mr-2" aria-label="Preferência por cultura">
+                                                    <input type="checkbox" id="pref-cultura" class="mr-2" aria-label="Preferência por Cultura">
                                                     🎭 Cultura
                                                 </label>
                                             </div>
@@ -745,17 +742,19 @@
     </footer>
     
     <!-- Scripts -->
-    <script src="config.js?v=2.0.1"></script>
+    <script src="config.js?v=2.0.4"></script>
     <!-- Configuração de desenvolvimento (apenas para localhost) -->
     <script>
         if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
             const devScript = document.createElement('script');
-            devScript.src = 'dev-config.js?v=2.0.1';
+            devScript.src = 'dev-config.js?v=2.0.4';
             document.head.appendChild(devScript);
         }
     </script>
-    <script src="destinos.js?v=2.0.3"></script>
-    <script src="gerador.js?v=2.0.3"></script>
+    <script src="destinos.js?v=2.0.4"></script>
+    <script src="gerador.js?v=2.0.4"></script>
+    <script src="database.js?v=2.0.4"></script>
+    <script src="auth.js?v=2.0.4"></script>
     <script>
         // Lazy Loading for Images
         document.addEventListener('DOMContentLoaded', function() {

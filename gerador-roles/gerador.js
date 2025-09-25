@@ -34,58 +34,191 @@ function safeQuerySelector(selector, required = false) {
     return element;
 }
 
-// Configuração da API - usando função serverless para segurança
-function getAPIConfig() {
-    console.log('🔍 getAPIConfig chamado - hostname:', window.location.hostname);
-    // Força modo desenvolvimento se configurado
-    const forceDevelopment = window.FORCE_DEVELOPMENT_MODE === true;
-    
-    // Detecta plataforma de hospedagem
-    const isGitHubPages = window.location.hostname.includes('github.io');
-    const isNetlify = window.location.hostname.includes('netlify.app') || window.location.hostname.includes('netlify.com');
-    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    
-    // Determina se é desenvolvimento
-    const isDevelopment = forceDevelopment || isLocalhost;
-    
-    if (isDevelopment) {
-        // Para desenvolvimento local, usa API direta com chave de desenvolvimento
-        const devKey = window.DEV_API_KEY || 'AIzaSyCiHRVozYYmHB-5W64QdJzn9dQYAyRl9Tk';
-        console.log('🏠 Modo desenvolvimento detectado - usando API direta');
-        
-        return {
-            apiUrl: `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${devKey}`,
-            useServerless: false
-        };
-    } else if (isNetlify) {
-        // Em Netlify, usa função serverless
-        console.log('🌐 Netlify detectado - usando função serverless');
-        return {
-            apiUrl: '/.netlify/functions/generate-role',
-            useServerless: true
-        };
-    } else if (isGitHubPages) {
-        // Em GitHub Pages, usa API direta (chave pública é aceitável para este projeto)
-        const prodKey = 'AIzaSyCiHRVozYYmHB-5W64QdJzn9dQYAyRl9Tk';
-        console.log('📖 GitHub Pages detectado - usando API direta');
-        return {
-            apiUrl: `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${prodKey}`,
-            useServerless: false
-        };
-    } else {
-        // Outros ambientes - usa API direta
-        const prodKey = 'AIzaSyCiHRVozYYmHB-5W64QdJzn9dQYAyRl9Tk';
+/**
+ * Classe para gerenciar serviços de API (Gemini, Unsplash)
+ * Encapsula a lógica de configuração, chamadas e cache.
+ */
+class ApiService {
+    constructor() {
+        this.cache = new Map();
+        this.CACHE_DURATION = 1000 * 60 * 30; // 30 minutos
+    }
+
+    /**
+     * Obtém a API key de forma segura, priorizando variáveis de ambiente
+     */
+    getSecureApiKey(environment = 'production') {
+        // Tenta buscar de variáveis de ambiente primeiro
+        const envKey = window.GOOGLE_GEMINI_API_KEY || process?.env?.GOOGLE_GEMINI_API_KEY;
+        if (envKey && envKey !== 'undefined') {
+            return envKey;
+        }
+
+        // Tenta buscar da configuração do projeto
+        const configKey = window.GERADOR_CONFIG?.apiKey || window.DEV_API_KEY;
+        if (configKey && configKey !== 'SUA_CHAVE_AQUI') {
+            return configKey;
+        }
+
+        // Fallback para chaves conhecidas (apenas para demonstração/desenvolvimento)
+        console.warn('⚠️ Usando API key de fallback - configure GOOGLE_GEMINI_API_KEY');
+        return 'AIzaSyCiHRVozYYmHB-5W64QdJzn9dQYAyRl9Tk';
+    }
+
+    /**
+     * Determina a configuração da API com base no ambiente.
+     */
+    getAPIConfig() {
+        console.log('🔍 getAPIConfig chamado - hostname:', window.location.hostname);
+        const forceDevelopment = window.FORCE_DEVELOPMENT_MODE === true;
+        const isNetlify = window.location.hostname.includes('netlify.app');
+        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const isDevelopment = forceDevelopment || isLocalhost;
+
+        if (isDevelopment) {
+            const devKey = this.getSecureApiKey('development');
+            console.log('🏠 Modo desenvolvimento detectado - usando API direta');
+            return {
+                apiUrl: `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${devKey}`,
+                useServerless: false
+            };
+        }
+        if (isNetlify) {
+            console.log('🌐 Netlify detectado - usando função serverless');
+            return { apiUrl: '/.netlify/functions/generate-role', useServerless: true };
+        }
+        // Para GitHub Pages e outros, a chave de produção é usada.
+        const prodKey = this.getSecureApiKey('production');
         console.log('🌐 Produção detectada - usando API direta');
         return {
             apiUrl: `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${prodKey}`,
             useServerless: false
         };
     }
+
+    /**
+     * Busca uma imagem de destino no Unsplash.
+     */
+    async fetchDestinationImage(destinationName) {
+        const unsplashConfig = window.GERADOR_CONFIG?.thirdParty?.unsplash;
+        if (!unsplashConfig?.apiKey || unsplashConfig.apiKey === 'SUA_CHAVE_DE_ACESSO_UNSPLASH') {
+            console.warn('⚠️ Chave da API do Unsplash não configurada. Usando imagem padrão.');
+            return '../assets/img/card-mapas.jpg';
+        }
+
+        const query = encodeURIComponent(`${destinationName} moto viagem`);
+        const url = `${unsplashConfig.apiUrl}?query=${query}&per_page=1&orientation=landscape&client_id=${unsplashConfig.apiKey}`;
+
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`Erro na API do Unsplash: ${response.statusText}`);
+            const data = await response.json();
+            return data.results?.[0]?.urls?.regular || '../assets/img/card-mapas.jpg';
+        } catch (error) {
+            console.error('Erro ao buscar imagem no Unsplash:', error);
+            return '../assets/img/card-mapas.jpg';
+        }
+    }
+    
+    /**
+     * Obtém roteiros da IA, utilizando cache.
+     */
+    async getRoteiros(prompt, formData) {
+        const cacheKey = this.generateCacheKey(prompt, formData);
+        const cached = this.getCachedResponse(cacheKey);
+        
+        if (cached) {
+            console.log('📦 Usando resposta do cache');
+            return cached;
+        }
+
+        const config = this.getAPIConfig();
+        const requestBody = {
+            contents: [{
+                parts: [{
+                    text: prompt
+                }]
+            }],
+            generationConfig: {
+                temperature: 0.8,
+                topK: 40,
+                topP: 0.95,
+                maxOutputTokens: 2048
+            }
+        };
+
+        try {
+            const response = await fetch(config.apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: config.useServerless ? JSON.stringify({ prompt }) : JSON.stringify(requestBody)
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            let responseText;
+
+            if (config.useServerless) {
+                responseText = data.response || data.text || JSON.stringify(data);
+            } else {
+                responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || 
+                               JSON.stringify(data);
+            }
+
+            this.setCachedResponse(cacheKey, responseText);
+            return responseText;
+        } catch (error) {
+            console.error('❌ Erro na API:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Gera chave de cache baseada no prompt e dados do formulário
+     */
+    generateCacheKey(prompt, formData) {
+        const keyData = {
+            prompt: prompt.substring(0, 100),
+            endereco: formData.enderecoPartida,
+            experiencia: formData.experienciaDesejada,
+            orcamento: formData.orcamento
+        };
+        return btoa(JSON.stringify(keyData)).substring(0, 20);
+    }
+
+    /**
+     * Obtém resposta do cache
+     */
+    getCachedResponse(key) {
+        const cached = this.cache.get(key);
+        if (cached && Date.now() - cached.timestamp < this.CACHE_DURATION) {
+            return cached.data;
+        }
+        this.cache.delete(key);
+        return null;
+    }
+
+    /**
+     * Salva resposta no cache
+     */
+    setCachedResponse(key, data) {
+        this.cache.set(key, {
+            data,
+            timestamp: Date.now()
+        });
+    }
 }
 
-// Cache para melhor performance
-const cache = new Map();
-const CACHE_DURATION = 1000 * 60 * 30; // 30 minutos
+// Instanciar o serviço de API
+const apiService = new ApiService();
+
+// Configuração da API - usando apiService para consistência
+function getAPIConfig() {
+    return apiService.getAPIConfig();
+}
 
 // Estado da aplicação
 let isGenerating = false;
@@ -133,6 +266,17 @@ function initializeApp() {
         
         // Inicializa PWA
         initializePWA();
+        
+        // Adiciona botão de Histórico no header
+        const headerActions = safeQuerySelector('header .flex.items-center.space-x-4');
+        if (headerActions && !safeGetElement('history-btn')) {
+            const historyButton = document.createElement('button');
+            historyButton.id = 'history-btn';
+            historyButton.className = 'text-white hover:text-gold-primary transition-colors hidden md:flex items-center';
+            historyButton.innerHTML = '<i class="fas fa-history mr-1"></i>Histórico';
+            historyButton.onclick = () => showHistoryModal();
+            headerActions.insertBefore(historyButton, headerActions.querySelector('#mobile-menu-btn'));
+        }
         
         // Analytics
         trackPageView();
@@ -242,163 +386,37 @@ async function handleFormSubmit(event) {
  * Gera o rolê usando IA
  */
 async function generateRole(formData) {
-    const cacheKey = JSON.stringify(formData);
+    const cacheKey = JSON.stringify({ prompt: formData.experienciaDesejada, partida: formData.enderecoPartida });
     
     // Verifica cache
-    if (cache.has(cacheKey)) {
-        const cached = cache.get(cacheKey);
-        if (Date.now() - cached.timestamp < CACHE_DURATION) {
+    if (apiService.cache.has(cacheKey) && !window.FORCE_RELOAD) {
+        const cached = apiService.cache.get(cacheKey);
+        if (Date.now() - cached.timestamp < apiService.CACHE_DURATION) {
             console.log('📦 Usando resultado do cache');
             return cached.data;
         }
-        cache.delete(cacheKey);
+        apiService.cache.delete(cacheKey);
     }
     
-    const prompt = buildPrompt(formData);
-    console.log('🧠 Prompt gerado:', prompt.substring(0, 200) + '...');
-    
-    // Obter configuração da API (sem fallback)
-    const apiConfig = getAPIConfig();
-    console.log('🔧 Usando API:', apiConfig.apiUrl.substring(0, 100) + '...');
-    console.log('🔧 Configuração:', JSON.stringify(apiConfig, null, 2));
+    const prompt = buildAdvancedPrompt(formData); // Usando o novo prompt
+    console.log('🧠 Prompt gerado:', prompt.substring(0, 300) + '...');
     
     try {
-        let requestBody, response;
+        // A lógica de chamada foi movida para a ApiService para melhor organização.
+        // A função generateRole agora apenas orquestra.
+        const finalResponse = await apiService.getRoteiros(prompt, formData);
+
+        const results = parseAdvancedAIResponse(finalResponse, formData); // Usando o novo parser
         
-        if (apiConfig.useServerless) {
-            // Usando função serverless (produção)
-            requestBody = {
-                prompt: prompt
-            };
-            
-            console.log('📤 Using serverless function');
-            console.log('📡 URL:', apiConfig.apiUrl);
-            
-            response = await fetch(apiConfig.apiUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(requestBody)
-            });
-        } else {
-            // Usando API direta (desenvolvimento local)
-            requestBody = {
-                contents: [{
-                    parts: [{
-                        text: prompt
-                    }]
-                }],
-                generationConfig: {
-                    temperature: 0.8,
-                    topK: 40,
-                    topP: 0.95,
-                    maxOutputTokens: 2048,
-                }
-            };
-            
-            console.log('📤 Using direct API (development)');
-            console.log('📡 URL:', apiConfig.apiUrl);
-            
-            response = await fetch(apiConfig.apiUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(requestBody)
-            });
-        }
-        
-        console.log('📨 Response received:', response.status, response.statusText);
-        console.log('📨 Response headers:', [...response.headers.entries()]);
-        
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('❌ Erro HTTP:', errorText);
-            throw new Error(`Erro na API: ${response.status} - ${response.statusText}: ${errorText}`);
-        }
-        
-        const responseText = await response.text();
-        console.log('📄 Response text completo:', responseText);
-        
-        let data;
-        try {
-            data = JSON.parse(responseText);
-            console.log('📡 Resposta parseada da API:', JSON.stringify(data, null, 2));
-        } catch (parseError) {
-            console.error('❌ Erro ao parsear JSON:', parseError);
-            console.error('📄 Texto que não pôde ser parseado:', responseText);
-            throw new Error(`Erro ao parsear resposta da API: ${parseError.message}`);
-        }
-        
-        if (!data.candidates || !data.candidates[0]) {
-            console.error('❌ Estrutura de resposta inválida:', data);
-            throw new Error('Resposta inválida da IA: candidates não encontrado');
-        }
-        
-        if (!data.candidates[0].content || !data.candidates[0].content.parts || !data.candidates[0].content.parts[0]) {
-            console.error('❌ Estrutura de content inválida:', data.candidates[0]);
-            throw new Error('Resposta inválida da IA: content.parts não encontrado');
-        }
-        
-        if (!data.candidates[0].content.parts[0].text) {
-            console.error('❌ Texto não encontrado:', data.candidates[0].content.parts[0]);
-            throw new Error('Resposta inválida da IA: texto não encontrado');
-        }
-        
-        const aiResponse = data.candidates[0].content.parts[0].text;
-        console.log('🤖 Resposta da IA:', aiResponse.substring(0, 300) + '...');
-        
-        // Verificar se resposta foi truncada por MAX_TOKENS
-        const finishReason = data.candidates[0].finishReason;
-        let finalResponse = aiResponse;
-        
-        if (finishReason === 'MAX_TOKENS') {
-            console.warn('⚠️ Resposta truncada por MAX_TOKENS - tentando com prompt reduzido');
-            
-            try {
-                // Retry com prompt ultra-simplificado
-                const simplePrompt = `Crie 3 roteiros de moto brasileiros em JSON:
-{"sugestoes": [
-  {"tipo": "ECONÔMICA", "titulo": "Roteiro Econômico", "resumo": "Baixo custo", "distancia_total": "100km", "tempo_total": "4h", "custo_total_estimado": "R$150", "destinos": [{"nome": "Local1", "endereco": "End1", "descricao": "Desc1"}]},
-  {"tipo": "EQUILIBRADA", "titulo": "Roteiro Equilibrado", "resumo": "Balanceado", "distancia_total": "150km", "tempo_total": "6h", "custo_total_estimado": "R$300", "destinos": [{"nome": "Local2", "endereco": "End2", "descricao": "Desc2"}]},
-  {"tipo": "PREMIUM", "titulo": "Roteiro Premium", "resumo": "Completo", "distancia_total": "200km", "tempo_total": "8h", "custo_total_estimado": "R$500", "destinos": [{"nome": "Local3", "endereco": "End3", "descricao": "Desc3"}]}
-]}`;
-                
-                const retryRequestBody = {
-                    contents: [{
-                        parts: [{
-                            text: simplePrompt
-                        }]
-                    }]
-                };
-                
-                const retryResponse = await fetch(apiConfig.apiUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(retryRequestBody)
-                });
-                
-                if (retryResponse.ok) {
-                    const retryData = await retryResponse.json();
-                    const retryText = retryData.candidates?.[0]?.content?.parts?.[0]?.text;
-                    
-                    if (retryText && retryData.candidates?.[0]?.finishReason !== 'MAX_TOKENS') {
-                        console.log('✅ Retry bem-sucedido - resposta completa obtida');
-                        finalResponse = retryText;
-                    }
-                }
-            } catch (retryError) {
-                console.warn('⚠️ Retry falhou, usando resposta original truncada:', retryError);
-            }
-        }
-        
-        const results = parseAIResponse(finalResponse, formData);
-        
-        // Salva no cache
-        cache.set(cacheKey, {
+        // Busca imagens para cada sugestão
+        const imagePromises = results.map(roteiro => apiService.fetchDestinationImage(roteiro.titulo));
+        const images = await Promise.all(imagePromises);
+        results.forEach((roteiro, index) => {
+            roteiro.imageUrl = images[index];
+        });
+
+        // Salva no cache através do serviço
+        apiService.cache.set(cacheKey, {
             data: results,
             timestamp: Date.now()
         });
@@ -406,62 +424,75 @@ async function generateRole(formData) {
         return results;
         
     } catch (error) {
-        console.error('❌ Erro na chamada da API:', error);
-        
-        // Tratamento específico para diferentes tipos de erro
-        if (error.message.includes('405') || error.message.includes('Method Not Allowed')) {
-            console.warn('⚠️ Erro 405: Tentativa de usar serverless no GitHub Pages');
-            // Força uso da API direta como fallback
-            try {
-                console.log('🔄 Tentando novamente com API direta...');
-                const directApiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyCiHRVozYYmHB-5W64QdJzn9dQYAyRl9Tk';
-                
-                const directRequestBody = {
-                    contents: [{
-                        parts: [{
-                            text: prompt
-                        }]
-                    }],
-                    generationConfig: {
-                        temperature: 0.8,
-                        topK: 40,
-                        topP: 0.95,
-                        maxOutputTokens: 2048,
-                    }
-                };
-                
-                const directResponse = await fetch(directApiUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(directRequestBody)
-                });
-                
-                if (directResponse.ok) {
-                    const directData = await directResponse.json();
-                    if (directData.candidates?.[0]?.content?.parts?.[0]?.text) {
-                        const aiResponse = directData.candidates[0].content.parts[0].text;
-                        const results = parseAIResponse(aiResponse, formData);
-                        
-                        // Salva no cache
-                        cache.set(cacheKey, {
-                            data: results,
-                            timestamp: Date.now()
-                        });
-                        
-                        return results;
-                    }
-                }
-            } catch (fallbackError) {
-                console.error('❌ Fallback API também falhou:', fallbackError);
-            }
-        }
-        
         // Se a API falhar, mostra erro específico
         throw new Error('Não foi possível gerar o rolê via IA. Verifique sua conexão com a internet e tente novamente.');
     }
 }
+
+/**
+ * Constrói o prompt AVANÇADO para a IA (movido de app.js)
+ */
+function buildAdvancedPrompt(formData) {
+    const {
+        experienciaDesejada,
+        enderecoPartida,
+        capacidadeTanque,
+        consumoMedio,
+        perfilPilotagem,
+        horarioSaida,
+        horarioVolta
+    } = formData;
+
+    const tempoDisponivel = calcularTempoDisponivel(formData);
+    
+    // Determina descrição da moto baseada no consumo
+    let consumoMotoDesc;
+    if (consumoMedio <= 18) {
+        consumoMotoDesc = '1000cc+ (big trail/esportiva)';
+    } else if (consumoMedio <= 25) {
+        consumoMotoDesc = '600-800cc (esportiva)';
+    } else if (consumoMedio <= 35) {
+        consumoMotoDesc = '250-400cc (média)';
+    } else {
+        consumoMotoDesc = '125-150cc (econômica)';
+    }
+
+    return `Você é um especialista mundial em rolês de motociclismo. Sua missão é sugerir 3 experiências REAIS e específicas que atendam exatamente ao que foi pedido.
+
+🏍️ INFORMAÇÕES DO MOTOCICLISTA:
+- Rolê desejado: "${experienciaDesejada}"
+- Ponto de partida: ${enderecoPartida}
+- Moto: ${consumoMotoDesc} (Consumo: ${consumoMedio} km/L)
+- Capacidade do tanque: ${capacidadeTanque}L
+- Perfil de pilotagem: ${perfilPilotagem}
+- Tempo disponível: ${tempoDisponivel}h (${horarioSaida} às ${horarioVolta})
+
+🎯 SUA MISSÃO:
+Sugira 3 experiências REAIS e específicas. Para cada sugestão, forneça:
+
+1. NOME DO LOCAL (estabelecimento específico, atração, restaurante, etc.)
+2. ENDEREÇO COMPLETO (rua, número, cidade, estado, CEP se possível)
+3. EXPERIÊNCIA DETALHADA (o que exatamente vai vivenciar lá)
+4. DISTÂNCIA E TEMPO (km de ${enderecoPartida} e tempo de viagem de moto)
+5. CUSTOS DETALHADOS:
+   - Gasolina (considere consumo de ${consumoMedio} km/L, preço R$6,50/L)
+   - Pedágios de moto (valores reais das rodovias)
+   - Gastos no local (alimentação, ingressos, etc.)
+   - Total estimado
+6. LOGÍSTICA (melhor rota, horários recomendados, dicas importantes)
+7. POR QUE É PERFEITO (como atende à experiência desejada)
+
+IMPORTANTE - OBRIGATÓRIO:
+- Use lugares REAIS e específicos (nomes de estabelecimentos, cidades, atrações)
+- SEMPRE inclua ENDEREÇO COMPLETO com rua, número, cidade, estado
+- Considere o tempo disponível para ser viável
+- Seja preciso nos custos e distâncias reais
+- Foque na EXPERIÊNCIA, não apenas no destino
+- Se o orçamento for limitado, respeite-o
+
+Formato de resposta: JSON com array "sugestoes", cada item com: nome, endereco, experiencia, distancia, tempoViagem, custos{gasolina, pedagio, local, total}, logistica, porquePerfeito`;
+}
+
 
 /**
  * Constrói o prompt para a IA
@@ -469,32 +500,29 @@ async function generateRole(formData) {
 function buildPrompt(formData) {
     const { 
         enderecoPartida, 
-        dataRole, 
         horarioSaida, 
         horarioVolta,
         orcamento, 
-        quilometragemDesejada,
-        capacidadeTanque,
-        consumoMedio,
-        autonomia,
-        perfilPilotagem,
         experienciaDesejada,
-        nivelAventura,
-        companhia,
         preferencias
     } = formData;
     
-    const consumoMoto = formData.consumoMedio || 22; // Usar consumo real informado pelo usuário
-    const velocidadeMedia = getVelocidadeMedia(perfilPilotagem);
-    
-    // Monta informações de quilometragem
-    const quilometragemInfo = quilometragemDesejada ? getQuilometragemRange(quilometragemDesejada) : 'Não especificada';
+    // Monta informações de quilometragem - usando diretamente no prompt
     
     // Monta informações de orçamento
     const orcamentoInfo = orcamento ? `R$ ${orcamento}` : 'Não especificado (sem limite definido)';
     
     const tempoDisponivel = calcularTempoDisponivel(formData);
-    const maxDestinos = tempoDisponivel <= 4 ? 1 : tempoDisponivel <= 6 ? 2 : 3;
+    
+    // Determina número máximo de destinos baseado no tempo disponível
+    let maxDestinos;
+    if (tempoDisponivel <= 4) {
+        maxDestinos = 1;
+    } else if (tempoDisponivel <= 6) {
+        maxDestinos = 2;
+    } else {
+        maxDestinos = 3;
+    }
     
     return `
 Especialista em turismo rodoviário brasileiro. Crie 3 roteiros de moto baseado em:
@@ -558,6 +586,127 @@ FORMATO JSON:
 
 IMPORTANTE: Responda APENAS com JSON válido. Use locais reais do Brasil.`;
 }
+
+/**
+ * Processa a resposta AVANÇADA da IA (movido de app.js e adaptado)
+ */
+function parseAdvancedAIResponse(response, formData) {
+    try {
+        const jsonMatch = response.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+            throw new Error('JSON não encontrado na resposta da IA.');
+        }
+        const data = JSON.parse(jsonMatch[0]);
+
+        if (!data.sugestoes || !Array.isArray(data.sugestoes)) {
+            throw new Error('Formato de resposta da IA inválido.');
+        }
+
+        return data.sugestoes.map(sugestao => {
+            // Determina o tipo da sugestão baseado na descrição
+            let tipo = 'EQUILIBRADA';
+            const descricao = sugestao.porquePerfeito?.toLowerCase() || '';
+            if (descricao.includes('econômico')) {
+                tipo = 'ECONÔMICA';
+            } else if (descricao.includes('premium')) {
+                tipo = 'PREMIUM';
+            }
+
+            return {
+                // Mapeia para o formato esperado pela nova função de renderização
+                tipo,
+            titulo: sugestao.nome,
+            resumo: sugestao.experiencia,
+            distancia_total: sugestao.distancia,
+            tempo_total: sugestao.tempoViagem,
+            custo_total_estimado: `R$ ${sugestao.custos?.total || 0}`,
+            nivel_dificuldade: 'Moderado', // Pode ser extraído da logística no futuro
+            destinos: [{
+                nome: sugestao.nome,
+                endereco: sugestao.endereco,
+                descricao: sugestao.experiencia,
+                dicas_motociclista: sugestao.logistica ? sugestao.logistica.split('\n') : []
+            }],
+            custos_detalhados: {
+                combustivel: `R$ ${sugestao.custos?.gasolina || 0}`,
+                alimentacao: `R$ ${sugestao.custos?.local || 0}`,
+                entradas: `R$ ${sugestao.custos?.pedagio || 0}`, // Usando pedagio como entradas por enquanto
+                outros: 'R$ 0',
+                total: `R$ ${sugestao.custos?.total || 0}`
+            },
+                porquePerfeito: sugestao.porquePerfeito,
+                logistica: sugestao.logistica,
+                observacoes: [],
+                dicas_importantes: []
+            };
+        });
+
+    } catch (error) {
+        console.error('Erro ao processar resposta avançada da IA:', error);
+        // Fallback para parsing manual se o JSON falhar
+        return parseResponseManually(response, formData);
+    }
+}
+
+/**
+ * Exibe os resultados na tela usando o novo layout de cards (movido de app.js)
+ */
+function displayAdvancedResults(sugestoes) {
+    const container = safeGetElement('sugestoes-role', true);
+    const resultsSection = safeGetElement('results-section', true);
+
+    container.innerHTML = sugestoes.map((sugestao, index) => {
+        return `
+            <div class="experiencia-card" data-index="${index}" onclick="selectRoteiro(${index})">
+                <div class="experiencia-card-image-container">
+                    <img src="${sugestao.imageUrl || 'assets/img/card-mapas.jpg'}" 
+                         alt="Imagem de ${sugestao.titulo}" 
+                         class="experiencia-card-image"
+                         loading="lazy">
+                </div>
+                <div class="experiencia-card-header">
+                    <div class="flex-1">
+                        <h3 class="experiencia-card-title">${sugestao.titulo}</h3>
+                        <p class="experiencia-card-address">${sugestao.destinos[0]?.endereco || 'Localização a ser definida'}</p>
+                    </div>
+                    <div class="experiencia-card-cost">
+                        ${sugestao.custo_total_estimado || 'R$ --'}
+                    </div>
+                </div>
+
+                <div class="experiencia-card-body">
+                    <div class="info-group">
+                        <h4 class="info-group-title">✨ Sua Experiência</h4>
+                        <p class="info-group-text">${sugestao.resumo}</p>
+                    </div>
+                    <div class="info-group">
+                        <h4 class="info-group-title">🎯 Por que é Ideal</h4>
+                        <p class="info-group-text">${sugestao.porquePerfeito || 'Perfeito para sua experiência desejada!'}</p>
+                    </div>
+                </div>
+
+                <div class="experiencia-card-footer">
+                    <div class="stats">
+                        <div class="stat-item">🛣️ ${sugestao.distancia_total || '~?'}</div>
+                        <div class="stat-item">⏱️ ${sugestao.tempo_total || '~?'}</div>
+                    </div>
+                    <div class="actions">
+                        <button class="btn-choose-experience">
+                            Ver Detalhes
+                        </button>
+                        </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    resultsSection.classList.remove('hidden');
+    resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    // Atualiza a variável global para funções de compartilhamento
+    window.generatedRoteiros = sugestoes;
+}
+
 
 /**
  * Processa a resposta da IA
@@ -652,7 +801,16 @@ function parseAIResponse(response, formData) {
  */
 function calculateCostByType(formData, tipo, categoria) {
     const tempoDisponivel = calcularTempoDisponivel(formData);
-    const distanciaEstimada = tipo === 'ECONÔMICA' ? 120 : tipo === 'EQUILIBRADA' ? 200 : 300;
+    
+    // Determina distância estimada baseada no tipo
+    let distanciaEstimada;
+    if (tipo === 'ECONÔMICA') {
+        distanciaEstimada = 120;
+    } else if (tipo === 'EQUILIBRADA') {
+        distanciaEstimada = 200;
+    } else {
+        distanciaEstimada = 300;
+    }
     
     // Custos base realistas para 2024
     const custosBase = {
@@ -687,7 +845,16 @@ function calculateCostByType(formData, tipo, categoria) {
  */
 function calculateSmartCosts(formData, tipoRoteiro, index) {
     const tempoDisponivel = calcularTempoDisponivel(formData);
-    const distanciaEstimada = index === 0 ? 120 : index === 1 ? 200 : 300;
+    
+    // Determina distância estimada baseada no índice do roteiro
+    let distanciaEstimada;
+    if (index === 0) {
+        distanciaEstimada = 120;
+    } else if (index === 1) {
+        distanciaEstimada = 200;
+    } else {
+        distanciaEstimada = 300;
+    }
     
     // Combustível - sempre presente, calculado pelos dados reais da moto
     const consumoReal = formData.consumoMedio || 22; // km/l do usuário ou padrão
@@ -1127,7 +1294,6 @@ function selecionarDestinosPorExperiencia(destinosDisponiveis, experienciaDeseja
     if (!experienciaDesejada) return destinosDisponiveis;
     
     const experienciaLower = experienciaDesejada.toLowerCase();
-    const palavrasChave = ['café da manhã', 'estrada bonita', 'vista', 'natureza', 'aventura', 'comida'];
     
     // Priorizar destinos que atendem a experiência
     const destinosPrioritarios = destinosDisponiveis.filter(dest => 
@@ -1251,77 +1417,17 @@ function parseResponseManually(response, formData) {
  */
 function generateFallbackResults(formData) {
     throw new Error('Fallback desabilitado - apenas IA generativa deve ser usada');
-    // Verificar se destinos está disponível no window
-    const destinosArray = window.destinos || window.DESTINOS_DATABASE || [];
-    if (!destinosArray || destinosArray.length === 0) {
-        throw new Error('Nenhum destino disponível - destinos.js não carregado');
-    }
-    
-    // Filtra destinos por orçamento e preferências
-    let destinosParaFiltrar = destinosArray;
-    if (!Array.isArray(destinosParaFiltrar)) {
-        // Se for o DESTINOS_DATABASE, converter para array
-        destinosParaFiltrar = Object.values(destinosParaFiltrar).flat();
-    }
-    
-    const destinosFiltrados = destinosParaFiltrar.filter(d => {
-        const custoEstimado = d.custoMedio || d.custos?.total || 100;
-        return custoEstimado <= formData.orcamento;
-    });
-    
-    if (destinosFiltrados.length === 0) {
-        throw new Error('Nenhum destino encontrado para o orçamento especificado');
-    }
-    
-    // Seleciona destino aleatório
-    const destino = destinosFiltrados[Math.floor(Math.random() * destinosFiltrados.length)];
-    
-    return [{
-        titulo: `Rolê para ${destino.nome}`,
-        resumo: destino.descricao || "Destino incrível para motociclistas",
-        distancia_total: `${destino.distancia || 150} km`,
-        tempo_total: "6-8 horas",
-        custo_total_estimado: `R$ ${Math.min(destino.custoMedio || 200, formData.orcamento)}`,
-        nivel_dificuldade: destino.dificuldade || 'Moderado',
-        destinos: [{
-            nome: destino.nome,
-            endereco: destino.endereco || "Consulte GPS",
-            distancia_anterior: `${destino.distancia || 150} km`,
-            tempo_viagem: `${Math.floor((destino.distancia || 150) / 60)} horas`,
-            horario_chegada: "10:00",
-            tempo_permanencia: "240 min",
-            descricao: destino.descricao || formData.experienciaDesejada,
-            custo_estimado: `R$ ${Math.floor((destino.custoMedio || 200) * 0.7)}`,
-            dicas_motociclista: destino.dicas || [
-                "Estrada em boas condições",
-                "Local seguro para estacionar",
-                "Ótimo para fotos"
-            ]
-        }],
-        custos_detalhados: {
-            combustivel: `R$ ${Math.floor(formData.orcamento * 0.3)}`,
-            alimentacao: `R$ ${Math.floor(formData.orcamento * 0.4)}`,
-            entradas: `R$ ${Math.floor(formData.orcamento * 0.2)}`,
-            outros: `R$ ${Math.floor(formData.orcamento * 0.1)}`,
-            total: `R$ ${formData.orcamento}`
-        },
-        observacoes: [
-            "Baseado em destinos conhecidos",
-            "Confirme condições atuais",
-            "Pilote com segurança"
-        ]
-    }];
 }
 
 /**
  * Exibe os resultados na tela
  */
 function displayResults(results) {
-    const container = document.getElementById('sugestoes-role');
-    const resultsSection = document.getElementById('results-section');
+    const container = safeGetElement('sugestoes-role', true);
+    const resultsSection = safeGetElement('results-section', true);
     
-    if (!container || !results || results.length === 0) {
-        showError('Erro ao exibir resultados');
+    if (!results || results.length === 0) {
+        showError('Nenhum resultado para exibir.');
         return;
     }
     
@@ -1329,48 +1435,13 @@ function displayResults(results) {
     generatedRoteiros = results;
     
     // Limpa completamente o container
-    container.innerHTML = '';
-    
-    // Cria header de seleção
-    const header = document.createElement('div');
-    header.className = 'text-center mb-8';
-    header.innerHTML = `
-        <h2 class="text-3xl font-bold text-gold-primary mb-4">🎯 Escolha Sua Aventura</h2>
-        <p class="text-gray-300 text-lg">Gerou 3 sugestões personalizadas para você. Escolha a que mais combina com seu estilo!</p>
-        
-        <div class="mt-6">
-            <button onclick="shareForVoting()" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors shadow-lg">
-                🗳️ Compartilhar para Votação
-            </button>
-            <p class="text-gray-400 text-sm mt-2">Deixe seu grupo votar na melhor opção!</p>
-        </div>
-    `;
-    container.appendChild(header);
-    
-    // Cria container das sugestões
-    const suggestionsContainer = document.createElement('div');
-    suggestionsContainer.className = 'grid md:grid-cols-3 gap-6 mb-8';
-    suggestionsContainer.id = 'suggestions-grid';
-    
-    console.log(`🔍 DEBUG: Recebidas ${results.length} sugestões para exibir:`, results);
-    
-    results.forEach((roteiro, index) => {
-        console.log(`🔍 DEBUG: Criando card ${index + 1} para:`, roteiro.titulo);
-        const suggestionCard = createSuggestionCard(roteiro, index);
-        suggestionsContainer.appendChild(suggestionCard);
-    });
-    
-    container.appendChild(suggestionsContainer);
+    container.innerHTML = ''; // Limpa antes de renderizar
     
     // Container para roteiro selecionado (inicialmente oculto)
     const selectedContainer = document.createElement('div');
     selectedContainer.id = 'selected-roteiro';
     selectedContainer.className = 'hidden';
     container.appendChild(selectedContainer);
-    
-    // Cria checklist de dicas
-    const checklistContainer = createChecklistSummary(results);
-    container.appendChild(checklistContainer);
     
     // Mostra seção de resultados
     resultsSection.classList.remove('hidden');
@@ -1383,6 +1454,9 @@ function displayResults(results) {
             block: 'start' 
         });
     }, 300);
+
+    // Usa a nova função de renderização para os cards de experiência
+    displayAdvancedResults(results);
 }
 
 /**
@@ -1412,7 +1486,7 @@ function createChecklistSummary(roteiros) {
  */
 function generateFullChecklist(roteiros) {
     const formData = getLastFormData();
-    const isLongTrip = formData && formData.autonomia && formData.autonomia > 200;
+    const isLongTrip = formData?.autonomia > 200;
     const hasWeatherRisk = new Date(formData?.dataRole || Date.now()).getMonth() >= 10 || new Date(formData?.dataRole || Date.now()).getMonth() <= 3; // Inverno
     
     const checklistCategories = [
@@ -1589,95 +1663,9 @@ function toggleChecklist() {
 }
 
 /**
- * Cria um card de sugestão (preview)
- */
-function createSuggestionCard(roteiro, index) {
-    const card = document.createElement('div');
-    card.className = 'suggestion-card cursor-pointer transform transition-all duration-300 hover:scale-105';
-    card.onclick = () => selectRoteiro(index);
-    
-    // Validações defensivas para evitar null/undefined
-    const safeRoteiro = {
-        tipo: roteiro?.tipo || 'EQUILIBRADA',
-        titulo: roteiro?.titulo || 'Roteiro Personalizado',
-        resumo: roteiro?.resumo || 'Roteiro gerado pela IA',
-        custo_total_estimado: roteiro?.custo_total_estimado || 'R$ --',
-        distancia_total: roteiro?.distancia_total || '-- km',
-        tempo_total: roteiro?.tempo_total || '-- horas',
-        destinos: roteiro?.destinos || []
-    };
-    
-    // Cores por tipo
-    const typeColors = {
-        'ECONÔMICA': 'from-green-600 to-green-800 border-green-500',
-        'EQUILIBRADA': 'from-blue-600 to-blue-800 border-blue-500', 
-        'PREMIUM': 'from-purple-600 to-purple-800 border-purple-500'
-    };
-    
-    const typeIcons = {
-        'ECONÔMICA': '💚',
-        'EQUILIBRADA': '⚖️',
-        'PREMIUM': '👑'
-    };
-    
-    const colorClass = typeColors[safeRoteiro.tipo] || 'from-gray-600 to-gray-800 border-gray-500';
-    
-    card.innerHTML = `
-        <div class="bg-gradient-to-br ${colorClass} p-6 rounded-xl border-2 hover:border-opacity-100 border-opacity-50 transition-all">
-            <div class="text-center mb-4">
-                <div class="text-4xl mb-2">${typeIcons[safeRoteiro.tipo] || '🏍️'}</div>
-                <div class="bg-black bg-opacity-30 px-3 py-1 rounded-full text-sm font-bold text-white mb-2">
-                    ${safeRoteiro.tipo}
-                </div>
-                <h3 class="text-xl font-bold text-white mb-2">${safeRoteiro.titulo}</h3>
-                <p class="text-gray-200 text-sm">${safeRoteiro.resumo}</p>
-            </div>
-            
-            <div class="space-y-3 mb-6">
-                <div class="flex justify-between items-center bg-black bg-opacity-30 p-3 rounded-lg">
-                    <span class="text-white font-semibold">💰 Custo Total</span>
-                    <span class="text-white font-bold text-lg">${safeRoteiro.custo_total_estimado}</span>
-                </div>
-                
-                <div class="grid grid-cols-2 gap-2 text-sm">
-                    <div class="bg-black bg-opacity-30 p-2 rounded text-center">
-                        <div class="text-white font-semibold">📍 ${safeRoteiro.distancia_total}</div>
-                        <div class="text-gray-300">Distância</div>
-                    </div>
-                    <div class="bg-black bg-opacity-30 p-2 rounded text-center">
-                        <div class="text-white font-semibold">⏱️ ${safeRoteiro.tempo_total}</div>
-                        <div class="text-gray-300">Tempo</div>
-                    </div>
-                </div>
-                
-                <div class="bg-black bg-opacity-30 p-3 rounded-lg">
-                    <div class="text-white font-semibold mb-2">📍 Principais Destinos:</div>
-                    <div class="space-y-1">
-                        ${safeRoteiro.destinos.length > 0 ? safeRoteiro.destinos.slice(0, 2).map(d => `
-                            <div class="text-gray-200 text-sm">• ${d?.nome || 'Destino'}</div>
-                        `).join('') : '<div class="text-gray-300 text-sm">• Destinos serão definidos</div>'}
-                        ${safeRoteiro.destinos.length > 2 ? `<div class="text-gray-300 text-xs">+ ${safeRoteiro.destinos.length - 2} destinos...</div>` : ''}
-                    </div>
-                </div>
-                
-                ${getTypeCharacteristics(safeRoteiro.tipo)}
-            </div>
-            
-            <div class="text-center">
-                <button class="bg-white text-black font-bold py-3 px-6 rounded-full hover:bg-gray-100 transition-colors w-full">
-                    ✨ Escolher Este Roteiro
-                </button>
-            </div>
-        </div>
-    `;
-    
-    return card;
-}
-
-/**
  * Cria um card de resultado completo (expandido)
  */
-function createResultCard(roteiro, index) {
+function createAdvancedResultCard(roteiro, index) {
     const card = document.createElement('div');
     card.className = 'result-card';
     card.innerHTML = `
@@ -1735,16 +1723,25 @@ function createResultCard(roteiro, index) {
                         </div>
                     </div>
                     
-                    ${destino.dicas_motociclista && destino.dicas_motociclista.length > 0 ? `
+                    ${destino.dicas_motociclista?.length > 0 ? `
                         <div class="mt-4">
                             <h6 class="text-gold-primary font-semibold mb-3">🏍️ Dicas Especializadas:</h6>
                             <div class="space-y-2">
                                 ${destino.dicas_motociclista.map(dica => {
-                                    const icon = dica.toLowerCase().includes('estrada') ? '🛣️' :
-                                               dica.toLowerCase().includes('segurança') ? '🔒' :
-                                               dica.toLowerCase().includes('equipamento') ? '🛡️' :
-                                               dica.toLowerCase().includes('horário') ? '⏰' :
-                                               dica.toLowerCase().includes('emergência') ? '🚨' : '💡';
+                                    // Determina ícone baseado no conteúdo da dica
+                                    const dicaLower = dica.toLowerCase();
+                                    let icon = '💡'; // ícone padrão
+                                    if (dicaLower.includes('estrada')) {
+                                        icon = '🛣️';
+                                    } else if (dicaLower.includes('segurança')) {
+                                        icon = '🔒';
+                                    } else if (dicaLower.includes('equipamento')) {
+                                        icon = '🛡️';
+                                    } else if (dicaLower.includes('horário')) {
+                                        icon = '⏰';
+                                    } else if (dicaLower.includes('emergência')) {
+                                        icon = '🚨';
+                                    }
                                     return `<div class="bg-gray-600 rounded-lg p-2">
                                         <span class="text-lg mr-2">${icon}</span>
                                         <span class="text-gray-200 text-sm">${dica}</span>
@@ -1789,18 +1786,11 @@ function createResultCard(roteiro, index) {
             </div>
         ` : ''}
         
-        ${roteiro.cronograma && roteiro.cronograma.length > 0 ? `
+        ${roteiro.cronograma?.length > 0 ? `
             <div class="bg-blue-900 bg-opacity-30 p-4 rounded-lg mb-4">
                 <h4 class="text-lg font-bold text-blue-400 mb-3">⏰ Cronograma do Rolê</h4>
                 <div class="space-y-3">
                     ${roteiro.cronograma.map(item => {
-                        const iconMap = {
-                            'saida': '🏠',
-                            'chegada': '🏍️',
-                            'saida_destino': '🚀',
-                            'chegada_final': '🏡',
-                            'combustivel': '⛽'
-                        };
                         const bgColorMap = {
                             'saida': 'bg-green-600',
                             'chegada': 'bg-blue-600',
@@ -1827,7 +1817,7 @@ function createResultCard(roteiro, index) {
             </div>
         ` : ''}
         
-        ${roteiro.observacoes && roteiro.observacoes.length > 0 ? `
+        ${roteiro.observacoes?.length > 0 ? `
             <div class="bg-blue-900 bg-opacity-30 p-4 rounded-lg">
                 <h4 class="text-blue-400 font-bold mb-2">ℹ️ Observações Importantes</h4>
                 <ul class="text-sm text-gray-300 space-y-1">
@@ -1902,17 +1892,15 @@ function getFormData() {
         
         // Campos obrigatórios
         const enderecoPartida = getFieldValue('endereco-partida');
-        const dataRole = getFieldValue('data-role');
         const horarioSaida = getFieldValue('horario-saida');
         const horarioVolta = getFieldValue('horario-volta');
-        const capacidadeTanque = getFieldValue('capacidade-tanque');
         const consumoMedio = getFieldValue('consumo-medio');
         const perfilPilotagem = getFieldValue('perfil-pilotagem');
         const experienciaDesejada = getFieldValue('experiencia-desejada');
         
         // Validação para submissão (mais rigorosa)
         const isForSubmission = arguments[0] === true;
-        const hasRequiredFields = enderecoPartida && dataRole && horarioSaida && horarioVolta && capacidadeTanque && consumoMedio && perfilPilotagem && experienciaDesejada;
+        const hasRequiredFields = enderecoPartida && horarioSaida && horarioVolta && consumoMedio && perfilPilotagem && experienciaDesejada;
         
         if (isForSubmission && !hasRequiredFields) {
             throw new Error('Campos obrigatórios não preenchidos');
@@ -1985,8 +1973,8 @@ function getQuilometragemRange(tipo) {
 function validateForm() {
     // Apenas campos OBRIGATÓRIOS para traçar a rota
     const requiredFields = [
-        'endereco-partida', 'data-role', 'horario-saida', 
-        'horario-volta', 'tipo-moto', 'perfil-pilotagem', 
+        'endereco-partida', 'data-role', 'horario-saida',
+        'horario-volta', 'capacidade-tanque', 'consumo-medio', 'perfil-pilotagem',
         'experiencia-desejada'
     ];
     
@@ -2029,19 +2017,26 @@ function validateField(event) {
 
 function showFieldError(field, message) {
     clearFieldError({ target: field });
-    
-    field.classList.add('border-red-500');
+
+    // Adiciona classe de erro ao campo e ao seu contêiner
+    field.classList.add('border-red-500', 'focus:border-red-500', 'focus:ring-red-500/20');
+    field.closest('.form-field-container')?.classList.add('has-error');
     
     const error = document.createElement('div');
-    error.className = 'field-error text-red-400 text-sm mt-1';
-    error.textContent = message;
+    error.className = 'field-error text-red-400 text-xs mt-1 flex items-center gap-1';
+    error.innerHTML = `
+        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
+        <span>${message}</span>
+    `;
     
-    field.parentNode.appendChild(error);
+    // Insere a mensagem de erro após o campo
+    field.parentNode.insertBefore(error, field.nextSibling);
 }
 
 function clearFieldError(event) {
     const field = event.target;
-    field.classList.remove('border-red-500');
+    field.classList.remove('border-red-500', 'focus:border-red-500', 'focus:ring-red-500/20');
+    field.closest('.form-field-container')?.classList.remove('has-error');
     
     const error = field.parentNode.querySelector('.field-error');
     if (error) {
@@ -2242,6 +2237,103 @@ function loadSavedData() {
     }
 }
 
+/**
+ * Exibe o modal com o histórico de rolês gerados.
+ */
+function showHistoryModal() {
+    const history = getHistory();
+    const modalId = 'history-modal';
+
+    // Remove modal antigo se existir
+    const existingModal = document.getElementById(modalId);
+    if (existingModal) existingModal.remove();
+
+    const modal = document.createElement('div');
+    modal.id = modalId;
+    modal.className = 'fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4';
+    modal.innerHTML = `
+        <div class="bg-gray-900 rounded-2xl max-w-3xl w-full max-h-[90vh] flex flex-col border border-gray-700 shadow-2xl">
+            <!-- Header -->
+            <div class="p-6 border-b border-gray-700 flex justify-between items-center flex-shrink-0">
+                <h2 class="text-2xl font-bold text-gold-primary">📜 Histórico de Rolês</h2>
+                <button onclick="this.closest('#${modalId}').remove()" class="text-gray-400 hover:text-white text-2xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <!-- Conteúdo -->
+            <div class="p-6 overflow-y-auto">
+                ${history.length === 0 ? `
+                    <div class="text-center py-12">
+                        <div class="text-6xl mb-4">🗺️</div>
+                        <h3 class="text-xl text-gray-400 mb-2">Nenhum rolê no histórico</h3>
+                        <p class="text-gray-500">Gere seu primeiro rolê para que ele apareça aqui!</p>
+                    </div>
+                ` : `
+                    <div class="space-y-4">
+                        ${history.map((entry, index) => createHistoryEntry(entry, index)).join('')}
+                    </div>
+                `}
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+    trackEvent('history_viewed');
+}
+
+/**
+ * Cria o HTML para uma entrada do histórico.
+ */
+function createHistoryEntry(entry, index) {
+    const firstSuggestion = entry.results[0];
+    return `
+        <div class="bg-gray-800 rounded-lg p-4 hover:bg-gray-700/50 transition-colors">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                <div>
+                    <p class="text-sm text-gray-400">${new Date(entry.timestamp).toLocaleString('pt-BR')}</p>
+                    <h4 class="text-lg font-bold text-white">${firstSuggestion?.titulo || 'Rolê Personalizado'}</h4>
+                    <p class="text-sm text-gray-300">${entry.formData.experienciaDesejada}</p>
+                </div>
+                <div class="flex gap-2 mt-3 sm:mt-0">
+                    <button onclick="reuseHistoryEntry(${index})" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm font-semibold">Reutilizar</button>
+                    <button onclick="deleteHistoryEntry(${index})" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm font-semibold">Excluir</button>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * Reutiliza os dados de uma entrada do histórico para preencher o formulário.
+ */
+function reuseHistoryEntry(index) {
+    const history = getHistory();
+    const entry = history[index];
+    if (!entry) return;
+
+    Object.keys(entry.formData).forEach(key => {
+        const elementId = key.replace(/([A-Z])/g, '-$1').toLowerCase();
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.value = entry.formData[key];
+        }
+    });
+
+    showNotification('📝 Formulário preenchido com dados do histórico!', 'success');
+    document.getElementById('history-modal')?.remove();
+    window.scrollTo({ top: document.getElementById('gerador-form').offsetTop, behavior: 'smooth' });
+}
+
+/**
+ * Deleta uma entrada do histórico.
+ */
+function deleteHistoryEntry(index) {
+    if (!confirm('Tem certeza que deseja excluir este item do histórico?')) return;
+    deleteFromHistory(index);
+    showHistoryModal(); // Recarrega o modal
+}
+
 function saveToHistory(formData, results) {
     try {
         const history = JSON.parse(localStorage.getItem('gerador_history') || '[]');
@@ -2263,6 +2355,26 @@ function saveToHistory(formData, results) {
     } catch (error) {
         console.error('Erro ao salvar histórico:', error);
     }
+}
+
+/**
+ * Retorna o histórico salvo.
+ */
+function getHistory() {
+    try {
+        return JSON.parse(localStorage.getItem('gerador_history') || '[]');
+    } catch {
+        return [];
+    }
+}
+
+/**
+ * Deleta um item do histórico pelo índice.
+ */
+function deleteFromHistory(index) {
+    const history = getHistory();
+    history.splice(index, 1);
+    localStorage.setItem('gerador_history', JSON.stringify(history));
 }
 
 // PWA
@@ -2399,10 +2511,20 @@ function createVotingCard(roteiro, index, collaborativeId, votos) {
     const userVote = localStorage.getItem(`voted_${collaborativeId}`);
     const isUserChoice = userVote == index;
     
+    // Determina a cor do gradiente baseada no índice
+    let gradientClass;
+    if (index === 0) {
+        gradientClass = 'from-green-600 to-green-700';
+    } else if (index === 1) {
+        gradientClass = 'from-blue-600 to-blue-700';
+    } else {
+        gradientClass = 'from-purple-600 to-purple-700';
+    }
+
     return `
         <div class="bg-gray-800 rounded-xl p-6 hover:bg-gray-750 transition-colors ${isUserChoice ? 'ring-2 ring-gold-primary' : ''}">
             <div class="text-center mb-4">
-                <div class="bg-gradient-to-r ${index === 0 ? 'from-green-600 to-green-700' : index === 1 ? 'from-blue-600 to-blue-700' : 'from-purple-600 to-purple-700'} text-white px-3 py-1 rounded-full text-sm font-bold inline-block">
+                <div class="bg-gradient-to-r ${gradientClass} text-white px-3 py-1 rounded-full text-sm font-bold inline-block">
                     ${roteiro.tipo}
                 </div>
             </div>
@@ -2495,7 +2617,16 @@ function generateVotingResults(votos, roteiros) {
     
     return results.map((result, position) => {
         const percentage = totalVotes > 0 ? (result.count / totalVotes * 100).toFixed(1) : 0;
-        const medal = position === 0 ? '🥇' : position === 1 ? '🥈' : '🥉';
+        
+        // Determina a medalha baseada na posição
+        let medal;
+        if (position === 0) {
+            medal = '🥇';
+        } else if (position === 1) {
+            medal = '🥈';
+        } else {
+            medal = '🥉';
+        }
         
         return `
             <div class="flex justify-between items-center py-2 ${position === 0 ? 'text-gold-primary font-bold' : 'text-gray-300'}">
@@ -2928,11 +3059,10 @@ function getLastFormData() {
 function selectRoteiro(index) {
     const roteiro = generatedRoteiros[index];
     if (!roteiro) return;
-    
+
     // Esconde as sugestões com animação
-    const suggestionsGrid = document.getElementById('suggestions-grid');
-    suggestionsGrid.style.transform = 'translateY(-20px)';
-    suggestionsGrid.style.opacity = '0';
+    const suggestionsGrid = document.querySelector('.experiencia-grid');
+    if (suggestionsGrid) suggestionsGrid.classList.add('hidden');
     
     setTimeout(() => {
         suggestionsGrid.classList.add('hidden');
@@ -2993,7 +3123,7 @@ function selectRoteiro(index) {
             </div>
         `;
         
-        const expandedCard = createResultCard(roteiro, index);
+        const expandedCard = createAdvancedResultCard(roteiro, index);
         expandedCard.classList.add('animate-fade-in');
         selectedContainer.appendChild(expandedCard);
         
@@ -3017,13 +3147,13 @@ function selectRoteiro(index) {
  * Volta para as sugestões
  */
 function showSuggestions() {
-    const suggestionsGrid = document.getElementById('suggestions-grid');
+    const suggestionsGrid = document.querySelector('.experiencia-grid');
     const selectedContainer = document.getElementById('selected-roteiro');
     
     // Esconde roteiro expandido
     selectedContainer.classList.add('hidden');
     
-    // Mostra sugestões novamente
+    // Mostra sugestões novamente (se existirem)
     suggestionsGrid.classList.remove('hidden');
     suggestionsGrid.style.transform = 'translateY(0)';
     suggestionsGrid.style.opacity = '1';
@@ -3040,33 +3170,7 @@ function showSuggestions() {
 /**
  * Salvar roteiro nos favoritos
  */
-function saveRoteiro(index) {
-    const roteiro = generatedRoteiros[index];
-    if (!roteiro) return;
-    
-    const favoritos = JSON.parse(localStorage.getItem('sop_roteiros_favoritos') || '[]');
-    
-    // Verifica se já existe
-    const jaExiste = favoritos.some(fav => fav.roteiro.titulo === roteiro.titulo);
-    if (jaExiste) {
-        showNotification(`⚠️ "${roteiro.titulo}" já está nos favoritos!`, 'warning');
-        return;
-    }
-    
-    const roteiroFavorito = {
-        id: Date.now().toString(36),
-        roteiro: roteiro,
-        formData: lastFormData,
-        dataSalvo: new Date().toISOString(),
-        titulo: roteiro.titulo
-    };
-    
-    favoritos.push(roteiroFavorito);
-    localStorage.setItem('sop_roteiros_favoritos', JSON.stringify(favoritos));
-    
-    showNotification(`✅ "${roteiro.titulo}" salvo nos favoritos! Clique em "Favoritos" no menu para ver.`, 'success');
-    trackEvent('save_favorite', { roteiro: roteiro.titulo });
-}
+
 
 /**
  * Mostrar modal de favoritos

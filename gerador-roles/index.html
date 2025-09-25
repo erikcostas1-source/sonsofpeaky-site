@@ -9,7 +9,7 @@
     
     <!-- Security Headers -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://generativelanguage.googleapis.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data: https:; connect-src 'self' https://generativelanguage.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com; frame-ancestors 'none';" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://generativelanguage.googleapis.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; img-src 'self' data: https:; connect-src 'self' https://generativelanguage.googleapis.com https://api.unsplash.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; frame-ancestors 'none';" />
     <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
     <!-- X-XSS-Protection e X-Frame-Options foram removidos conforme recomendações modernas -->
     
@@ -20,20 +20,19 @@
     <link rel="dns-prefetch" href="//fonts.googleapis.com" />
     
     <!-- Preload Critical Images -->
-    <link rel="preload" href="assets/img/hero-banner.jpg" as="image" media="(min-width: 769px)">
-    <link rel="preload" href="assets/img/hero-banner-mobile.jpg" as="image" media="(max-width: 768px)">
-    <link rel="preload" href="assets/img/background-texture.png" as="image">
-    <link rel="preload" href="assets/img/loading-spinner.png" as="image">
+    <link rel="preload" href="../assets/img/hero-banner.jpg" as="image" media="(min-width: 769px)">
+    <link rel="preload" href="../assets/img/hero-banner-mobile.jpg" as="image" media="(max-width: 768px)">
+    <link rel="preload" href="../assets/img/loading-spinner.png" as="image">
     <title>Sons of Peaky - Gerador de Rolês de Moto</title>
-    <link rel="icon" href="assets/img/moto-icon.png" />
-    <link rel="apple-touch-icon" sizes="192x192" href="assets/img/moto-icon-192.png" />
-    <link rel="icon" type="image/png" sizes="192x192" href="assets/img/moto-icon-192.png" />
-    <link rel="icon" type="image/png" sizes="512x512" href="assets/img/moto-icon-512.png" />
+    <link rel="icon" href="../assets/img/moto-icon.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="../assets/img/moto-icon-192.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="../assets/img/moto-icon-192.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="../assets/img/moto-icon-512.png" />
     
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="Sons of Peaky - Gerador de Rolês de Moto" />
     <meta property="og:description" content="IA que cria roteiros personalizados para motociclistas. Descubra destinos únicos, calcule custos e planeje a aventura perfeita." />
-    <meta property="og:image" content="assets/img/hero-banner.jpg" />
+    <meta property="og:image" content="../assets/img/hero-banner.jpg" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://sonsofpeaky.com/" />
     
@@ -41,10 +40,10 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Sons of Peaky - Gerador de Rolês de Moto" />
     <meta name="twitter:description" content="IA que cria roteiros personalizados para motociclistas. Descubra destinos únicos, calcule custos e planeje a aventura perfeita." />
-    <meta name="twitter:image" content="assets/img/hero-banner.jpg" />
+    <meta name="twitter:image" content="../assets/img/hero-banner.jpg" />
     
     <!-- CSS Styling -->
-    <link rel="stylesheet" href="tailwind-prod.css?v=2.0.3" id="tailwind-prod" />
+    <link rel="stylesheet" href="styles.css?v=2.0.3" id="tailwind-prod" />
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -55,191 +54,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/brands.min.css">
     
-    <!-- Custom Styles -->
-    <link rel="stylesheet" href="styles.css?v=2.1.0" />
-    
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
     
     <!-- Apple Touch Icon -->
-    <link rel="apple-touch-icon" href="assets/img/moto-icon.png">
+    <link rel="apple-touch-icon" href="../assets/img/moto-icon.png">
     
     <!-- CSS Environment Control -->
     <script>
         // Usar sempre CSS local - sem CDN
         console.log('� Usando Tailwind CSS local');
     </script>
-    
-    <style>
-        :root {
-            --bg-primary: #000000;
-            --bg-secondary: #1a1a1a;  
-            --bg-tertiary: #2d2d2d;
-            --gold-primary: #ffd700;
-            --gold-secondary: #c9a14a;
-            --accent-primary: #ff6b35;
-            --text-white: #ffffff;
-            --text-gray: #cccccc;
-            --text-muted: #999999;
-        }
-        
-        body { 
-            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: var(--text-white);
-            min-height: 100vh;
-        }
-        
-        .hero-gradient {
-            background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #2d2d2d 100%);
-        }
-        
-        .card {
-            background: rgba(26, 26, 26, 0.8);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 215, 0, 0.2);
-            border-radius: 1rem;
-            padding: 2rem;
-            transition: all 0.3s ease;
-        }
-        
-        .card:hover {
-            border-color: rgba(255, 215, 0, 0.5);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.1);
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #c9a14a 0%, #ff6b35 100%);
-            color: #000;
-            font-weight: bold;
-            padding: 1rem 2rem;
-            border-radius: 0.5rem;
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(201, 161, 74, 0.3);
-        }
-        
-        .input-field {
-            background: rgba(45, 45, 45, 0.8);
-            border: 1px solid rgba(255, 215, 0, 0.2);
-            color: var(--text-white);
-            padding: 0.75rem 1rem;
-            border-radius: 0.5rem;
-            width: 100%;
-            transition: border-color 0.3s ease;
-        }
-        
-        .input-field:focus {
-            outline: none;
-            border-color: var(--gold-primary);
-        }
-        
-        .loading-animation {
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-        
-        .result-card {
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            border-radius: 1rem;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-        }
-        
-        .floating-particles {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: -1;
-        }
-        
-        .particle {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: var(--gold-primary);
-            border-radius: 50%;
-            opacity: 0.3;
-            animation: float 20s infinite linear;
-        }
-        
-        @keyframes float {
-            0% { transform: translateY(100vh) rotate(0deg); }
-            100% { transform: translateY(-100px) rotate(360deg); }
-        }
-
-        /* Sugestões de Roteiros */
-        .suggestion-card {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .suggestion-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 20px 40px rgba(255, 215, 0, 0.2);
-        }
-
-        .animate-fade-in {
-            animation: fadeInUp 0.6s ease-out;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Grid de sugestões com transição */
-        #suggestions-grid {
-            transition: all 0.3s ease-in-out;
-        }
-
-        /* Cards de resultado expandido */
-        .result-card {
-            background: rgba(26, 26, 26, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            border-radius: 1rem;
-            padding: 2rem;
-            margin-bottom: 2rem;
-        }
-        
-        /* Error 404 Styles */
-        .error-404 {
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-            border: 1px solid rgba(255, 215, 0, 0.2);
-            border-radius: 1rem;
-            padding: 3rem 2rem;
-            text-align: center;
-            max-width: 600px;
-            margin: 2rem auto;
-        }
-        
-        .error-404 img {
-            max-width: 300px;
-            margin: 0 auto 2rem;
-            opacity: 0.8;
-            border-radius: 1rem;
-        }
-    </style>
 </head>
 <body>
     <!-- Floating Particles Background -->
@@ -280,10 +105,13 @@
                         <a href="admin.html" class="text-white hover:text-gold-primary transition-colors">
                             <i class="fas fa-shield-alt mr-1"></i>Admin
                         </a>
+                        <button id="history-btn" onclick="showHistoryModal()" class="text-white hover:text-gold-primary transition-colors">
+                            <i class="fas fa-history mr-1"></i>Histórico
+                        </button>
                     </div>
                     
                     <!-- Mobile Menu Button -->
-                    <button id="mobile-menu-btn" class="md:hidden text-white" aria-label="Abrir menu de navegação" aria-expanded="false" title="Menu de navegação">
+                    <button id="mobile-menu-btn" class="md:hidden text-white" aria-label="Abrir menu de navegação" aria-expanded="false" title="Menu de navegação" aria-controls="mobile-menu" aria-haspopup="true">
                         <i class="fas fa-bars" aria-hidden="true"></i>
                     </button>
                     
@@ -294,7 +122,7 @@
             </div>
             
             <!-- Mobile Menu -->
-            <div id="mobile-menu" class="hidden md:hidden bg-black bg-opacity-95 border-t border-gray-800">
+            <div id="mobile-menu" class="hidden md:hidden bg-black bg-opacity-95 border-t border-gray-800" role="navigation">
                 <div class="container mx-auto px-4 py-4 space-y-2">
                     <a href="index.html" class="block text-white hover:text-gold-primary transition-colors py-2">
                         <i class="fas fa-home mr-2"></i>Início
@@ -323,8 +151,8 @@
             <!-- Hero Banner Background -->
             <div class="absolute inset-0 z-0">
                 <picture>
-                    <source media="(max-width: 768px)" srcset="assets/img/hero-banner-mobile.jpg">
-                    <img src="assets/img/hero-banner.jpg" 
+                    <source media="(max-width: 768px)" srcset="../assets/img/hero-banner-mobile.jpg">
+                    <img src="../assets/img/hero-banner.jpg" 
                          alt="Sons of Peaky - Motociclistas em estrada brasileira" 
                          class="w-full h-full object-cover opacity-30"
                          loading="eager"
@@ -381,7 +209,7 @@
                     <!-- Card IA -->
                     <div class="card group cursor-pointer">
                         <div class="relative overflow-hidden rounded-lg mb-4">
-                            <img src="assets/img/card-ia.jpg" 
+                            <img src="../assets/img/card-ia.jpg" 
                                  alt="Inteligência Artificial para Roteiros" 
                                  class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
                                  loading="lazy">
@@ -399,7 +227,7 @@
                     <!-- Card Custos -->
                     <div class="card group cursor-pointer">
                         <div class="relative overflow-hidden rounded-lg mb-4">
-                            <img src="assets/img/card-custos.jpg" 
+                            <img src="../assets/img/card-custos.jpg" 
                                  alt="Cálculo Inteligente de Custos" 
                                  class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
                                  loading="lazy">
@@ -417,7 +245,7 @@
                     <!-- Card Mapas -->
                     <div class="card group cursor-pointer">
                         <div class="relative overflow-hidden rounded-lg mb-4">
-                            <img src="assets/img/card-mapas.jpg" 
+                            <img src="../assets/img/card-mapas.jpg" 
                                  alt="Rotas e Mapas Inteligentes" 
                                  class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
                                  loading="lazy">
@@ -583,6 +411,15 @@
                                                 <option value="aventureiro">🔥 Aventureiro - Trilhas, off-road e destinos selvagens</option>
                                             </select>
                                         </div>
+
+                                        <div>
+                                            <label for="tipo-estrada" class="block text-sm font-medium text-gray-300 mb-2">🏞️ Tipo de Estrada</label>
+                                            <select id="tipo-estrada" class="input-field">
+                                                <option value="asfalto" selected>🛣️ Apenas Asfalto</option>
+                                                <option value="terra-leve">🏞️ Aceito Estradas de Terra Leves</option>
+                                                <option value="off-road">🚵 Off-Road / Aventura</option>
+                                            </select>
+                                        </div>
                                     </div>
 
                                     <div class="space-y-4">
@@ -599,28 +436,28 @@
                                         <div>
                                             <label for="preferencias-extras" class="block text-sm font-medium text-gray-300 mb-2">🎯 Interesses Específicos</label>
                                             <div class="grid grid-cols-2 gap-2 text-sm">
-                                                <label class="flex items-center">
-                                                    <input type="checkbox" id="pref-gastronomia" class="mr-2" aria-label="Preferência por gastronomia">
+                                                <label class="flex items-center cursor-pointer">
+                                                    <input type="checkbox" id="pref-gastronomia" class="mr-2">
                                                     🍽️ Gastronomia
                                                 </label>
-                                                <label class="flex items-center">
-                                                    <input type="checkbox" id="pref-natureza" class="mr-2" aria-label="Preferência por natureza">
+                                                <label class="flex items-center cursor-pointer">
+                                                    <input type="checkbox" id="pref-natureza" class="mr-2">
                                                     🌿 Natureza
                                                 </label>
-                                                <label class="flex items-center">
-                                                    <input type="checkbox" id="pref-historia" class="mr-2" aria-label="Preferência por história">
+                                                <label class="flex items-center cursor-pointer">
+                                                    <input type="checkbox" id="pref-historia" class="mr-2">
                                                     🏛️ História
                                                 </label>
-                                                <label class="flex items-center">
-                                                    <input type="checkbox" id="pref-esportes" class="mr-2" aria-label="Preferência por esportes">
+                                                <label class="flex items-center cursor-pointer">
+                                                    <input type="checkbox" id="pref-esportes" class="mr-2">
                                                     ⚽ Esportes
                                                 </label>
-                                                <label class="flex items-center">
-                                                    <input type="checkbox" id="pref-compras" class="mr-2" aria-label="Preferência por compras">
+                                                <label class="flex items-center cursor-pointer">
+                                                    <input type="checkbox" id="pref-compras" class="mr-2">
                                                     🛍️ Compras
                                                 </label>
-                                                <label class="flex items-center">
-                                                    <input type="checkbox" id="pref-cultura" class="mr-2" aria-label="Preferência por cultura">
+                                                <label class="flex items-center cursor-pointer">
+                                                    <input type="checkbox" id="pref-cultura" class="mr-2">
                                                     🎭 Cultura
                                                 </label>
                                             </div>
@@ -661,7 +498,7 @@
                 <div class="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
                     <!-- Banner Checklist -->
                     <div class="relative overflow-hidden rounded-xl group cursor-pointer">
-                        <img src="assets/img/checklist-banner.jpg" 
+                        <img src="../assets/img/checklist-banner.jpg" 
                              alt="Checklist Inteligente para Motociclistas" 
                              class="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-105"
                              loading="lazy">
@@ -684,7 +521,7 @@
                     
                     <!-- Banner Timeline -->
                     <div class="relative overflow-hidden rounded-xl group cursor-pointer">
-                        <img src="assets/img/timeline-banner.jpg" 
+                        <img src="../assets/img/timeline-banner.jpg" 
                              alt="Timeline e Cronograma Inteligente" 
                              class="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-105"
                              loading="lazy">
@@ -716,7 +553,7 @@
                     <div id="loading-role" class="card text-center mb-8 hidden">
                         <div class="loading-animation">
                             <div class="relative inline-block mb-4">
-                                <img src="assets/img/loading-spinner.png" 
+                                <img src="../assets/img/loading-spinner.png" 
                                      alt="Carregando..." 
                                      class="w-16 h-16 animate-spin opacity-80"
                                      loading="eager">
@@ -755,17 +592,19 @@
     </footer>
     
     <!-- Scripts -->
-    <script src="config.js?v=2.0.1"></script>
-    <!-- Configuração de desenvolvimento (apenas para localhost) -->
+    <script src="config.js?v=2.0.3"></script>
+    <!-- Configuração de desenvolvimento (apenas para localhost) --> 
     <script>
         if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
             const devScript = document.createElement('script');
-            devScript.src = 'dev-config.js?v=2.0.1';
+            devScript.src = 'dev-config.js?v=2.0.3';
             document.head.appendChild(devScript);
         }
     </script>
     <script src="destinos.js?v=2.0.3"></script>
     <script src="gerador.js?v=2.0.3"></script>
+    <script src="database.js?v=2.0.3"></script>
+    <script src="auth.js?v=2.0.3"></script>
     <script>
         // Lazy Loading for Images
         document.addEventListener('DOMContentLoaded', function() {

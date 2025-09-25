@@ -1,17 +1,17 @@
 // Service Worker para PWA do Gerador de Rolês
-const CACHE_NAME = 'gerador-roles-v1.0.0';
+const CACHE_NAME = 'gerador-roles-v1.0.6';
 const urlsToCache = [
   './',
-  './index.html',
-  './styles.css',
+  './gerador-index.html',
+  './styles.css', // Correct path as used in the HTML
   './gerador.js',
   './manifest.json',
   './config.js',
   './destinos.js',
-  './assets/img/moto-icon-192.png',
+  './assets/img/moto-icon-192.png', // Correct path relative to this scope
   './assets/img/moto-icon-512.png',
-  'https://cdn.tailwindcss.com',
-  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
+  './assets/img/hero-banner.jpg',
+  './assets/img/loading-spinner.png'
 ];
 
 // Install
@@ -47,31 +47,6 @@ self.addEventListener('activate', event => {
 // Fetch
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
-  
-  // Cache strategy for API calls
-  if (url.hostname === 'generativelanguage.googleapis.com') {
-    event.respondWith(
-      fetch(event.request)
-        .then(response => {
-          // Clone response for cache
-          const responseClone = response.clone();
-          
-          // Cache successful API responses for 30 minutes
-          if (response.status === 200) {
-            caches.open('api-cache').then(cache => {
-              cache.put(event.request, responseClone);
-            });
-          }
-          
-          return response;
-        })
-        .catch(() => {
-          // Fallback to cache if network fails
-          return caches.match(event.request);
-        })
-    );
-    return;
-  }
   
   // Cache-first strategy for static assets
   event.respondWith(

@@ -71,7 +71,7 @@ LINHAS 603-623: Checkboxes sem labels (6 problemas)
 - pref-esportes
 - pref-compras
 - pref-cultura
-```
+```bash
 
 ---
 
@@ -152,16 +152,19 @@ LINHAS 603-623: Checkboxes sem labels (6 problemas)
 
 ## 🎯 **PROMPT PARA RETOMAR**
 
-```
-Continuando nossa análise técnica completa do Sons of Peaky. Já instalamos todas as extensões e identificamos 6 problemas críticos de acessibilidade. 
+```bash
+
+Continuando nossa análise técnica completa do Sons of Peaky. Já instalamos todas as extensões e identificamos 6 problemas críticos de acessibilidade.
 
 ESTADO ATUAL:
+
 - ✅ Extensões instaladas (17 para análise profissional)  
 - ✅ 6 problemas críticos identificados (aria-hidden duplicado + checkboxes sem labels)
 - 🔄 Análise técnica pausada no meio
 
 PRÓXIMA AÇÃO:
 Continue a análise completa seguindo a metodologia estruturada:
+
 1. Completar revisão de Layout & Responsividade
 2. Analisar Tipografia & Consistência Visual  
 3. Revisar Organização & Qualidade do Código
@@ -170,6 +173,7 @@ Continue a análise completa seguindo a metodologia estruturada:
 6. Testar Funcionalidade & Bugs
 
 Crie o PLANO DE AÇÃO ESTRUTURADO com:
+
 - Inventário completo de problemas (categoria, prioridade, localização)
 - Soluções específicas step-by-step
 - Código antes/depois para cada correção
@@ -178,7 +182,92 @@ Crie o PLANO DE AÇÃO ESTRUTURADO com:
 - Otimizações avançadas
 
 OBJETIVO: Transformar em código profissional nível sênior.
+
+## 📝 PLANO DE AÇÃO ESTRUTURADO
+
+### 1. Inventário Completo de Problemas
+
+| Categoria         | Prioridade | Localização                | Descrição                                   |
+|-------------------|------------|----------------------------|----------------------------------------------|
+| Acessibilidade    | Alta       | gerador-index.html:287     | aria-hidden duplicado                        |
+| Acessibilidade    | Alta       | gerador-index.html:603-623 | Checkboxes sem labels (6 casos)              |
+| Layout            | Média      | styles.css                 | Possíveis problemas de alinhamento/overflow  |
+| Tipografia        | Média      | index.html/styles.css      | Hierarquia e contraste de fontes             |
+| Código            | Média      | app.js/gerador.js          | Código repetido e semântica HTML             |
+| Performance       | Média      | assets/img/                | Imagens não otimizadas                       |
+| SEO               | Média      | index.html                 | Meta tags e estrutura semântica              |
+
+### 2. Soluções Específicas Step-by-Step
+
+#### Acessibilidade
+- Remover atributos duplicados (`aria-hidden`)
+- Adicionar `aria-label` ou `<label>` aos checkboxes
+- Validar navegação por teclado e uso de ARIA roles
+
+#### Layout & Responsividade
+- Revisar breakpoints e media queries
+- Corrigir problemas de alinhamento/flexbox/grid
+- Testar em múltiplas resoluções
+
+#### Tipografia & Consistência Visual
+- Uniformizar uso de fontes e tamanhos
+- Garantir contraste mínimo WCAG AA
+- Ajustar hierarquia de títulos
+
+#### Organização & Qualidade do Código
+- Refatorar código duplicado
+- Melhorar semântica HTML (uso correto de tags)
+- Modularizar CSS/JS conforme padrões profissionais
+
+#### Performance & Otimização
+- Converter imagens para WebP e aplicar lazy loading
+- Minificar CSS/JS
+- Revisar estratégias de carregamento (defer/async)
+
+#### SEO & Funcionalidade
+- Adicionar meta tags essenciais
+- Estruturar dados para buscadores
+- Testar e corrigir validações de formulários
+
+### 3. Código Antes/Depois (Exemplo)
+
+**Antes:**
+```html
+<i class="fas fa-bars" aria-hidden="true" aria-hidden="true"></i>
+<input type="checkbox" id="pref-gastronomia" class="mr-2">
 ```
+
+**Depois:**
+
+```html
+<i class="fas fa-bars" aria-hidden="true"></i>
+<input type="checkbox" id="pref-gastronomia" class="mr-2" aria-label="Preferência por gastronomia">
+```
+
+### 4. Guia de Backup
+
+```bash
+git add .
+git commit -m "Backup antes da revisão completa - 24/09/2025"
+git branch backup-pre-review
+```
+
+### 5. Upgrade Visual Moderno
+
+- Aplicar design system dark/gold consistente
+- Revisar espaçamentos, bordas e sombras
+- Garantir responsividade total
+
+### 6. Otimizações Avançadas
+
+- Implementar service worker para PWA
+- Ativar push notifications
+- Auditar Core Web Vitals e corrigir pontos críticos
+
+---
+
+**Próximos passos:**  
+Executar cada etapa do plano, validar com extensões e garantir métricas de sucesso.
 
 ---
 
