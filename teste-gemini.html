@@ -22,8 +22,8 @@
         <h1>🧪 Teste da Integração com Google Gemini</h1>
         
         <form class="test-form" id="testForm">
-            <input type="text" id="enderecoPartida" placeholder="Endereço de partida" value="São Paulo, SP" required>
-            <input type="number" id="orcamento" placeholder="Orçamento (R$)" value="300" required>
+            <input type="text" id="enderecoPartida" placeholder="Endereço de partida" value="São Paulo, SP" required aria-label="Endereço de partida">
+            <input type="number" id="orcamento" placeholder="Orçamento (R$)" value="300" required aria-label="Orçamento em reais">
             <select id="tipoMoto" required>
                 <option value="naked">Naked (CB600, MT07)</option>
                 <option value="esportiva">Esportiva (CBR, R6)</option>
@@ -157,8 +157,8 @@ Retorne um JSON válido com um roteiro personalizado. Use destinos reais no Bras
                 };
             }
             return {
-                apiKey: 'AIzaSyCiHRVozYYmHB-5W64QdJzn9dQYAyRl9Tk',
-                apiUrl: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=AIzaSyCiHRVozYYmHB-5W64QdJzn9dQYAyRl9Tk'
+                apiKey: 'API_KEY_REMOVED_FOR_SECURITY',
+                apiUrl: 'API_URL_REMOVED_FOR_SECURITY'
             };
         }
     </script>

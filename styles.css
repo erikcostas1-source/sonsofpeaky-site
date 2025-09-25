@@ -193,7 +193,8 @@ a:hover, a:focus {
   right: 0;
   z-index: var(--z-fixed);
   background: rgba(13, 13, 13, 0.95);
-  -webkit-backdrop-filter: blur(12px);`n    backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border-primary);
   transition: all var(--transition-base);
 }
@@ -834,7 +835,8 @@ a:hover, a:focus {
 .pricing-card {
     transition: all 0.3s ease;
     position: relative;
-    -webkit-backdrop-filter: blur(10px);`n    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
 }
 
 .pricing-card:hover {
@@ -926,7 +928,8 @@ a:hover, a:focus {
 .testimonial-card {
     transition: all 0.3s ease;
     position: relative;
-    -webkit-backdrop-filter: blur(10px);`n    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
 }
 
 .testimonial-card:hover {
@@ -951,7 +954,8 @@ a:hover, a:focus {
 
 .success-case {
     transition: all 0.3s ease;
-    -webkit-backdrop-filter: blur(10px);`n    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
 }
 
 .success-case:hover {
@@ -1013,7 +1017,8 @@ a:hover, a:focus {
 /* ====== SEÇÃO DE PARCERIAS ====== */
 .partner-category {
     transition: all 0.3s ease;
-    -webkit-backdrop-filter: blur(10px);`n    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
 }
 
 .partner-category:hover {
@@ -1023,7 +1028,8 @@ a:hover, a:focus {
 
 .partner-highlight {
     transition: all 0.3s ease;
-    -webkit-backdrop-filter: blur(10px);`n    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
 }
 
 .partner-highlight:hover {
@@ -1067,7 +1073,8 @@ a:hover, a:focus {
 /* ====== SEÇÃO SEJA UM PARCEIRO ====== */
 .partner-plan {
     transition: all 0.3s ease;
-    -webkit-backdrop-filter: blur(10px);`n    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
 }
 
 .partner-plan:hover {
@@ -1180,7 +1187,8 @@ a:hover, a:focus {
 
 /* Modal de captura */
 #modal-captura {
-    -webkit-backdrop-filter: blur(10px);`n    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
 }
 
 #modal-captura .bg-white {

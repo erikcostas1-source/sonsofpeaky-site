@@ -1,0 +1,1 @@
+$content = Get-Content "styles.css" -Raw; $content = $content -replace "-webkit-backdrop-filter: blur\(10px\);\`n    backdrop-filter: blur\(10px\);", "-webkit-backdrop-filter: blur(10px);`r`n    backdrop-filter: blur(10px);"; Set-Content "styles.css" -Value $content -NoNewline
