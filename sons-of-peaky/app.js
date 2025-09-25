@@ -1673,3 +1673,115 @@ function toggleSection(contentId, iconId) {
         }
     }
 }
+
+// ===== FUNCIONALIDADE CONFIRMAÇÃO DE PRESENÇA =====
+function confirmarPresencaQuinta() {
+    // Criar modal de confirmação
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4';
+    modal.innerHTML = `
+        <div class="bg-gray-800 rounded-2xl max-w-md w-full p-6 border border-amber-600">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-amber-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-calendar-check text-2xl text-black"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-white mb-2">Confirmar Presença</h3>
+                <p class="text-gray-300">Quinta-feira • 19:30h no Galpão</p>
+            </div>
+            
+            <form id="confirmacao-form" class="space-y-4">
+                <div>
+                    <label class="block text-amber-300 font-semibold mb-2">Nome Completo:</label>
+                    <input type="text" id="nome-confirmacao" required 
+                           class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:border-amber-500 focus:outline-none">
+                </div>
+                
+                <div>
+                    <label class="block text-amber-300 font-semibold mb-2">WhatsApp:</label>
+                    <input type="tel" id="whatsapp-confirmacao" required 
+                           class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:border-amber-500 focus:outline-none"
+                           placeholder="(11) 99999-9999">
+                </div>
+                
+                <div>
+                    <label class="block text-amber-300 font-semibold mb-2">Você é:</label>
+                    <select id="tipo-confirmacao" required 
+                            class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:border-amber-500 focus:outline-none">
+                        <option value="">Selecione...</option>
+                        <option value="membro">Membro da Irmandade</option>
+                        <option value="frequentador">Frequentador</option>
+                        <option value="primeira-vez">Primeira vez no galpão</option>
+                    </select>
+                </div>
+                
+                <div class="flex space-x-3 mt-6">
+                    <button type="button" onclick="fecharModalConfirmacao()" 
+                            class="flex-1 px-4 py-3 bg-gray-600 hover:bg-gray-500 text-white rounded-lg font-semibold transition-colors">
+                        Cancelar
+                    </button>
+                    <button type="submit" 
+                            class="flex-1 px-4 py-3 bg-amber-600 hover:bg-amber-500 text-black rounded-lg font-semibold transition-colors">
+                        Confirmar
+                    </button>
+                </div>
+            </form>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Focus no primeiro campo
+    setTimeout(() => {
+        document.getElementById('nome-confirmacao').focus();
+    }, 100);
+    
+    // Handle form submission
+    document.getElementById('confirmacao-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const nome = document.getElementById('nome-confirmacao').value;
+        const whatsapp = document.getElementById('whatsapp-confirmacao').value;
+        const tipo = document.getElementById('tipo-confirmacao').value;
+        
+        // Criar mensagem para WhatsApp do grupo
+        const mensagem = `🏍️ *CONFIRMAÇÃO DE PRESENÇA - QUINTA-FEIRA*\n\n` +
+                        `📅 *Data:* Próxima quinta-feira (19:30h)\n` +
+                        `👤 *Nome:* ${nome}\n` +
+                        `📱 *WhatsApp:* ${whatsapp}\n` +
+                        `🏷️ *Tipo:* ${tipo === 'membro' ? 'Membro da Irmandade' : tipo === 'frequentador' ? 'Frequentador' : 'Primeira vez no galpão'}\n\n` +
+                        `📍 *Local:* Galpão Sons of Peaky\n` +
+                        `📍 *Endereço:* Rua José Flavio, 420 - Travessa 1A, Penha\n\n` +
+                        `_"A estrada nos chama, mas o galpão nos une!"_ 🔥`;
+        
+        // Encode message for WhatsApp
+        const whatsappUrl = `https://wa.me/5511999999999?text=${encodeURIComponent(mensagem)}`;
+        
+        // Mostrar confirmação e abrir WhatsApp
+        modal.innerHTML = `
+            <div class="bg-gray-800 rounded-2xl max-w-md w-full p-6 border border-green-600 text-center">
+                <div class="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-check text-2xl text-white"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-white mb-2">Presença Confirmada!</h3>
+                <p class="text-gray-300 mb-6">Redirecionando para WhatsApp para enviar confirmação...</p>
+                <button onclick="fecharModalConfirmacao()" 
+                        class="px-6 py-3 bg-green-600 hover:bg-green-500 text-white rounded-lg font-semibold transition-colors">
+                    Entendi
+                </button>
+            </div>
+        `;
+        
+        // Redirecionar para WhatsApp
+        setTimeout(() => {
+            window.open(whatsappUrl, '_blank');
+            fecharModalConfirmacao();
+        }, 2000);
+    });
+}
+
+function fecharModalConfirmacao() {
+    const modal = document.querySelector('.fixed.inset-0.bg-black\\/80');
+    if (modal) {
+        modal.remove();
+    }
+}
