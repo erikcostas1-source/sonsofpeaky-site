@@ -2,9 +2,9 @@
 // Config completo para sistema de negócios com IA
 
 window.GERADOR_CONFIG = {
-    // API Google Gemini (chave independente)
-    textUrl: "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=AIzaSyB6MdY8jd1pxAw-K0LN3F3xF8Z5q5dFmJE",
-    apiKey: "AIzaSyB6MdY8jd1pxAw-K0LN3F3xF8Z5q5dFmJE",
+    // API Google Gemini (usando chave funcional)
+    textUrl: "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyCiHRVozYYmHB-5W64QdJzn9dQYAyRl9Tk",
+    apiKey: "AIzaSyCiHRVozYYmHB-5W64QdJzn9dQYAyRl9Tk",
     
     // Informações da plataforma
     app: {

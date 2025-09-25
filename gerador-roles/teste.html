@@ -67,23 +67,43 @@
 
         async function testAPI() {
             const results = document.getElementById('results');
+            results.innerHTML += '<div class="status">🔄 Testando API Google Gemini...</div>';
+            
             try {
                 const response = await fetch(window.GERADOR_CONFIG.textUrl, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify({
-                        contents: [{ parts: [{ text: 'Teste simples da API' }] }],
-                        generationConfig: { temperature: 0.7, maxOutputTokens: 100 }
+                        contents: [{
+                            parts: [{
+                                text: 'Responda apenas "API funcionando" para este teste.'
+                            }]
+                        }],
+                        generationConfig: {
+                            temperature: 0.1,
+                            topK: 1,
+                            topP: 0.1,
+                            maxOutputTokens: 10
+                        }
                     })
                 });
                 
                 if (response.ok) {
-                    results.innerHTML += '<div class="status success">✅ API Google Gemini respondendo</div>';
+                    const data = await response.json();
+                    if (data && data.candidates && data.candidates[0]) {
+                        results.innerHTML += '<div class="status success">✅ API Google Gemini funcionando!</div>';
+                        results.innerHTML += '<div class="status success">📝 Resposta: ' + data.candidates[0].content.parts[0].text + '</div>';
+                    } else {
+                        results.innerHTML += '<div class="status error">❌ Resposta inesperada da API</div>';
+                    }
                 } else {
-                    results.innerHTML += '<div class="status error">❌ API retornou erro: ' + response.status + '</div>';
+                    const errorText = await response.text();
+                    results.innerHTML += '<div class="status error">❌ API erro ' + response.status + ': ' + errorText + '</div>';
                 }
             } catch (error) {
-                results.innerHTML += '<div class="status error">❌ Erro na API: ' + error.message + '</div>';
+                results.innerHTML += '<div class="status error">❌ Erro na conexão: ' + error.message + '</div>';
             }
         }
 

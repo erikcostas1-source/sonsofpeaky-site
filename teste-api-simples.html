@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Rápido - API</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #1a1a1a; color: white; }
+        .result { padding: 15px; margin: 10px 0; border-radius: 8px; }
+        .success { background: #22c55e; }
+        .error { background: #ef4444; }
+        .info { background: #3b82f6; }
+        button { background: #c9a14a; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Teste Rápido da API</h1>
+    
+    <button onclick="testAPI()">🤖 Testar API Gemini</button>
+    <button onclick="testConfig()">⚙️ Testar Config</button>
+    
+    <div id="results"></div>
+
+    <script>
+        // Usando chave diretamente para teste
+        const API_KEY = "AIzaSyCiHRVozYYmHB-5W64QdJzn9dQYAyRl9Tk";
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+
+        function log(message, type = 'info') {
+            const results = document.getElementById('results');
+            results.innerHTML += `<div class="result ${type}">${message}</div>`;
+        }
+
+        function testConfig() {
+            log('🔍 Testando configuração básica...', 'info');
+            
+            if (typeof API_KEY !== 'undefined' && API_KEY.length > 0) {
+                log('✅ API Key carregada: ' + API_KEY.substring(0, 20) + '...', 'success');
+            } else {
+                log('❌ API Key não encontrada', 'error');
+            }
+            
+            log('🌐 URL da API: ' + API_URL, 'info');
+        }
+
+        async function testAPI() {
+            log('🚀 Iniciando teste da API...', 'info');
+            
+            try {
+                const payload = {
+                    contents: [{
+                        parts: [{
+                            text: 'Responda apenas "Funcionando" para confirmar que a API está operacional.'
+                        }]
+                    }],
+                    generationConfig: {
+                        temperature: 0.1,
+                        topK: 1,
+                        topP: 0.1,
+                        maxOutputTokens: 20
+                    }
+                };
+
+                log('📤 Enviando requisição...', 'info');
+                
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                log(`📡 Status da resposta: ${response.status} ${response.statusText}`, response.ok ? 'success' : 'error');
+
+                if (response.ok) {
+                    const data = await response.json();
+                    log('✅ API funcionando perfeitamente!', 'success');
+                    
+                    if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+                        const responseText = data.candidates[0].content.parts[0].text;
+                        log('🤖 Resposta da IA: ' + responseText, 'success');
+                    }
+                } else {
+                    const errorText = await response.text();
+                    log('❌ Erro da API: ' + errorText, 'error');
+                }
+                
+            } catch (error) {
+                log('💥 Erro na conexão: ' + error.message, 'error');
+                console.error('Erro detalhado:', error);
+            }
+        }
+
+        // Auto-teste ao carregar
+        window.addEventListener('load', () => {
+            testConfig();
+        });
+    </script>
+</body>
+</html>

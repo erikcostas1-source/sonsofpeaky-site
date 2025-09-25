@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Gerador Config</title>
+    <style>
+        body { font-family: monospace; background: #1a1a1a; color: white; padding: 20px; }
+        .log { padding: 5px; margin: 5px 0; }
+        .error { background: #ff4444; }
+        .success { background: #44ff44; color: black; }
+        .info { background: #4444ff; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Debug - Configuração do Gerador</h1>
+    <div id="logs"></div>
+    
+    <script src="config.js"></script>
+    <script>
+        function log(msg, type = 'info') {
+            const logs = document.getElementById('logs');
+            logs.innerHTML += `<div class="log ${type}">${new Date().toLocaleTimeString()} - ${msg}</div>`;
+            console.log(msg);
+        }
+
+        // 1. Verificar se config carregou
+        log('🔧 Verificando GERADOR_CONFIG...', 'info');
+        
+        if (typeof window.GERADOR_CONFIG === 'undefined') {
+            log('❌ GERADOR_CONFIG não encontrado!', 'error');
+        } else {
+            log('✅ GERADOR_CONFIG carregado', 'success');
+            log('📝 Config: ' + JSON.stringify(window.GERADOR_CONFIG, null, 2), 'info');
+            
+            // 2. Testar API URL
+            log('🌐 URL da API: ' + window.GERADOR_CONFIG.textUrl, 'info');
+            
+            // 3. Testar chave
+            log('🔑 API Key: ' + window.GERADOR_CONFIG.apiKey.substring(0, 20) + '...', 'info');
+        }
+
+        // 4. Teste simples da API
+        window.testSimple = async function() {
+            log('🚀 Testando API simples...', 'info');
+            
+            try {
+                const response = await fetch(window.GERADOR_CONFIG.textUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: 'Responda: OK' }] }],
+                        generationConfig: { maxOutputTokens: 10 }
+                    })
+                });
+                
+                log('📡 Status: ' + response.status, response.ok ? 'success' : 'error');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log('✅ Resposta: ' + JSON.stringify(data, null, 2), 'success');
+                } else {
+                    const error = await response.text();
+                    log('❌ Erro: ' + error, 'error');
+                }
+                
+            } catch (e) {
+                log('💥 Exception: ' + e.message, 'error');
+            }
+        };
+    </script>
+    
+    <button onclick="testSimple()" style="background: #c9a14a; color: white; padding: 10px; border: none; border-radius: 4px;">
+        🧪 Testar API
+    </button>
+</body>
+</html>
