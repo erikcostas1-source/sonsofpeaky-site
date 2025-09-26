@@ -36,6 +36,11 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@300;400;600;700&family=Rye&display=swap" rel="stylesheet">
+    
     <!-- Custom Styles -->
     <style>
         :root {
@@ -48,7 +53,25 @@
         body {
             background-color: var(--sop-dark);
             color: var(--sop-text);
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Oswald', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        /* Typography Improvements */
+        h1, h2, h3 {
+            font-family: 'Bebas Neue', 'Oswald', cursive;
+            font-weight: 400;
+            letter-spacing: 2px;
+        }
+        
+        .hero-title {
+            font-family: 'Rye', 'Bebas Neue', cursive;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
+            letter-spacing: 3px;
+        }
+        
+        .wanted-title {
+            font-family: 'Rye', serif;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
         }
         
         .text-gradient-gold {
@@ -242,6 +265,71 @@
         
         .wanted-card.eliminated:hover {
             transform: scale(1.05) rotate(-2deg);
+        }
+        
+        /* Photo Frame Improvements */
+        .wanted-photo {
+            border: 3px solid #8B4513;
+            box-shadow: 
+                inset 0 0 10px rgba(0, 0, 0, 0.5),
+                0 4px 8px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .wanted-photo::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .wanted-photo img {
+            transition: transform 0.3s ease;
+            filter: sepia(0.2) contrast(1.1);
+        }
+        
+        .wanted-card:hover .wanted-photo img {
+            transform: scale(1.05);
+        }
+        
+        /* Better Mobile Responsiveness */
+        @media (max-width: 640px) {
+            .wanted-card {
+                margin-bottom: 1rem;
+            }
+            
+            .wanted-photo {
+                height: 160px !important;
+            }
+            
+            h1, h2 {
+                font-size: 2rem !important;
+            }
+            
+            .hero-title {
+                font-size: 2.2rem !important;
+                letter-spacing: 1px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .wanted-photo {
+                height: 140px !important;
+            }
+            
+            .wanted-card {
+                transform: none !important;
+            }
+            
+            .wanted-card:hover {
+                transform: scale(1.02) !important;
+            }
         }
     </style>
 </head>
@@ -506,8 +594,8 @@
         <section id="alta-cupula" class="py-20 bg-black">
             <div class="container mx-auto px-4">
                 <div class="text-center mb-16">
-                    <h2 class="text-4xl md:text-5xl font-bold mb-6">
-                        <span class="text-gradient-gold">Mural</span> da Alta Cúpula
+                    <h2 class="wanted-title text-4xl md:text-5xl font-bold mb-6">
+                        <span class="text-gradient-gold">MURAL</span> DA ALTA CÚPULA
                     </h2>
                     <p class="text-xl text-gray-300">
                         Os líderes que comandam a irmandade
@@ -518,11 +606,11 @@
                 <div class="max-w-7xl mx-auto">
                     <!-- Primeira linha - Fundadores -->
                     <div class="text-center mb-8">
-                        <h3 class="text-2xl font-bold text-sop-gold mb-2">OS FUNDADORES</h3>
+                        <h3 class="wanted-title text-2xl font-bold text-sop-gold mb-2">OS FUNDADORES</h3>
                         <div class="w-24 h-1 bg-sop-gold mx-auto"></div>
                     </div>
                     
-                    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-12">
                         
                         <!-- Erik -->
                         <div class="wanted-card bg-gradient-to-b from-amber-100 to-amber-200 text-black rounded-lg overflow-hidden border-4 border-amber-800 shadow-2xl transform hover:scale-105 transition-transform">
@@ -532,7 +620,7 @@
                             </div>
                             
                             <div class="p-4">
-                                <div class="w-full h-40 rounded border-2 border-amber-800 mb-3 overflow-hidden">
+                                <div class="wanted-photo w-full h-40 rounded mb-3">
                                     <img src="assets/img/erik.jpeg" alt="Erik" class="w-full h-full object-cover">
                                 </div>
                                 
@@ -562,7 +650,7 @@
                             </div>
                             
                             <div class="p-4">
-                                <div class="w-full h-40 rounded border-2 border-amber-800 mb-3 overflow-hidden">
+                                <div class="wanted-photo w-full h-40 rounded mb-3">
                                     <img src="assets/img/brutos.jpeg" alt="Brutos" class="w-full h-full object-cover">
                                 </div>
                                 
@@ -592,7 +680,7 @@
                             </div>
                             
                             <div class="p-4">
-                                <div class="w-full h-40 rounded border-2 border-amber-800 mb-3 overflow-hidden">
+                                <div class="wanted-photo w-full h-40 rounded mb-3">
                                     <img src="assets/img/kazulo.jpeg" alt="Kazulo" class="w-full h-full object-cover">
                                 </div>
                                 
@@ -652,11 +740,11 @@
                     
                     <!-- Segunda linha - Membros Ativos -->
                     <div class="text-center mb-8">
-                        <h3 class="text-2xl font-bold text-sop-gold mb-2">MEMBROS ATIVOS</h3>
+                        <h3 class="wanted-title text-2xl font-bold text-sop-gold mb-2">MEMBROS ATIVOS</h3>
                         <div class="w-24 h-1 bg-sop-gold mx-auto"></div>
                     </div>
                     
-                    <div class="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 sm:gap-6">
                         
                         <!-- Gabriel -->
                         <div class="wanted-card bg-gradient-to-b from-amber-100 to-amber-200 text-black rounded-lg overflow-hidden border-4 border-amber-800 shadow-2xl transform hover:scale-105 transition-transform">
@@ -666,7 +754,7 @@
                             </div>
                             
                             <div class="p-3">
-                                <div class="w-full h-32 rounded border-2 border-amber-800 mb-2 overflow-hidden">
+                                <div class="wanted-photo w-full h-32 rounded mb-2">
                                     <img src="assets/img/gabriel.jpeg" alt="Gabriel" class="w-full h-full object-cover">
                                 </div>
                                 
@@ -694,7 +782,7 @@
                             </div>
                             
                             <div class="p-3">
-                                <div class="w-full h-32 rounded border-2 border-amber-800 mb-2 overflow-hidden">
+                                <div class="wanted-photo w-full h-32 rounded mb-2">
                                     <img src="assets/img/zé.jpeg" alt="Zé" class="w-full h-full object-cover">
                                 </div>
                                 
@@ -722,7 +810,7 @@
                             </div>
                             
                             <div class="p-3">
-                                <div class="w-full h-32 rounded border-2 border-amber-800 mb-2 overflow-hidden">
+                                <div class="wanted-photo w-full h-32 rounded mb-2">
                                     <img src="assets/img/Danilo.jpeg" alt="Danilo" class="w-full h-full object-cover">
                                 </div>
                                 
@@ -750,7 +838,7 @@
                             </div>
                             
                             <div class="p-3">
-                                <div class="w-full h-32 rounded border-2 border-amber-800 mb-2 overflow-hidden">
+                                <div class="wanted-photo w-full h-32 rounded mb-2">
                                     <img src="assets/img/Diogo.jpeg" alt="Diogo" class="w-full h-full object-cover">
                                 </div>
                                 
@@ -778,7 +866,7 @@
                             </div>
                             
                             <div class="p-3">
-                                <div class="w-full h-32 rounded border-2 border-amber-800 mb-2 overflow-hidden">
+                                <div class="wanted-photo w-full h-32 rounded mb-2">
                                     <img src="assets/img/Marquinhos.jpeg" alt="Marquinhos" class="w-full h-full object-cover">
                                 </div>
                                 
@@ -806,7 +894,7 @@
                             </div>
                             
                             <div class="p-3">
-                                <div class="w-full h-32 rounded border-2 border-amber-800 mb-2 overflow-hidden">
+                                <div class="wanted-photo w-full h-32 rounded mb-2">
                                     <img src="assets/img/Rodrigao.jpeg" alt="Rodrigão" class="w-full h-full object-cover">
                                 </div>
                                 
