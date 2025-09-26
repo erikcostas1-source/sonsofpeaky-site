@@ -267,6 +267,39 @@
             transform: scale(1.05) rotate(-2deg);
         }
         
+        /* Wanted Card Text Contrast Fix */
+        .wanted-card {
+            color: #4a4a4a !important;
+        }
+        
+        .wanted-card .space-y-1 > div {
+            color: #2d1810 !important;
+            font-weight: 500;
+        }
+        
+        .wanted-card .space-y-1 strong {
+            color: #8B4513 !important;
+            font-weight: 700;
+        }
+        
+        .wanted-card .text-center .text-xs:not(.font-semibold) {
+            color: #5d4e37 !important;
+            font-weight: 600;
+        }
+        
+        /* Eliminated Card Text Contrast */
+        .wanted-card.bg-gradient-to-b.from-red-100 {
+            color: #4a1a1a !important;
+        }
+        
+        .wanted-card.bg-gradient-to-b.from-red-100 .space-y-1 > div {
+            color: #741b1b !important;
+        }
+        
+        .wanted-card.bg-gradient-to-b.from-red-100 .space-y-1 strong {
+            color: #8B1538 !important;
+        }
+        
         /* Photo Frame Improvements */
         .wanted-photo {
             border: 3px solid #8B4513;
