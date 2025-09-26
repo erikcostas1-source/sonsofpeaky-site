@@ -298,14 +298,32 @@
             transform: scale(1.05);
         }
         
+        /* Founder Cards Specific Fixes */
+        .wanted-photo.h-40 {
+            height: 160px;
+            border: 4px solid #8B4513;
+            box-shadow: 
+                inset 0 0 15px rgba(0, 0, 0, 0.6),
+                0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+        
+        .wanted-photo.h-32 {
+            height: 128px;
+            border: 3px solid #8B4513;
+        }
+        
         /* Better Mobile Responsiveness */
         @media (max-width: 640px) {
             .wanted-card {
                 margin-bottom: 1rem;
             }
             
-            .wanted-photo {
+            .wanted-photo.h-40 {
                 height: 160px !important;
+            }
+            
+            .wanted-photo.h-32 {
+                height: 140px !important;
             }
             
             h1, h2 {
@@ -319,8 +337,12 @@
         }
         
         @media (max-width: 480px) {
-            .wanted-photo {
+            .wanted-photo.h-40 {
                 height: 140px !important;
+            }
+            
+            .wanted-photo.h-32 {
+                height: 120px !important;
             }
             
             .wanted-card {
@@ -620,7 +642,7 @@
                             </div>
                             
                             <div class="p-4">
-                                <div class="wanted-photo w-full h-40 rounded mb-3">
+                                <div class="wanted-photo h-40 w-full rounded mb-3">
                                     <img src="assets/img/erik.jpeg" alt="Erik" class="w-full h-full object-cover">
                                 </div>
                                 
@@ -650,7 +672,7 @@
                             </div>
                             
                             <div class="p-4">
-                                <div class="wanted-photo w-full h-40 rounded mb-3">
+                                <div class="wanted-photo h-40 w-full rounded mb-3">
                                     <img src="assets/img/brutos.jpeg" alt="Brutos" class="w-full h-full object-cover">
                                 </div>
                                 
@@ -680,7 +702,7 @@
                             </div>
                             
                             <div class="p-4">
-                                <div class="wanted-photo w-full h-40 rounded mb-3">
+                                <div class="wanted-photo h-40 w-full rounded mb-3">
                                     <img src="assets/img/kazulo.jpeg" alt="Kazulo" class="w-full h-full object-cover">
                                 </div>
                                 
@@ -754,7 +776,7 @@
                             </div>
                             
                             <div class="p-3">
-                                <div class="wanted-photo w-full h-32 rounded mb-2">
+                                <div class="wanted-photo h-32 w-full rounded mb-2">
                                     <img src="assets/img/gabriel.jpeg" alt="Gabriel" class="w-full h-full object-cover">
                                 </div>
                                 
@@ -782,7 +804,7 @@
                             </div>
                             
                             <div class="p-3">
-                                <div class="wanted-photo w-full h-32 rounded mb-2">
+                                <div class="wanted-photo h-32 w-full rounded mb-2">
                                     <img src="assets/img/zé.jpeg" alt="Zé" class="w-full h-full object-cover">
                                 </div>
                                 
@@ -810,7 +832,7 @@
                             </div>
                             
                             <div class="p-3">
-                                <div class="wanted-photo w-full h-32 rounded mb-2">
+                                <div class="wanted-photo h-32 w-full rounded mb-2">
                                     <img src="assets/img/Danilo.jpeg" alt="Danilo" class="w-full h-full object-cover">
                                 </div>
                                 
@@ -838,7 +860,7 @@
                             </div>
                             
                             <div class="p-3">
-                                <div class="wanted-photo w-full h-32 rounded mb-2">
+                                <div class="wanted-photo h-32 w-full rounded mb-2">
                                     <img src="assets/img/Diogo.jpeg" alt="Diogo" class="w-full h-full object-cover">
                                 </div>
                                 
@@ -866,7 +888,7 @@
                             </div>
                             
                             <div class="p-3">
-                                <div class="wanted-photo w-full h-32 rounded mb-2">
+                                <div class="wanted-photo h-32 w-full rounded mb-2">
                                     <img src="assets/img/Marquinhos.jpeg" alt="Marquinhos" class="w-full h-full object-cover">
                                 </div>
                                 
@@ -894,7 +916,7 @@
                             </div>
                             
                             <div class="p-3">
-                                <div class="wanted-photo w-full h-32 rounded mb-2">
+                                <div class="wanted-photo h-32 w-full rounded mb-2">
                                     <img src="assets/img/Rodrigao.jpeg" alt="Rodrigão" class="w-full h-full object-cover">
                                 </div>
                                 
